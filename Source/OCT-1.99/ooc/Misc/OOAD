@@ -1,0 +1,419 @@
+Path: csusac!ucdavis!csus.edu!beach.csulb.edu!nic.csu.net!usc!ucsd!ucbvax!bloom-beacon!eru!hagbard!sunic!news.funet.fi!tukki.jyu.fi!sakkinen
+From: sakkinen@tukki.jyu.fi (Markku Sakkinen)
+Newsgroups: comp.object
+Subject: Re: ADT vs. Objects
+Message-ID: <1990Nov13.094257.15308@tukki.jyu.fi>
+Date: 13 Nov 90 09:42:57 GMT
+References: <4255@oasys.dt.navy.mil> <658426218.13725@minster.york.ac.uk>
+Reply-To: sakkinen@jytko.jyu.fi (Markku Sakkinen)
+Organization: University of Jyvaskyla, Finland
+Lines: 94
+
+In article <658426218.13725@minster.york.ac.uk> paulb@minster.york.ac.uk writes:
+>In article <4255@oasys.dt.navy.mil> flitter@atisun.dt.navy.mil (Lance Flitter) writes:
+>>   Greetings. I was wondering if someone would venture a good description
+>>of the difference between Abstract Data Types and Objects. Is there a
+>>difference? Is one a subset of the other?
+>
+>This is something that has been discussed quite a bit here at York
+>recently.  We reached the conclusion that an object-oriented programming
+>language is basically a superset of abstract data types.  A class is an
+>simply abstract data type, and an object is an instantiation of that ADT.
+>
+>Another way of looking at it is to notice that objects are *unique*,
+>i.e. two objects whose instance variables contain the same values are
+>*different* objects, whereas a value in an ADT-language is just a value,
+>and has no existence in it's own right.
+>
+>Whether uniqueness is an advantage or not is, of course, debatable.  It
+>certainly causes some problems (just look at the implementation of sets
+>in SmallTalk to see what I mean).  My own preference would be for a good
+>ADT language.
+
+There has been no tidewave of answers to the original question yet:
+it is important but difficult.  Likely almost everyone has an idea
+that is a little different from others; I'm offering a variation
+of the above.
+
+Historically, Objects are older than ADT's.  In Simula (67) the essential
+novelty of objects was the packaging of functionality together with data.
+Abstraction and encapsulation have entered the picture of OOP much later.
+An object is a natural extension of a variable in a conventional,
+imperative programming language; therefore it is also natural to distinguish
+objects by identity (uniqueness) and not by the values they contain,
+just like conventional variables.
+
+Other influences to current OOPL's have come notably from semantic data
+models and from frame-based AI systems; of course also from programming
+languages that incorporate ADT ideas (CLU, Ada, Modula-2, ...).
+
+Objects in Simula and in some (not most) newer OOPL's can have
+one property that clearly does not fit within the ADT framework:
+an internal activity, not only operations (methods) that can be invoked.
+
+In some respects, OOPL's can be more restricted than typical ADT's.
+The ADT approach puts no restrictions on how binary (and ternary or
+higher degree) operations or functions on a type may be defined.
+In contrast, Smalltalk and some other OOPL's don't allow an object
+to see inside another objects even of the same class.
+
+Among the most distinctive traits of OOP are _inheritance_ ('prefixing'
+in Simula) and _late binding_ (for which many use the overstatement
+'message passing'), especially in combination.  Some people suggest
+the following definition at least as an approximation:
+  OOP = ADT + inheritance + late binding
+(Sorry, I don't remember the origin just now.)
+
+The three-stage classification of Prof. Peter Wegner from OOPSLA'87
+seems to be quite popular, and he presented it again in the first
+issue of OOPS Messenger (published by ACM SIGMOD).
+- Object-based: the class of all languages that support objects.
+- Class-based: the subclass that requires all objects to belong to a class.
+- Object-oriented: the subclass that requires classes to support inheritance.
+
+Incidentally, I don't see this classification as very relevant; it is
+a rather arbitrary choice among the many aspects in which existing,
+more or less object-oriented languages differ from each other.
+One can also suspect some kind of grudge against the Ada community
+behind this scheme, because it just nicely leaves Ada in the lowest
+category. - However, don't miss Wegner's new article, "Concepts and
+Paradigms of Object-Oriented Programming": it gives a very broad perspective.
+
+There are some new OOPL's that abandon classes altogether and are instead
+based on the principle of existing objects acting as prototypes for new ones.
+One can hardly speak about ADT's in such languages.
+
+Contrary to what "paulb" said, many languages based on ADT's
+are identity-oriented and _not_ value-oriented.
+This is true even of the best-known pioneering ADT language, CLU.
+The basic datatypes are an exception, but so are they in Smalltalk.
+(I think this exception is ugly; we had a good fight over this issue
+in this group some months ago.)
+
+On the other hand, many ideas and features typical of OOPL's
+can be adapted also into a value-oriented language that does not support
+object identity.  For instance, the OOPS+ database programming language,
+which has been developed in the Esprit KIWI project, seems to take
+an essentially value-oriented approach (there was a paper at ECOOP'88).
+
+Markku Sakkinen
+Department of Computer Science and Information Systems
+University of Jyvaskyla (a's with umlauts)
+Seminaarinkatu 15
+SF-40100 Jyvaskyla (umlauts again)
+Finland
+          SAKKINEN@FINJYU.bitnet (alternative network address)
+
+Path: csusac!ucdavis!csus.edu!wuarchive!udel!haven!uflorida!ukma!usenet.ins.cwru.edu!abvax!iccgcc!klimas
+From: klimas@iccgcc.decnet.ab.com
+Newsgroups: comp.object
+Subject: Re: Object-Oriented COBOL?
+Message-ID: <2060.2747a134@iccgcc.decnet.ab.com>
+Date: 19 Nov 90 14:09:08 GMT
+References: <694@ghp.UUCP> <1864.2736eae0@iccgcc.decnet.ab.com> <2558@runxtsa.runx.oz.au>
+Lines: 19
+
+In article <2558@runxtsa.runx.oz.au>, timm@runxtsa.runx.oz.au (Tim Menzies) writes:
+> In article <1864.2736eae0@iccgcc.decnet.ab.com> klimas@iccgcc.decnet.ab.com writes:
+>>In article <694@ghp.UUCP>, tom@ghp.UUCP (Tom Huras) writes:
+>>> Has anyone managed to work object-orientation into a traditional data
+>>> processing environment?
+> 
+> [stuff deleted]
+> 
+>>	OOP dilettanti beware, two million + Smalltalk programmers might be
+>>	waiting to take your job!
+> 
+> two million smalltalkers? yeah? references? comparisions with other OO
+> languages?
+
+	This was a (very?) subtle attempt at some levity!
+
+	The warning was that the two million current COBOL programmers
+	might in fact become excellent Smalltalk programmers based upon
+	some preliminary experiences in training them!
+
+
+From csusac!ucdavis!ucbvax!ucsd!usc!zaphod.mps.ohio-state.edu!rpi!uupsi!grebyn!schultz Mon Dec  3 18:17:10 PST 1990
+
+
+Much has been mentioned on the net as to how the development of
+OO software is significantly different than the development of
+software using other approaches.  And so I ask, how much
+different is OO development from conventional development when
+comparing OO against other approaches from a development
+management perspective?  Albeit from the developer's viewpoint
+much is changed, but from a management perspective what has
+changed?
+
+1.   For instance, how have you found configuration management
+     (CM) to be different ?
+
+2.   How different is your development team organization ?
+
+3.   How is quality assurance and control different ?
+
+4.   How different are your schedules and estimating when done in
+     an OO lifecycle vs. another approach ?
+
+5.   How are your user specifications different ?
+
+6.   If you are a contractor bidding for work, how do your OO
+     proposals differ from your other development proposals ?
+
+At the November meeting of an IBM Mainframe User's Group (GUIDE),
+Dave Dykstal of IBM Rochester presented on the development issues
+involved in developing a cooperative processing OO interface
+between the AS/400 and IBM PS/2s under OS/2.  The presentation
+highlighted the differences and conflicts between the development
+team's spiral model of development and the rest of IBM
+Rochester's waterfall lifecycle development.  Simple issues such
+as defining 'when is the product ready to be documented?' became
+a critical management issue when injecting OO into a development
+staff.  
+
+Any thoughts or comments would be appreciated.  I will post a
+summary to the net if there is sufficient response.
+
+Ron Schultz
+schultz@grebyn.com
+614-759-3127
+
+
+
+Path: csusac!ucdavis!csus.edu!wuarchive!udel!cis.udel.edu
+From: carroll@cis.udel.edu (Mark Carroll)
+Newsgroups: comp.lang.objective-c
+Subject: Re: Objective C vs C++
+Keywords: why
+Message-ID: <44957@nigel.ee.udel.edu>
+Date: 18 Feb 91 18:38:26 GMT
+References: <60377@eerie.acsu.Buffalo.EDU>
+Sender: usenet@ee.udel.edu
+Organization: University of Delaware
+Lines: 47
+Nntp-Posting-Host: mars.cis.udel.edu
+
+In article <60377@eerie.acsu.Buffalo.EDU> summers@acsu.buffalo.edu (Michael Summers) writes:
+>Why would I want to use Objective C ? Can any one give me a
+>short description of the pros and cons of the two
+>languages?
+>
+>There is a lot of support for C++ in terms of PD software
+>and vendors but hardly any for Objective C. Perhaps this
+>will change when the new g++ come out. This lack of broad
+>support is a definite limitation to Objective C whatever its
+>attributes. What is so superior about Objective C that would
+>induce me to abandon this support?
+>
+
+Contrasting Objective-C and C++ in this way doesn't make sense. Obj-C
+and C++ are designed for very different purposes. The languages should
+not be competing.
+
+C++ is a systems language. It's very low level, very fast, etc. It's 
+optimized towards very low level programming. It's not very good
+at abstraction. It's completely impossible to implement a class in
+a way where a user cannot change the private parts of the class, or
+alter the class declaration. C++ is almost completely statically bound;
+dynamic binding only comes into play when you start using virtual
+function, and only functions tagged virtual can be rewritten in your
+subclasses.
+
+Objective-C is an applications language. It's higher level than C++. It's
+not quite as fast, but in exchange for the (minor) loss in speed, you gain
+a much more dynamic language. All object method calls are dynamically
+bound, unless specifically forced to be static. (Sort of the opposite of
+C++. C++ is static unless forced dynamic; Obj-C is dynamic unless forced
+static.) All member functions can be reimplemented in subclasses. Also, in
+C++, it is possible to distribute object-code for classes, without the
+corresponding source. You can present objects which the user can make
+full use of, but cannot alter without implementing a subclass. The private
+parts of one of these classes can NEVER be changed by their users.
+
+In summary: Objective-C is NOT superiour to C++; C++ is NOT superior to 
+Objective-C. They are different languages with completely different aims.
+
+	<MC>
+
+-- 
+---------------------- Mark Craig Carroll:  <MC> ------------------------
+------ U of Del. Grad Student in CIS ------ EE/CIS LabStaff Hacker ------
+-- Resident Wierdo @ 105 E Cleveland Ave, Newark DE - carroll@udel.edu --
+---------------------- Shalom Achshav - Peace NOW! ----------------------
+
+Path: csusac!ucdavis!csus.edu!wuarchive!uunet!mcsun!ukc!dcl-cs!aber-cs!athene!pcg
+From: pcg@cs.aber.ac.uk (Piercarlo Grandi)
+Newsgroups: comp.object
+Subject: Re: The Emperor Strikes Back
+Message-ID: <PCG.91Mar2185335@odin.cs.aber.ac.uk>
+Date: 2 Mar 91 18:53:35 GMT
+References: <3351@sequent.cs.qmw.ac.uk> <PCG.91Feb25203412@odin.cs.aber.ac.uk>
+	<PCG.91Feb28214244@odin.cs.aber.ac.uk> <2217@m1.cs.man.ac.uk>
+Sender: aro@aber-cs.UUCP
+Organization: Coleg Prifysgol Cymru
+Lines: 160
+Nntp-Posting-Host: odin
+In-reply-to: mario@cs.man.ac.uk's message of 1 Mar 91 20:46:29 GMT
+
+On 1 Mar 91 20:46:29 GMT, mario@cs.man.ac.uk (Mario Wolczko) said:
+
+mario> However, this part has me really foxed:
+
+pcg> Smalltalk/Actor oriented people, being locked in this particular
+pcg> implementation of the overload resolver, are blinkered and cannot
+pcg> see that what they call "dynamic binding" is really dynamic
+pcg> overload (on just the first argument!) resolution and has nothing
+pcg> to do with scoping, and is not an essential aspect of the system,
+pcg> while scoping is essential to keep together the attributes of a
+pcg> class (for traditional class based OO systems, e.g. not CLOS).
+
+mario> If what we call "dynamic binding" is really "dynamic overload
+mario> resolution" (a term I have never heard before),
+
+I cannot claim I invented it, unfortunately :-). I cannot remember
+exactly, but I probably saw it in some text on CLOS or Trellis or
+similar.
+
+mario> then what *is* "dynamic binding"?
+
+Let's explain this in detail :-).
+
+What binding and overloading have in common and leads people into error
+is that both require a runtime (dynamic) associative search of some
+database.
+
+Binding requires searching a tree, the identifier/reference environment
+list, for an identifier.
+
+Overloading requires searching a multidimensional sparse matrix, the
+function interfaces/arguments types table, for an identifier and at
+least one type.
+
+When the matrix is bidimensional, that is overloading resolution is done
+only with respect to one argument type, then each row of the sparse
+matrix can be implemented as a list of identifiers, and overloading
+resolution may superficially resemble binding resolution, because both
+then eventually imply searching an a-list for an identifier.
+
+Naturally this is only incidental to a particularly restricted form of
+overloading and to a particular implementation of that restricted form.
+The fact that these are those prevalent in the Smalltalk world is
+unfortunate, as I remarked above, because it induces confusion.
+
+I would not use therefore "dynamic binding" as a synonym for the more
+generic "runtime associative search" of a table using a key that
+contains also an indetifier. The Lisp people don't either; 'getprop' is
+not usually described as doing dynamic binding, even if 'getprop' has
+does imply runtime associative search of a tablee using an identifier
+(or more, in some implementations) as a key.
+
+mario> Are you restricting the term to non-lexically-scoped variables
+mario> (aka "special" or "fluid") as in Lisp?
+
+Yes, because I think that overloading resolution and scoping
+implementation are semantically completely different things, as they
+involve different entities for different purposes.
+
+I will take the opportunity to post my own "humpty-dumpty" (a word means
+what I want it to mean! :->) glossary:
+
+<constant>	A value known from the text of a program.
+
+<reference>	A value that may denote another value.
+
+<identifier>	An element of program text that denotes a <constant>.
+
+<variable>	An <identifier> that denotes a <constant> <reference>.
+
+<scope>		The domain of visibility of a <variable>.
+
+<binding>	The technique used to implement <scoping>.
+
+<static scoping>
+		Where the relevant <scope> is that of where 
+		a <function implementation> is defined.
+
+<dynamic scoping>
+		Where the relevant <scope> is that of where and when
+		a <function implementation> is executed.
+
+<shallow binding>
+		A <binding> technique based on Dijkstra's displays
+
+<dynamic binding>
+		A <binding> technique based on a-lists. Also called
+		deep binding.
+
+<function interface>
+		The textual form for invoking a function. Usually,
+		the identifier denoting that function.
+
+<function implementation>
+		The code for computing a function. Usually, the
+		specification of a closure, and a block of statements.
+
+<overloading>	The ability to use the same <function interface> for
+		several <function implementations>; which of the latter
+		actually gets invoked depends on context, usually the
+		number and types of the arguments. Note that this is a
+		property of interfaces, not implementations.
+	
+<static overloading>
+		The ability to identify from the program text which
+		<function implementation> applies when a given
+		<function interface> is used from the program text.
+		Usually this requires <manifest types> for the arguments.
+
+<dynamic overloading>
+		The ability to identify which <function implementation>
+		applies when a given <function interface> is used, when
+		this depends from values that are not evident in the
+		program text.
+
+<polymorphism>	The ability to apply the same <function implementation>
+		to values of different types. Polymorphism need not
+		apply to all parameters, and need not apply to all types
+		for that parameter. To achieve polymorphism with
+		respect to a parameter, all uses of that parameters must
+		be via <overloaded> or <polymorphic> operations. The
+		intersection of the applicability of these is the extent
+		of polymorphism with respect to that parameter. Note
+		that this is a property of implementations, not of
+		interfaces.
+
+<static polymorphism>
+		<Polymorphism> thanks to <static overloadings> in the
+		<function implementation>.
+
+<dynamic polymorphism>
+		<Polymorphism> thanks to <dynamic overloadings> in the
+		<function implementation>.
+
+I would also like to offer some very unusual definitions:
+
+<value>		A number.
+
+<object>	Synonym for <value>.
+
+<type>		The set of all values over which a given set of <function
+		implementations> is meaningfully defined. Note that a
+		<type> may be _represented_ in several ways, but this
+		is incidental.
+
+These are very unconventional, but please consider them carefully. They
+have some unsual properties; for example, the same type can belong to
+several different types, depending on which set of functions is chosen
+to characterize it. This seems to closely correspond to intuition (for
+example NATURAL and POSITIVE are different but overlapping types). Note
+also that in a sense it is the death of OO programming in one aspect;
+<object> has not special status. It becomes a redundant synonym for
+<value>.
+
+It is obvious at this point I hope that CLOS & C. have had a mind
+blowing (in every sense :->) effect on my view of what OO is all about.
+--
+Piercarlo Grandi                   | ARPA: pcg%uk.ac.aber.cs@nsfnet-relay.ac.uk
+Dept of CS, UCW Aberystwyth        | UUCP: ...!mcsun!ukc!aber-cs!pcg
+Penglais, Aberystwyth SY23 3BZ, UK | INET: pcg@cs.aber.ac.uk
+

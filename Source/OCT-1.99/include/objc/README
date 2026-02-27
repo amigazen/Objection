@@ -1,0 +1,10 @@
+ooc:include/objc
+================
+
+This directory is the default include directory to search for class
+interface definition files.  Includes like <objc/Object.h> should
+reach to this directory.  The translator also needs a few files from
+here.  The files objc-runtime.h and objc-class.h support the runtime
+substrate.
+
+--- brian witt, 27-oct-90

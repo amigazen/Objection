@@ -1,0 +1,304 @@
+############################
+#	:bk=0
+#	
+#	Makefile for class files in the foundation.
+#	make  --  produce classes and substrate.
+#	make clean  -- delete all intermediary files.
+#	make lib    -- produce classes and substrate libraries.
+#			when adding new classes, delete clsObj.ord.
+#	make latex	-- create .tex document (process with LaTeX).
+#
+#	Libraries are stored in OOCLIB, currently "LIB:".
+#
+#   15-sept-90  bjw 	Moving towards NeXT aligment.
+#   27-sept-90  bjw 	Choose user.m, or user2.m.
+#   12-Nov-90   bjw 	Added class System.
+#   16-feb-91   bjw     UNIX Makeover...
+#   21-april-91 bjw    Added "help" and subconfig.h reference.
+#   31-may-91   bjw     Added WILD_OBJ, little cleanup.
+#
+# -------------------------------------
+
+## vvvvvvvvvvvvvvvvvvv  User Servicable Parts Follow  vvvvvvvvvvvvvvvvvv */
+
+# ---- AMIGA  -------------------------------------
+#A #
+#A CC = cc
+#A LN = ln
+#A LEX = flex
+#A DELETE = delete quiet
+#A CLONE  = copy clone
+#A RENAME = rename
+#A 
+#A #  Filename Extension (Object file and Executable):
+#A OE = .o
+#A EE =
+#A 
+#A WILD_ALL = #?
+#A WILD_BAK = $(WILD_ALL).bak
+#A WILD_OBJ = $(WILD_ALL)$(OE)
+#A TMPDIR = t:
+#A OOCINC = ooc:include/
+#A OOCBIN = Haven:bins/
+#A # OOCLIB = ooc:include/
+#A OOCLIB = LIB:
+#A 
+#A # -------------------------------------
+#A 
+#A #	Some actual include files:
+#A RELEASE = $(OOCINC)objc/release.h
+#A TEMP = $(TMPDIR)cpp-temp.c
+#A 
+#A #	The programs we create:
+#A OCT = oct
+#A PLN = prelink
+#A 
+#A CLASSLIB = $(OOCLIB)ocbase.lib
+#A SUBSLIB  = $(OOCLIB)ocsubs.lib
+#A 
+#A LIBS = -lc
+#A CLIB   = tree$(OE)
+#A MODEL  =
+#A 
+#A CFLAGS   = $(MODEL) -n -DNO_PROTOTYPE
+#A CF_STACK = +m
+#A #  CFlags just for substrate files:
+#A CS_FLAGS = $(CFLAGS)
+#A 
+#A LFLAGS   = -g
+
+
+# ---- UNIX  -------------------------------------
+
+.SUFFIXES: .o .c .m .h
+
+CC = cc -c
+LN = cc
+LEX = lex
+DELETE = rm -f
+CLONE = cp
+RENAME = mv
+
+#  Filename Extension (Object file and Executable):
+OE = .o
+EE =
+
+WILD_ALL = *
+WILD_BAK = $(WILD_ALL).bak $(WILD_ALL)~
+WILD_OBJ = $(WILD_ALL)$(OE)
+TMPDIR = /usr/tmp/
+OOCINC = $(HOME)/myoct/include/
+OOCBIN = $(HOME)/bin/
+OOCLIB = $(HOME)/myoct/lib/
+
+# -------------------------------------
+
+#	Some actual include files:
+RELEASE = $(OOCINC)objc/release.h
+TEMP = $(TMPDIR)cpp-temp.c
+
+#	The programs we create:
+OCT = oct
+PLN = prelink
+
+CLASSLIB = $(OOCLIB)libocbase.a
+SUBSLIB  = $(OOCLIB)libocsubs.a
+
+# MODEL = -g
+MODEL = 
+LFLAGS = $(MODEL) -g
+LIBS = 
+CLIB   = tree$(OE)
+
+CFLAGS = $(MODEL) -DNO_PROTOTYPE -I../usr/include -I$(OOCINC)
+CF_STACK =
+#  CFlags just for substrate files:
+CS_FLAGS = -g $(CFLAGS) -DANSI_PRINTF=0
+
+
+##
+## ^^^^^^^^^^^^^^^^  No User Servicable Parts Beyound  ^^^^^^^^^^^^^^^^^ */
+##
+
+
+# -------------------------------------
+
+HEADERS  = $(OOCINC)objc/objc.h
+SUBHEADERS = subconfig.h $(HEADERS) $(OOCINC)objc/objc-runtime.h
+
+OCFLAG = -w2 -p -DANSI_PRINTF=0
+#
+
+#	Store the .tex output somewhere:
+TEXFILE = all.tex
+
+OBJSIZE = osize$(OE)
+
+QUES = PointXY.o List.o LinkList.o
+CQUES = PointXY.c List.c LinkList.c
+MQUES = PointXY.m List.m LinkList.m
+
+OBJS = Object.o IdArray.o ByteArray.o System.o
+COBJS = Object.c IdArray.c ByteArray.c System.c
+MOBJS = Object.m IdArray.m ByteArray.m System.m
+
+#	Substrate functions written in "C":
+#		The order here is VERY important!
+SUBS = subs.o subio.o submem.o subbind.o submsg.o 
+CSUBS = user.c user2.c
+MSUBS = user.m user2.m
+
+
+#  All named methods:
+ALL_LIB_METHODS = $(MOBJS) $(MQUES)
+ALL_METHODS = $(ALL_LIB_METHODS)
+
+#	All modules in class library:
+ALL_LIB_OBJ = $(QUES) $(OBJS)
+
+# ----------------------------------
+#	Rules fro the Roundtable:
+#
+.m.c :
+	$(OCT) $(OCFLAG) $*.m
+
+
+# ----------------------------------
+#	The beginning has order:
+#
+all :	main16
+
+zoo :	lib zoofile
+
+lib :	$(CLASSLIB) $(SUBSLIB)
+
+latex :	$(TEXFILE)
+
+clean :
+	-$(DELETE) $(CLASSLIB) $(SUBSLIB)
+	-$(DELETE) main16
+	-$(DELETE) $(COBJS)
+	-$(DELETE) $(CQUES)
+	-$(DELETE) $(CSUBS)
+	-$(DELETE) $(WILD_ALL).tex $(WILD_OBJ) $(WILD_ALL).sym $(WILD_ALL).lst
+	-$(DELETE) $(WILD_BAK)
+
+help :
+	@echo "Makefile for OCT substrate and Foundation classes."
+	@echo "Makes these classes: $(MOBJS)"
+	@echo "_               and: $(MQUES)."
+	@echo "_ all   -- creates foundation and a test program."
+	@echo "_ zoo   -- bundles up source into a .zoo file."
+	@echo "_ lib   -- installs library files."
+	@echo "_ clean -- deletes rebuildable files."
+
+
+# ----------------------------------
+#	Create the foundation library:
+#	The Object library is ordered, the substrate library is
+#	already ordered correctly.
+#
+# vvvvvvvvvvvvvvvvv  Amiga  vvvvvvvvvvvvvvvvvvvv
+#A 
+#A $(CLASSLIB) :	$(ALL_LIB_OBJ) clsObj.ord
+#A 	-@type $(OBJSIZE)
+#A 	lb $(CLASSLIB) -f clsObj.ord
+#A 	echo >$(OBJSIZE) "16 bit ints"
+#A 
+#A $(SUBSLIB) :	$(SUBS) 
+#A 	-@type $(OBJSIZE)
+#A 	lb $(SUBSLIB) tree.o $(SUBS)
+#A 	echo >$(OBJSIZE) "16 bit ints"
+#A 
+#A clsObj.ord :	Makefile
+#A 	ls >t:uu $(ALL_LIB_OBJ)
+#A 	ord -v t:uu clsObj.ord
+#A 
+
+# vvvvvvvvvvvvvvvv  UN*X  vvvvvvvvvvvvvvvvvvvvv
+
+$(CLASSLIB) :	$(ALL_LIB_OBJ) clsObj.ord
+	ar -cr $(CLASSLIB) `cat clsObj.ord`
+
+$(SUBSLIB) :	$(SUBS) tree.o
+	ar -cr $(SUBSLIB) $(SUBS) tree.o
+
+clsObj.ord :	Makefile
+	lorder $(ALL_LIB_OBJ) | tsort >clsObj.ord
+
+ 
+# -----------------  common code  ------------------
+
+subs :	$(ALL_LIB_OBJ) $(SUBS)
+
+
+# ----------------------------------
+#	The workers of reality:
+#
+#  Main16  -- Full fledged test progam.
+main16 :	$(SUBS) $(ALL_LIB_OBJ) user.o ww.o $(CLIB)
+	$(LN) $(LFLAGS) -o main16 $(SUBS) user.o ww.o $(ALL_LIB_OBJ) $(CLIB) $(LIBS)
+	echo >$(OBJSIZE) "16 bit ints"
+
+ww.o :	ww.c
+	$(CC) $(CFLAGS) ww.c
+
+ww.c :	Makefile
+	$(PLN) ww.c $(ALL_METHODS) user.m
+
+subs.o submem.o submsg.o :	$(SUBHEADERS)
+	$(CC) $(CS_FLAGS) $*.c
+
+subbind.o subio.o : $(SUBHEADERS) $(OOCINC)objc/objc-class.h
+	$(CC) $(CS_FLAGS) $(CF_STACK) $*.c
+
+tree.o :	tree.c
+
+user.o :	user.c
+user.c :	user.m
+
+
+# ----------------------------------
+#	Statement of Relations for Class Files:
+#
+ByteArray.o :	ByteArray.c
+IdArray.o : 	IdArray.c
+Object.o : 	Object.c
+System.o :	System.c
+PointXY.o :	PointXY.c
+List.o :	List.c
+LinkList.o :	LinkList.c
+
+
+# ----------------------------------
+#	Super Dependencies:
+#
+ByteArray.c :	ByteArray.m  $(OOCINC)objc/objc-runtime.h
+
+Object.c : 	Object.m $(HEADERS) $(RELEASE) $(OOCINC)objc/objc-runtime.h
+
+
+# ----------------------------------
+#	Zoo file package:
+#
+#	(Amiga version has "cd /" for parent directory)
+zoofile :
+	$(CLONE) Makefile mk-amiga
+	cd /
+	zoo -add M methods/*.m methods/sub*.c methods/mk-amiga
+	zoo -add I include/objc/* include/apps/*.h
+	cd methods
+	@$(DELETE) mk-amiga
+
+
+# ----------------------------------
+#	TeX document:
+#
+$(TEXFILE) :
+
+#  (Amiga stuff...)
+# 	/makedoc/makedoc -C classfile -o $(TEXFILE) $(ALL_LIB_METHODS)
+# 	@echo "Type  TeX $(TEXFILE)  to format this stuff! (using LaTeX)"
+
+
+

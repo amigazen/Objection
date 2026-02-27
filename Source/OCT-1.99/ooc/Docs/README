@@ -1,0 +1,18 @@
+ooc/docs:
+=========
+
+This directory contains various documents describing the OCT system.
+The *.ro are the formatter output files, and are of the form
+<char><BACKSPACE><char>.  To print on a dot matrix printer (without
+beating the printhead to death), you should pipe them thru 'deroff'
+which create <line><CR><line> formats.
+
+The misc sub-directory are items collected about object-oriented
+programming from various sources.
+
+A whole bunch of neat articles written by Ed Benard are available
+from a mailserver on  {uunet | unisoft.com } seer.UUCP.  The postmaster
+will provide information about obtaining these informative USENET
+postings.
+
+--- brian witt, 8-Nov-90

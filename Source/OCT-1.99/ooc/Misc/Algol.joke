@@ -1,0 +1,54 @@
+Xref: csusac comp.lang.misc:3140 rec.humor:23730
+Path: csusac!csuchico.edu!petunia!unmvax!uakari.primate.wisc.edu!zaphod.mps.ohio-state.edu!caen!kuhub.cc.ukans.edu!kinnersley
+From: kinnersley@kuhub.cc.ukans.edu (Bill Kinnersley)
+Newsgroups: comp.lang.misc,rec.humor
+Subject: Algol (was: Fortran vs. C for numerical work)
+Message-ID: <27548.276f2628@kuhub.cc.ukans.edu>
+Date: 19 Dec 90 14:34:48 GMT
+References: <PCG.90Dec10214715@odin.cs.aber.ac.uk> <1990De <PCG.90Dec12181318@odin.cs.aber.ac.uk> <1990Dec13.084916.15659@ariel.unm.edu>
+Organization: University of Kansas Academic Computing Services
+Lines: 41
+
+In article <1990Dec13.084916.15659@ariel.unm.edu>, prentice@hydra.unm.edu (Colston Chandler PHYSICS) writes:
+: 
+: Whatever did happen to Algol?  You see alot of the old ACM algorithms
+: programmed in it and it looked rather interesting.  I can remember
+: seeing satellite ephemeris programs written in it 20 years ago, but you never
+: hear of it anymore.
+: 
+
+Algol suffered some unfortunate adverse publicity when Pascal came out,
+and was forced underground.  However it has been kept alive all these
+years by a small but dedicated network of users.  Sorry I can't tell you
+who they are--in the spirit of data hiding, each of us only knows the
+names of two others.
+
+Under our care Algol has continued to grow.  The number of reserved
+words is now 10,523, and the syntax diagrams are three-dimensional.
+The latest version is Algol-88, but an object-oriented derivative
+called Algol:= is under active development.
+
+To appreciate fully the features of Algol-88 you must be aware of some
+things about the old Algol-68.  Algol-68 was written in two separate
+styles, one for publication and one for actual programming.  With the
+advent of desktop publishing this is no longer necessary, and Algol-88
+programs are now entered directly in Times-Roman, with reserved words
+in Helvetica Bold.
+
+Data types supported are integer, real, complex, quaternion, character,
+string, sentence, paragraph, stream, list, record, tape and compact disk.
+
+Among the features of Algol-68 criticized as too complex was the
+loop construct, for-from-by-to-while-do-od.  In fact it had not
+reached its full potential, and in Algol-88 has the more general form 
+for-from-by-to-with-while-using-do-od-until.  The basic conditional
+construct has been expanded to if-then-elif-unless-yet-ontheotherhand-fi.
+In the interest of simplicity we have abolished the goto.
+
+Algol-88 has extensive support for multiprogramming.  Processes may be
+lightweight, heavyweight, bantamweight or overweight, and they communicate
+via  semaphores, monitors, message queues, smoke signals, carrier pigeons,
+interrupts and exceptions, not to mention shared memory and rendezvouses.
+There is something for everyone in Algol-88.
+
+

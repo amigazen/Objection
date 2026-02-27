@@ -1,0 +1,102 @@
+.\"
+.\" $Header: /usr/sirius/greg/src/makedoc/RCS/makedoc.1,v 3.1 89/10/10 11:37:45 greg Exp Locker: greg $
+.\" 
+.TH MAKEDOC 1 LOCAL
+.SH NAME
+makedoc \- Extract comments from Objective C source and generate documentation. 
+.SH SYNOPSIS
+\fBmakedoc\fP [ \fB-c\fP ] [ \fB-D\fP \fIname\fP[\fI=def\fP] ] [ \fB-I\fP directory ] [ \fB-o\fP outfile ] [ 
+\fB-C\fP classfile ] [ \fB-M\fP methodfile ]  sourcefile ... 
+.SH DESCRIPTION
+\fIMakedoc\fP searches for comments, method names and function names
+within the source files specified and generates documentation in LaTeX
+format.  The rules used to determine whether a comment is transferred
+to the output file are described below. 
+.PP
+Each input file must have an extension of either \fB.m\fP, \fB.c\fP or \fB.h\fP 
+and should consist of either C or objective C source.
+\fIMakedoc\fP will produce an output file with an extension of \fB.tex\fP 
+for each valid input file.  However, if \fIfile\fP is
+\fB\-\fP, or if no files are specified, input comes from the standard
+input and output is directed to standard output so \fImakedoc\fP can
+be used as a filter.  By default, the output file will be ready to be
+used as input to LATEX.  However, if either the \fB-c\fP or \fB-o\fP
+options are present, then the output file generated is intended to be
+used as an include file in a larger document.  The \fB-o\fP option
+generates a LATEX file that includes all of the generated \fB.tex\fP
+files.
+.PP
+There are many options:
+.IP \fB-C\ \fIclassfile\fR 1i
+Generate a class hierarchy diagram and place the results in
+\fIclassfile\fP.  If \fIclassfile\fP already exists, it will not be
+recreated. If the \fB-o\fP option is in effect, \fIclassfile\fP
+will be included at the appropriate point.
+.IP \fB-D\ \fIname\fR[\fI=def\fR]] 1i
+Define the symbol \fIname\fP to the C preprocessor \fIcpp\fP(1).
+Using this option caused \fImakedoc\fP to run all source files through
+\fIcpp\fP first.  This option is currently unavailable.
+.IP \fB-I\ \fIdirectory\fR 1i
+Include \fIdirectory\fP in the search path for class names.
+\fIDirectory\fP will also be passed to \fIcpp\fP if necessary.
+.IP \fB-M\ \fimethodfile\fR 1i
+Not used.
+.SH "COMMENT RULES"
+\fIMakedoc\fP searches for comments in specific places within a source
+file.  Multiple comments separated by whitespace are concatenated.
+Comments consisting of strings of '-' or '*' are removed.  Both
+standard C and Objective C commenting conventions are supported.
+.PP
+Any comment within the scope of any syntatic unit, i.e. a function or
+a structure definition, is always ignored.
+.PP
+Any comment outside of the scope of any syntatic unit that starts with
+a backslash ('\fB\\\fP') is treated as a LATEX directive and will be
+printed immediately.
+.PP
+Any comment that preceeds the \fI@implmentation\fP directive is taken
+to be the \fIIntroduction\fP of document for the class and is printed
+immediately after the header.  	The comment may only be separated from
+the directive by white space, otherwise it will be flushed.
+.PP
+Comments which precede method or function definitions are taken to be
+the documentation for that method or function and are printed after
+the method or function name in the output file.
+.PP
+Makedoc has a rudimentary macro substitution capability.  Macro
+expansion takes place when ever the dollar sign symbol ('\fB$\fP')
+followed by a single digit is encountered within a comment.  For method
+and function definitions, \fB$0\fP represents the actual method or
+function name.  In the case of method names, arguments are stripped.
+Arguments are represented as \fB$1\fP through \fB$9\fP.  Only the
+first nine arguments can be displayed in this manner.  In the case of
+the introductory comments, \fB$0\fP will expand to the class name.  A
+\fB$\fIn\fR token will be silently stripped if argument number \fIn\fP
+is not present in the method or function definition.
+.PP
+To get a dollar sign to appear in the output, use two dollar signs in
+a row, eg: \fB$$\fP.
+.PP
+\fIMakedoc\fP automatically escapes any LATEX special character found
+in macro arguments.  It is up to the user to escape these characters
+everywhere else.
+.SH DIAGNOSTICS
+.SH BUGS
+The lexer is too stupid to deal with function arguments.
+.PP
+The present method of using the description environment for method
+declarations needs to be redone because some method declarations are
+rather long.
+.PP
+Portability to systems other than Suns has not been taken into
+consideration.
+.PP
+Macro substitution works with ``classic'' C function defintions, but
+not for the ANSI style.  The position of the argument is determined
+from its type declaration, not from the function's parameter list.
+.SH "STILL TO COME"
+Automatic documentation of instance variables.  
+.PP
+Preprocessing source through CPP if desired.
+.SH "SEE ALSO"
+cpp(1), LATEX

@@ -1,0 +1,115 @@
+.!	MAN-MKMETHOD.RI   Man page for OOC Method Maker             Aug 89, bjw
+.!
+.!
+.!
+.! --------------
+.!
+.vs progname "mkmethod"
+.vs product "Object Oriented C"
+.vs list  "method selector code list"
+.!
+.! --------------
+.!
+.source manual.rinc
+.!
+.! --------------
+.!
+.header /${progname}(OOPS)//${vers}/
+.footer /%//Page #/
+.!
+.! +++++++++++++++++++++++++
+.!
+.section Name
+${progname} - Maintains ${list}.
+.!
+.! +++++++++++++++++++++++++
+.!
+.section Syntax
+.bold
+${progname}
+[-uv] method_name..
+.br
+.bold
+${progname}
+-q method__name [-q method__name]..
+.!
+.! +++++++++++++++++++++++++
+.!
+.section Description
+.!
+.program ${progname}
+allows the user to update the ${list},
+or to query to see if a method already exists.
+Status information is sent to stdout.
+The first form adds methods to the ${list} if they don't
+exist there already.
+The second form just queries the position of the named method.
+The text names are used by the substrate routines
+in printing error messages.
+The methods include file is only updated if new methods are added.
+.sp
+.!
+When used to add methods, the method name contains the selectors.
+Colons (_:) denote where parameters are placed, ie, "at:put:".
+The case of the selector names is important;
+spaces seperate methods on the command line.
+If the methods aren't duplicates, they will be added to the end
+of the ${list}.
+The method include file is only rewritten when methods are added.
+Updating can be forced by the
+.filename -u
+flag.
+You should do this after a deletion to remove the ``hole''.
+.sp
+.!
+The second form allows the user to query the ${list} to see
+if a method exists.
+The include file is not updated in this mode.
+If the method is found, it's position is printed out.
+If the method can't be located, a message stating this is printed.
+.sp
+.!
+If you must delete methods, for instance they were entered misspelled,
+then an editor can be used to remove the offending method.
+Only the string name need to removed.
+Once done, run
+.program ${progname}_,
+with the
+.filename -u
+option, and the include file will be rebuilt.
+You must now recompile all the classes in the system,
+to make sure no one uses that method.
+The method selectors are constants
+that have already been compiled into the object code,
+and you may have caused value to change.
+Failure to recompile could damage your system and/or
+cause the application to fail.
+.!
+.! +++++++++++++++++++++++++
+.!
+.section Files
+ooc(OOPS).
+.br
+ooc:include/methods.h
+.br
+.!
+.! +++++++++++++++++++++++++
+.!
+.section Example
+Here are a few invokation samples to ponder.
+Output of the program is omitted for brevity sake.
+.!
+.opencode
+>>> mkmethod error:vaDcl:
+>>> mkmethod at: at:put: atChar: atChar:put:
+>>> mkmethod -q at:put:
+.closecode
+.!
+.! +++++++++++++++++++++++++
+.!
+.section Bugs
+This program needs a silence mode so automated tools can query
+the ${list} for the user.
+.!
+.!
+.!   *** EOJ

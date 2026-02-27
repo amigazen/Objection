@@ -1,0 +1,24 @@
+#! /bin/sh
+# This is a shell archive.  Remove anything before this line, then unpack
+# it by saving it into a file and typing "sh file".  To overwrite existing
+# files, type "sh file -c".  You can also feed this as standard input via
+# unshar, or by typing "sh <file", e.g..  If this archive is complete, you
+# will see the following message at the end:
+#		"End of shell archive."
+# Contents:  README Makefile makedoc.h makedoc.c parse.c printclass.c
+#   printmethod.c makedoc.1
+# Wrapped by greg@organia on Wed Nov  1 11:01:41 1989
+
+-- 
+Greg Franks   (613) 788-5726     Systems and Computer Engineering,
+uunet!mitel!sce!greg (uucp)  	 Carleton University,
+greg@sce.carleton.ca (bitnet)	 Ottawa, Ontario, Canada  K1S 5B6.
+Overwhelm them with small bugs so that they don't see the big ones.
+
+
+
+Posting-number: Volume 8, Issue 102
+Submitted-by: greg@watmath.waterloo.edu@sce.carleton.ca.UUCP (Greg Franks)
+Archive-name: makedoc.gf/part02
+
+

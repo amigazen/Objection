@@ -1,0 +1,39 @@
+From csusac!babbage.ecs.csus.edu!brian Mon, 13 May 91 00:16:06 PST
+Received: by rael.UUCP (V1.08/Amiga)
+	id AA00000; Mon, 13 May 91 00:16:06 PST
+Received: from babbage.ecs.csus.edu by csusac.ecs.csus.edu (5.61/1.34)
+	id AA17387; Sun, 12 May 91 15:30:25 -0700
+Received: by babbage.ecs.csus.edu (5.61/1.34)
+	id AA12510; Sun, 12 May 91 15:30:25 -0700
+Date: Sun, 12 May 91 15:30:25 -0700
+Message-Id: <9105122230.AA12510@babbage.ecs.csus.edu>
+From: csusac!babbage.ecs.csus.edu!brian (Brian Witt)
+To: rael!aleks
+Subject: objc symdeb
+
+Subject: objc symdb
+
+Path: csusac!ucdavis!csus.edu!wuarchive!usc!rpi!ghost.unimi.it!matteo
+From: matteo@ghost.unimi.it (Matteo Gelosa)
+Newsgroups: comp.lang.objective-c
+Subject: Docs about OO Debugging Tools
+Message-ID: <1991May10.142632.7586@ghost.unimi.it>
+Date: 10 May 91 14:26:32 GMT
+Organization: Computer Science Dep. - Milan University
+Lines: 9
+
+
+	I developed a Symbolic Debugger on an hp9000s855 risc-machine
+	for Objective-C.
+	Now I'm looking for some documentations about any existing
+	product to do a comparison between my version and others.
+	I would like to receive some informations about that.
+	Anyway, a User Manual could be enough for my goals.
+
+	Thanks, Matteo. 
+-- 
+Matteo Gelosa					Phone  : +39-2-7575242
+Computer Science Dept, Milan University 	Fax    : +39-2-76110556
+Via Moretto da Brescia, 9			Telex  : 335199 - MIDSII
+I-20133 Milano - Italy - `92 Europe		E-Mail : matteo@ghost.unimi.it
+

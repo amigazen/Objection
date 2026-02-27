@@ -1,0 +1,379 @@
+From csusac!nextnet.ccs.csus.edu!wittbj Sun, 7 Jun 92 10:57:19 PST
+Received: by rael.UUCP (V1.08/Amiga)
+	id AA00000; Sun, 7 Jun 92 10:57:19 PST
+Received: from csus.ccs.csus.edu by csusac.ecs.csus.edu (5.61/1.34)
+	id AA29690; Fri, 5 Jun 92 18:04:29 -0700
+Received: from nextnet.ccs.csus.edu (cube05.ccs.csus.edu) by csus.edu with SMTP id AA08295
+  (5.65c/IDA-1.4.4 for <csusac!rael!aleks>); Fri, 5 Jun 1992 17:44:47 -0700
+Date: Fri, 5 Jun 92 18:00:20 PDT
+Message-Id: <9206060100.AA04860@nextnet.ccs.csus.edu>
+From: csusac!nextnet.ccs.csus.edu!wittbj (brian witt)
+To: rael!aleks
+Subject: objC FAQ
+
+Path: csus.edu!wupost!bcm!aio!shirley
+From: shirley@gothamcity.jsc.nasa.gov (Bill Shirley [CSC])
+Newsgroups: comp.lang.objective-c
+Subject: FAQ for comp.lang.objective-c
+Keywords: FAQ
+Message-ID: <1992Jun1.085843@gothamcity.jsc.nasa.gov>
+Date: 1 Jun 1992 13:58:43 GMT
+Sender: news@aio.jsc.nasa.gov (USENET News System)
+Organization: Software Technology Lab - NASA/Johnson Space Center
+Lines: 354
+
+
+
+				Answers to
+			FREQUENTLY ASKED QUESTIONS
+				concerning	
+			       Objective-C
+			(last updated May 1, 1992)
+
+
+
+Clarification: I have used the word `ObjC' for `Objective-C', the proper
+	and official name for the language discussed within, thoughout
+	this file.  Is is simply a time and space saver.
+
+
+
+Questions & Answers
+~~~~~~~~~~~~~~~~~~
+Q1. What is Objective-C?
+
+ A1. An object oriented (OO) computer language based on the C language and
+	influenced by SmallTalk.  It was designed by The Stepstone Corp. (and
+	is a Trademark of Stepstone) and includes many of the OO things that
+	make Smalltalk the "language to learn OOP with", and many of the
+	great things about C that make it highly portable and very optimizable.
+    It is NOT C++.
+
+
+Q2. Who makes an Objective-C compiler, what does it cost, how do I order?
+
+ A2.1	The Stepstone Corporation
+	(203) 426-1875 - (800) BUY-OBJEct voice / (203) 270-0106 fax
+	75 Glen Road
+	Sandy Hook, CT 06482
+
+	compilers and runtime
+
+		IBM RISC System/6000 w/ AIX
+		Sun 3, 4, SPARCstations w/ SunOS
+		HP9000/300,400,700,800 w/ HP-UX
+		DEC Stations w/ ULTRIX
+		Data General AViiON w/ DG/UX
+		SCO UNIX SYS V
+		PS/2 w/ AIX or OS/2
+		PC-AT w/ MS-DOS
+		VAX w/ VMS
+	      /	MIPS
+	 new <	NeXT
+	      \	Macs with MPW (Mac Programmers Workshop)
+
+	class libraries available for a subset of the above
+
+ A2.2	NeXT, Inc.
+
+		Comes bundled with the extended OS release.
+
+ A2.3	GNU Project
+
+		GNU Experimental Tape (NOW AVAILABLE)
+		GCC 2 (the GNU C/C++/ObjC Compiler with many new
+			features - doesn't include runtime - yet)
+		prep.ai.mit.edu (18.71.0.38) pub/gnu/gcc-2.0.tar.Z
+		(See sites at end of file)
+
+
+
+
+Q3. Does GNU's gcc `do' Objective-C?
+
+ A3. Didn't you read the above answer: It does as of release 2.0,
+	but does not initially include the runtime system required
+	to use ObjC.
+    Reports are: On the NeXT, which has a runtime system, programs
+	compiled with gcc 2.0 (as available on the net) run when linked
+	to NeXT's runtime library.
+    Hopefully, someone is working on a runtime system for all of us.
+	(Will it be NeXT compliant or Stepstone compliant, or maybe
+	a combination of both? or maybe even better... [*****] )
+	(What kind of gnu restrictions will it have?  One like gcc,
+	or one like bison?  i.e. Will any program using the GNU ObjC
+	runtime environment have to be freely available? [****] )
+
+
+Q4. What books concerning Objective-C are available?
+
+ A4.1
+    Object Oriented Programming: An Evolutionary Approach
+	Author:	Brad J. Cox (, Andrew J. Novobilski second edition)
+	ISBN#:	0-201-10393-1
+	ISBN#:	0-201-54834-8
+	two editions
+
+ A4.2
+    Objective-C: Object Oriented Programming Techniques
+	Authors:	Lewis J. Pinson, Richard S. Wiener
+	Publisher:	Addison-Wesley, 1991
+	ISBN#:		0-201-50828-1
+	Abstract:	Includes many examples, discusses both Stepstone's
+			and NeXT's versions of Objective-C, and the (minor)
+			differences between the two.
+
+ A4.3
+    An Introduction to Object-Oriented Programming
+	Author:		Timothy Budd
+	Publisher:	Addison-Wesley
+	ISBN#:		0-201-54709-0
+	Abstract:	An intro to the topic of OOP, as well as a comparison
+			of C++, Objective-C, Smalltalk, and Object Pascal
+
+
+Q5. What is the difference between Objective-C and C?
+
+ A5. ObjC is a superset of the ANSI C standard.
+	It includes a few more key words and constructs.
+	New Keywords:
+	 @interface
+	 @implementation
+	 @public
+	 @selector
+	[****************]
+
+
+Q6. What is the difference between Objective C and C++?
+
+ A6. C++ has operator overloading, ObjC doesn't.  Some consider this
+	to be 'syntactic sugar', and it is, but it can be a quite
+	handy bit of syntactic sugar.
+     C++ has multiple inheritance, ObjC doesn't.  There is much
+	debate over the desirability and value of this.  There are
+	several ways to 'get arround' this in ObjC.
+     The run-time binding mechanism differ quite a bit in their functionality.
+	(Details?? [***])
+
+
+Q7. What is the difference between NeXT's, Stepstone's and GNU's
+	versions of Objective C?
+
+ A7. NeXT has defined and distributed its own class libraries, which
+	are very integral to the NeXTstep environment.
+     NeXT also extended Stepstones definition of the language to include
+	new constructs, such as protocols, which are touted to deal with
+	some aspects of multiple inheritance.
+     NeXT's implementation does *not* support static binding, Stepstone's
+	does, and GNU's ???.
+     Stepstone has a standard set of class libraries that work across
+	all supported machines.
+     GNU gcc (C/C++/ObjC) does not have a runtime system for
+	resolving message passing, or include any classes. (yet)
+     The Object (root) class of NeXT's and Stepstone's are slightly
+	different; there are several Object methods and runtime C
+	functions that are not part of Stepstone's.
+     NeXT (and GNU?) supports Categories, Stepstone doesn't.
+     NeXT has a native language debugger, Stepstone and GNU don't.
+     [****************]
+
+
+Q8. What are some of the common problems of the language and how can
+	I work around them? (forward declarations of classes, class variables)
+
+ A8.1 There is no inate multiple inheritance (of course some see this as a
+	benefit).
+      To get around it you can create a compound class ( a class with
+	instance variables that are /id/s of other objects.  They can
+	specifically redirect messages to any combination of the
+	objects they are compounded of. (It isn't *that* much of a 
+	hassle and you have direct control over the inheritance
+	logistics)
+      Protocols address this to some extent. [***]
+      [** how does Delegation fit in here? **]
+
+ A8.2 ObjC has no class variables.
+      You can get around this by defining a static variable in the .m
+	file, and defining access methods for it.
+
+ A8.3 problem X [****************]
+
+
+Q9. What class libraries are available for Objective C?
+
+ A9.1	From Stepstone:
+  Bundled with the compiler is ICpak 101 - Foundation Class Library
+	(20 classes, more than 300 methods)
+  Object		object - the runtime 'root' object'
+    Array		array - an abstract class
+      IdArray		id array - array of objects
+      IntArray		integer array
+    AsciiFiler		ASCII filer - an automatic I/O object
+    Cltn		collection - an abstract class
+      OrdCltn		ordered collection
+      Stack		LIFO collection
+      Set		Set collection - no duplicate members
+        Dictionary	associations - a la symbol tables
+    BalNode		ballanced node - support for binary trees
+      SortCltn		sorted collection
+    String		string - null terminated ASCII sequence
+    Point		point - 2D coordinate
+    Rectangle		rectangle - 2D region
+    Assoc		association - key/value pairs support for dictionaries
+    IPSequence		in-place sequence - for sequencing through cltn
+      Sequence		sequence - same as obove but uses copy of data
+    ObjGraph		object graph - graph of objects reachable
+    Unknown		unknown - support for AsciiFiler
+
+  available separately for most systems, ICpak 201 - Graphical User Interface
+	(58 classes, more than 1100 methods)
+
+  *Object*
+    IntCltn
+      IntOrdCltn
+    PtrCltn
+      PtrOrdCltn
+    TransCltr
+      OpaqCltr
+    *Array*
+      ColorArray
+        ColorMap
+      ShortArray
+      PtrArray
+    RubberLine
+    EventQ
+    CharString
+    Quad
+      RectList
+      DispObject
+	SolidColor
+	DispText
+	DispMedium
+	  [****] ....
+	Pattern
+	Cursor
+      EchoBox
+    Font
+    Menu
+      DepMenu
+      AdHocMenu
+    Timer
+    DepObject
+    SharObject
+
+  avalable for several platforms, ICpak 301 - GRAPHpak
+
+  [****]
+
+ A9.2	On the NeXT the bundled (w/ extended OS) Class Libraries are:
+
+  General classes
+  AppKit
+	[*** more to come on classes contained in this programming kit ***]
+  MusicKit
+	[*** more to come on classes contained in this programming kit ***]
+  DB Kit (as of 3.0) - SGL database palettes
+  3D Kit (as of 3.0) - real time photo-realistic Renderman
+  Phone Kit (as of 3.0) - ISDN programming kit
+  Indexing Kit (as of 3.0) - search and retrieval functionality
+	This was basically abstracted out of the Digital Librarian App.
+  [****]
+
+ A9.3	GNU class libraries
+  [****]
+
+ A9.4	PD classes and class libraries
+  Random Class (sonata.cc.purdue.edu:/pub/next/oop/classes/Random1.1.tar.Z)
+	- implements its own random number generator, supports Gaussian
+	  variables, die rolling, etc.
+  [****]
+
+ A9.5	3rd Party NeXT Class Libraries
+  BarCodeKit - an object library for creating bar codes in PostScript and
+		TIFF formats.  (Hot Software, (617) 252-0088)
+
+  GeoKit - objects that perform map rendering
+		(Deltos Fleet Computing, (214) 540-2301)
+
+  ChooserPalette - a selection list manager
+		(Objective Technologies, (212) 227 6767)
+
+  GraphPalette - tools for graphing data in custom apps
+		(Objective Technologies, (212) 227 6767)
+
+  MathPalette - tools for interfacing with Mathmatica
+		(Objective Technologies, (212) 227 6767)
+
+  SmartFieldPalette - supplies data input fields that restrict and format
+		input, report errors, and notify the user of field content
+		(Objective Technologies, (212) 227 6767)
+		
+
+Q10.  Are there any FTP sites with Objectice C code?  Where?
+
+ A10.  Yes.
+	There are NeXT related sites at
+	 sonata.cc.purdue.edu
+	 cs.orst.edu
+	And non-NeXT related sites at
+	 ?
+
+
+Q11.  I'm an emacs junkie.  Are there any .el files somewhere to support
+	Objective-C?
+
+ A11.  Yes.  Try sonata.cc.purdue.edu /pub/next/misc/objc.tar.Z
+
+
+Q12.  So show me a program, a simple example.
+
+ A12.  See the companion file "A S[ia]mple Objective-C Program" or get
+	all of the code from music.sie.arizona.edu:pub/ObjC/Sample.tar.Z
+
+
+
+
+
+Terminology
+~~~~~~~~~~
+C:		A programming language.
+FTP:		File Transfer Protocol.
+GNU:		A project making freely available software.
+OOP:		Object Oriented Programming
+ObjC:		An abreviation of Objective-C
+Object:		The base {class} of Objective-C.
+Objective-C:	An Object Oriented programming language extended from
+		  the C language, and what this whole file is about.
+		It is also a registered trademark of The Stepstone
+		Corporation.
+
+
+
+
+---
+All [**********] designate incompleteness of the FAQ.  If you have any
+questions, corrections, comment, suggestions pass them along.  I can be
+reached directly at <shirley@krakatoa.jsc.nasa.gov> or you can post to
+the news group (comp.lang.objective-c).
+
+Disclaimer:  I am not related to any company or group mentioned above.
+This file was created to provide information to interested people, and
+not advertizing for anything listed above.
+
+gnu ftp site, prep.ai.mit.edu:pub/gnu/etc/DISTRIB
+ (prep UK/Europe mirror) src.doc.ic.ac.uk (???)
+ (prep Netherlands mirror) ftp.win.tue.nl (131.155.70.100)
+ (prep UK mirror) src.doc.ic.ac.uk (146.169.3.7)
+ (prep Japan mirror) utsun.s.u-tokyo.ac.jp (133.11.11.11)
+ (Australian site) archie.au (IP number may change)
+
+
+Thanks to Bill Edney, Nik Gervae, Jacob Gore, Robert D. La Ferla, Ken Lerman,
+ Dan LaLiberte, Phillip Musumeci, Gregor N. Purdy, Christopher Rath, and
+ Paul J. Sanchez for input ranging from one sentence to volumes.
+This information is what YOU make it.
+
+-- 
+Bill Shirley
+shirley@krakatoa.jsc.nasa.gov
+

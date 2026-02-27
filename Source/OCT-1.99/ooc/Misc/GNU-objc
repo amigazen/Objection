@@ -1,0 +1,153 @@
+From csusac!nextnet.ccs.csus.edu!wittb Tue, 13 Oct 92 23:57:34 PST
+Received: by rael.UUCP (V1.08/Amiga)
+	id AA00000; Tue, 13 Oct 92 23:57:34 PST
+Received: from csus.ccs.csus.edu by csusac.ecs.csus.edu (5.61/1.34)
+	id AA15515; Tue, 13 Oct 92 12:38:51 -0700
+Received: from nextnet.ccs.csus.edu by csus.edu with SMTP id AA28058
+  (5.65c/IDA-1.4.4 for <csusac!rael!aleks>); Tue, 13 Oct 1992 12:34:01 -0700
+Date: Tue, 13 Oct 92 12:33:46 PDT
+Message-Id: <9210131933.AA00735@nextnet.ccs.csus.edu>
+From: csusac!nextnet.ccs.csus.edu!wittb (brian witt)
+To: rael!aleks
+Subject: gnu objc
+
+> Newsgroups: comp.lang.objective-c
+> Path: csus.edu!wupost!uunet!world!gsk
+> From: gsk@world.std.com (Geoffrey S Knauth)
+> Subject: GNU Objective-C projects
+> Message-ID: <BvrDLF.AKq@world.std.com>
+> Keywords: help, objective-c, objects
+> Organization: The World Public Access UNIX, Brookline, MA
+> References: <mleung.718349782@ee.ualberta.ca>
+> Date: Wed, 7 Oct 1992 15:56:02 GMT
+> Lines: 128
+
+Max Leung writes:
+> These files do not come with the GCC compiler! GCC has no Object class!
+
+The GNU Objective-C project team is working on a runtime system, easy
+access to C++ from Objective-C, a class library, and a graphical
+interface builder.
+
+If you would like to help any of these project, here are the managers:
+
+	RUNTIME
+	  athan@object.com (Andrew C. Athan)
+
+	COMMUNICATIONS BETWEEN OBJECTIVE-C AND C++
+	  jjobe@mrj.com (Jason Jobe)
+
+	OBJECT MAP
+	  MKK2@psuvm.psu.edu (Lee Douglas Sailer)
+
+	A GRAPHICAL OBJECT-ORIENTED PROGRAMMING TOOL
+	  liberte@ncsa.uiuc.edu (Daniel LaLiberte)
+
+There is a GNU Objective-C mailing list.  The address is:
+
+  gnu-objc@prep.ai.mit.edu		for messages everyone will see
+
+  gnu-objc-request@prep.ai.mit.edu	{,un}subscribing, address corrections
+
+Geoffrey
+---
+Geoffrey S. Knauth <gsk@gnu.ai.mit.edu> <gsk@marble.com>
+GNU Objective-C Administrator
+
+The following information repeats previous statements about project
+goals.
+
+[adapted from 16 Sep 92 message]
+
+OBJECT MAP
+
+Many people are wondering exactly what objects should go into an
+Objective-C library.  If you have instinctive "object-feeling" from
+exposure to languages such as Smalltalk, Objective-C, CLOS, or C++,
+this group needs you.
+
+RUNTIME SYSTEM
+
+Dennis Glatting <dglattin@trirex.com> has already donated this to the
+project, and it is undergoing stylistic edits.  Releasing a version,
+even an early version, of this run-time has high priority.  If you
+would like a preliminary version of this runtime for evaluation and
+development, contact gnu-objc-request@prep.ai.mit.edu, and state
+whether you'd prefer NeXTmail or a uuencoded .tar.Z file.
+
+COMMUNICATIONS BETWEEN OBJECTIVE-C AND C++
+
+Make the Objective-C library and libg++ can help each other;
+investigate language enhancements to make this easy.  NeXT is helping
+us in this area.
+
+INTERFACES TO X
+
+X, as free software, is GNU's windowing system.  It will require study
+to ensure that existing work is not overlooked.  This project includes
+investigating the free software environment called Interviews.  If
+you've known X for a few years and you like it, this group is for you.
+
+A GRAPHICAL OBJECT-ORIENTED PROGRAMMING TOOL
+
+Those familiar with the NeXT computer would call it a kind of
+Interface Builder (IB) that will run on any GNU system, and that lacks
+the flaws of other interface builders.  This tool will produce
+stereotype code that does not need to be edited by the user, and which
+can be read back into the tool.  The tool will allow interfaces under
+construction to be tested with real objects.  This does not have high
+priority, because it is so big, but it may be an interesting project
+for someone.  If you speak French and Jean-Marie Hullot (author of IB)
+is your hero, soyez bienvenu[e].
+
+[adapted from 11 Sep 92 message]
+
+The GNU Objective-C Project's initial goals are:
+
+- to provide Objective-C tools as free software, under GNU Copyleft,
+  with the relaxed restrictions of the libg++ license.
+
+- machine independence: the tools will run on any GNU system.
+  It is very important that people keep this in mind.
+- a runtimesystem.  [see above]
+- communications between Objective-C and C++ objects.  [see above]
+- support for X, which, as free software, is GNU's windowing system;
+  This is a huge issue with moderately strong interest.  It will
+  require study to ensure that existing work is not overlooked.
+- education: We encourage people to submit papers that
+  advance the public's understanding of Objective-C techniques or
+  lead to better object organization.
+- a graphical object-oriented programming tool.  [see above]
+
+We acknowledge the boost that NeXT Computer, Inc., has given to the
+Objective-C programming language, and to the popularization of
+object-oriented programming.  However, please note the following
+qualification:
+
+"The aim of this project is to produce a useful addition to the GNU
+operating system, of which GCC is part.  This means we are only
+interested in packages that could run on a GNU system--and thus, not
+in packages that depend on NeXTstep, as we cannot expect to have
+anything compatible with NeXTstep available.  Supporting extensions to
+a proprietary window system is not part of the GNU mission and would
+be a diversion of effort."
+			--from Richard M. Stallman, FSF Founder
+
+Geoffrey Knauth is the FSF Objective-C general administrator.  This is
+a volunteer position, and nearly all contributors to this project are
+also volunteers.  The administrator's duties are to provide direction,
+collect software, provide for quality control, obtain releases and
+certifications of authenticity from authors, submit releases to the
+FSF, and ensure community access, support and recognition.  When
+subprojects grow too heavy, it is the duty of the administrator to
+delegate responsibility for them to willing persons or organizations
+demonstrating community-minded spirit and talent.
+
+[Addendum: This project now has four volunteer project managers.
+There names are at the top of this message.  Please contact them if
+you are willing to help!  Thanks.  10/5/92]
+
+-- 
+Geoffrey S. Knauth, Marble Associates, Inc.                Member BCS-NeXT, LPF
+gsk@marble.com, (617) 891-5555 work, (617) 547-5247 home   Standard Disclaimers
+

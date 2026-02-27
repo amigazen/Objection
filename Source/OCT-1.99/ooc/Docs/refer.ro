@@ -1,0 +1,361 @@
+
+
+   
+
+
+
+
+
+   SSeeccttiioonn 11 
+   SSeeccttiioonn 11 
+   __SS__ee__cc__tt__ii__oo__nn __11__..____MM__ee__tt__hh__oo__dd____SS__ee__ll__ee__cc__tt__oo__rr____DD__ee__ff__ii__nn__ii__tt__ii__oo__nn__ss________ 
+
+   Below are listed the methods in the OCT system.  There abstract
+   functionallity and return types are detailed.  Each class is
+   free to interpret them within some leway; after all this is an
+   object oriented system with data-hiding! 
+
+
+        The name in square brackets ([,]) after the method protype
+   is the category where the method is first defined.  Generally
+   speaking, any method in this category of classes or inheriting
+   from a class in this category can respond sucessfully to this
+   message.  
+
+
+
+   11..11.. FFaaccttoorryy MMeetthhooddss      
+   These methods are known by factory objects.  
+
+
+   iinniittiiaalliizzee [[FFoouunnddaattiioonn]]      Perform any presetting for this
+        class.  Returing nil will cause the application to abort.
+        Called before user's application begins to run.  Classes
+        with complex instance variable declarations that can't be
+        encoded during translation may change their text encoding.  
+
+        A handler for cleanup may be installed by calling
+        _oc_atExit().  The single parameter is a function that will
+        be called in LIFO (stack) order when the application exits.  
+
+
+   nneeww [[FFoouunnddaattiioonn]]      Allocate and initialize a new instance of
+        the receiver class.  In contrast to [Cox86], in a factory
+        method, it's illegal to assign the result to the variable
+        `self', as that refers to the class object, and not the
+        instance object! 
+
+
+       + new
+       {
+          id newObj;
+
+          /*  Never assign to "self" in a factory!  */
+          newObj = [super new];
+          newObj->capacity = 0;
+          return( newObj );
+       }
+
+
+   Barney - OCT                  pg. 1                   29-Jul-1993
+
+
+   
+
+
+   ((iinntt))nnddxxVVaarrSSiizzee [[FFoouunnddaattiioonn]]      Reply the count of bytes each
+        indexed variable occupies. For non-indexing class, the
+        default from Object will return 0.  Effectively returns:
+        sizeof( [self ndxVarType] ).  
+
+
+   ((SSTTRR))nnddxxVVaarrTTyyppee [[FFoouunnddaattiioonn]]      Reply a string encoding that
+        describes the instance variables that are index-able.  For
+        instance, BByytteeAArrrraayy returns "c", char type.  
+
+
+   ppoosseeAAss::((ccllaassssIIdd)) [[FFoouunnddaattiioonn]]      Perform surgery and change the
+        class of the receiver to a new class.  (Still under
+        construction.) 
+
+
+   wwiitthh::((iinntt))nnAArrggss vvaaDDccll::((iidd))aarrggLLiisstt [[FFoouunnddaattiioonn]]     Create a
+        "sized" object, capable of holding 'nArgs' things.  Of
+        course, the class is free is adjust to account for memory
+        management, and additional memory could be used by a class's
+        superclass.  The "vaDcl:" selector is inserted automatically
+        by the translator when it sees a comma inside a message
+        expression.  
+
+
+
+   11..22.. IInnssttaannccee MMeetthhooddss      
+   These methods are known by instance objects.  
+
+
+   aadddd::iitteemm [[AArrrraayy aanndd CCoolllleeccttiioonn]]    Store 'item' at the next
+        available slot.  If there is a notion of a cursor in self,
+        then 'item' will be after the cursored slot.  Array's
+        generally store in the first unused (nil) slot.  
+
+
+   aatt::((iinntt))iinnddeexx ppuutt::((iidd))aannOObbjjeecctt [[FFoouunnddaattiioonn]]     Store an object
+        into the indexing storage receiver object.  
+
+
+   ((iinntt)) ccoouunntt [[AArrrraayy aanndd CCoolllleeccttiioonn]]   Return the count of usable
+        objects contained within the object.  For Array types, 'nil'
+        pointers are not counted.  (Was named 'size'.) 
+
+
+   eerrrroorr::((SSTTRR))ffmmttSSTTRR vvaaDDccll::ssttuuffff [[FFoouunnddaattiioonn]]     Display an error
+        message about self.  Feeds 'stuff' to an sprintf() call.
+        Aborts the program and never returns.  
+
+
+
+
+
+
+   Barney - OCT                  pg. 2                   29-Jul-1993
+
+
+   
+
+
+   ffiinndd::ootthheerrOObbjj [[AArrrraayy aanndd CCoolllleeccttiioonn]]    Returns a member that is
+        "==" to 'otherObj'.  Returns nil if there is no match.  
+
+
+   ffiinnddMMaattcchhiinngg::ootthheerrOObbjj [[AArrrraayy aanndd CCoolllleeccttiioonn]]    Returns a member
+        that is isEqual: to 'otherObj'.  Returns nil if there is no
+        match.  
+
+
+   ffiinnddSSTTRR::((SSTTRR))aaSSttrriinngg [[AArrrraayy aanndd CCoolllleeccttiioonn]]    Returns a member
+        that is isEqual: to 'aString'.  Returns nil if there is no
+        match.  
+
+
+   ffiirrsstt [[SSeeqquueennccee]]      Sets the objects cursor to be the first
+        element.  Returns the first element within the list.  This
+        is how sequencing starts.  Performing [list next] returns
+        the second element.  
+
+
+   ffrreeee [[FFoouunnddaattiioonn]]      Releases memory used by object and returns
+        nil.  The object is no longer usable, and any references the
+        appliation holds must be forgotten.  Because there is no
+        reference counting, free'ing an object that has an
+        infrastructure (like SSeett)) will create unreachable objects.  
+
+
+   ffrreeeeCCoonntteennttss [[FFoouunnddaattiioonn]]      Walks through internal contents
+        and frees any major sub-objects.  The internal
+        infrastructure is invisible to the application.  Added an
+        object after freeContents will cause the object to rebuild
+        its infrastructure.  
+
+
+   hhaasshh [[FFoouunnddaattiioonn]]      Return an integer representing a the
+        receiver in hashed form.  The same hash value is returned
+        for all objects that are YES for "isEqual:".  Ie, [obj1
+        hash] == [obj2 hash], iff [obj1 isSame:obj2] == YES.
+        Implemented in OObbjjeecctt so everything hash a hash value.
+        Re-implemented in classes like BByytteeAArrrraayy..  
+
+
+   llaasstt [[CCoolllleeccttiioonn]]      Moves a cursor to the last element stored
+        and returns that element.  
+
+
+   ttooFFiirrsstt [[CCoolllleeccttiioonn]]      Set a cursor inside the object to point
+        at the first element.  Returns 'self', not the first object
+        in the list.  Performing [list next] returns the first
+        element.  
+
+
+
+
+   Barney - OCT                  pg. 3                   29-Jul-1993
+
+
+   
+
+
+   ttooLLaasstt [[CCoolllleeccttiioonn]]      Set a cursor inside the object to point
+        just past the last object.  Returns 'self', not the last
+        object in the list.  Performing [list prev] returns the last
+        element.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   Barney - OCT                  pg. 4                   29-Jul-1993
+
+
+   Object C Translator                                     Release 2
+
+
+
+
+
+   SSeeccttiioonn 22 
+   SSeeccttiioonn 22 
+   __SS__ee__cc__tt__ii__oo__nn __22__..____CC__ll__aa__ss__ss____HH__ee__ii__rr__aa__rr__cc__hh__yy__________ 
+
+
+        Listed here are the categories and which classes they
+   contain.  Each category has a superclass listed after it, except
+   "Foundation" which is the base for all other classes.  Class
+   structuring is a tradeoff between time and space.  For instance,
+   time has been gained by not subclassing the BByytteeAArrrraayy off of
+   AArrrraayy but rather copying the superclass's implementation code
+   into BByytteeAArrrraayy and making it a subclass of OObbjjeecctt..  This saves
+   one level of dictionary searching in _msg(), and for a these
+   central classes, the redundancy may be worth it.  
+
+
+       FFoouunnddaattiioonn::
+          Object
+             Array
+             ByteArray
+             IdArray
+
+       CCoolllleeccttiioonn ((OObbjjeecctt))::
+          Collection
+             Set
+             Sequence
+             Queue
+             OrderedCollection
+
+       WWiinnddoowwiinngg ((OObbjjeecctt))::
+          View
+             Fixture
+                ArrowFixture
+                ElevatorFixture
+                StretchFixture
+             NullView
+             MenuBar
+                PullDownMenu
+                   TextMenu
+             StdSystemView
+
+
+
+
+
+
+
+
+
+
+
+   Barney - OCT                  pg. 5                   29-Jul-1993
+
+
+                                                         29-Jul-1993
+
+
+                             TTaabbllee ooff CCoonntteennttss
+
+
+                       Barney  (Release 2)  OCT
+                            As of 25-May-90
+
+                          Includes 0 figures
+
+
+
+   1. Method Selector Definitions    .........................    1
+      1.1. Factory Methods     ...............................    1
+      1.2. Instance Methods     ..............................    2
+
+   2. Class Heirarchy     ....................................    5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                -- I --
+

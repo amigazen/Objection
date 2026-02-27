@@ -1,0 +1,11 @@
+ooc/collect:
+============
+
+This directory contains the OCT collection classes.  Once
+translated and compiled, they are stored a library: "ocCltn.lib".
+There is also a tester file, user.m.  This file excersises the
+classes to demonstrate their methods.  The file 'make.32' creates
+a large-code, large-data, 32-bit int version of the code (under
+Aztec M68000).  The 32-bit version has also been tested under Xenix.
+
+--- brian witt, 25-May-90

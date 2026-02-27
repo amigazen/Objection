@@ -1,0 +1,85 @@
+From csusac!nextnet.ccs.csus.edu!wittb Tue, 22 Sep 92 12:28:46 PST
+Received: by rael.UUCP (V1.08/Amiga)
+	id AA00000; Tue, 22 Sep 92 12:28:46 PST
+Received: from csus.ccs.csus.edu by csusac.ecs.csus.edu (5.61/1.34)
+	id AA00566; Tue, 15 Sep 92 13:40:46 -0700
+Received: from nextnet.ccs.csus.edu by csus.edu with SMTP id AA04009
+  (5.65c/IDA-1.4.4 for <csusac!rael!aleks>); Tue, 15 Sep 1992 13:36:42 -0700
+Date: Tue, 15 Sep 92 13:36:40 PDT
+Message-Id: <9209152036.AA17571@nextnet.ccs.csus.edu>
+From: csusac!nextnet.ccs.csus.edu!wittb (brian witt)
+To: rael!aleks
+Subject: objcIdea
+
+Newsgroups: comp.lang.objective-c
+Path: csus.edu!wupost!spool.mu.edu!yale.edu!ira.uka.de!math.fu-berlin.de!uniol!tpki.toppoint.de!stefki.toppoint.de!stefan
+From: stefan@stefki.toppoint.de (Stefan Krause)
+Subject: Re: instance variable declarations..
+Message-ID: <1992Sep12.140413.744@stefki.toppoint.de>
+Organization: Just Me at Home
+References: <MAS.92Aug30121306@csa.bu.edu> <19385@ector.cs.purdue.edu> <1992Sep2.045715.5803@panix.com> <1992Sep8.221554.18393@gmuvax2.gmu.edu>
+Date: Sat, 12 Sep 1992 14:04:13 MET
+Lines: 61
+
+bcox@gmuvax2.gmu.edu (Brad Cox) writes:
+>In article <1992Sep2.045715.5803@panix.com> you write:
+>>In <19385@ector.cs.purdue.edu> kane@cs.purdue.edu (Christopher Kane) writes:
+>>Although the quoted passage is incorrectly edited, it is usually NOT
+>>a good idea to repeat the interface in the implementation.
+
+>The quoted recommendation in our book reflects the voice of pragmatic
+>experience, not theoretical necessity. Healthy code is read more than it is
+>changed/written. And having to read two files, one for data & procedural
+>interfaces and the other for procedural implementations, really is a
+>hassle.
+
+When you've taken this step, repeating the instance variable
+declarations in the .m file, it comes into your mind that this is
+unnecessary redundancy.  What do you need in a  .h  file
+additionally to the instance variable and method declarations?
+
+First there is the #import directive for the superclass header
+file. If you have all the directories containing the header files
+in your cc's -I path then you can extract the directive out of
+the class definition:
+
+	@implementation MyObject:Object
+
+in the .m file becomes to
+
+	#import <Object.h>
+	@interface MyObject:Object
+
+in the .h file. Next thing are additional typedefs or #defines.
+In my early ObjC programs I have used some of them. But as time
+went by they showed up as the weak points in my program, where I
+couldn't reuse code and design, where the polymorphism was
+broken. So I've actually removed all of them. But I've left two
+or three #defines for some hardwired implemention restrictions
+(oh, blame me:-().
+
+Thus I need a way to write these statements in the .m file. The
+easiest solution is the #pragma directive. And because I'm
+working with NeXTstep, where  the  header  files  are  in
+subdirectories, I use this technique for the superclass header
+file too:
+
+	#pragma .h #import <objc/Object.h>
+	#pragma .h #define MAXADDRESS 5
+	@implementation MyObject:Object
+
+in the .m file becomes to
+
+	#import <objc/Object.h>
+	#define MAXADDRESS 5
+	@interface MyObject:Object
+
+in the .h file. And I use a simple awk-script to extract the .h
+file from the .m file. If you want to see this script then let me
+know.
+
+Stefan
+-- 
+Stefan Krause                          Kiel, Germany
+stef@tpki.toppoint.de                  Tel.(voice) +49 431 335022
+

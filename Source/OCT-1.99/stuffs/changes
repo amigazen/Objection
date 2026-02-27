@@ -1,0 +1,315 @@
+
+This file contains changes and release history of the O.C.T. system.
+Changes are added at the top of this file.
+
+-brian
+
+
+------------------------------------------------------------------
+19 SEPTEMEBER 1993:
+  DISTRIBUTION (1.99.x)
+
+  Translator:
+  	Now handles instance variables "unsigned foo;" correctly.  Before,
+	the `unsigned' by itself would terminate the decoding string.
+
+	Option "-Wall" is equivalent to "-w2".  For compatibility with
+	the GNU and NeXT compilers.
+
+  CPP:
+  	This version of the preprocessor has now been compiled with Borland
+	C++ version 3.1 (even though you won't need it).
+
+  Class Library Source:
+  	Eliminated all (?) of the #import directives from the header files
+	and the library source code.
+
+------------------------------------------------------------------
+xx JULY 1992:
+  DISTRIBUTION (1.95.0)
+
+  Translator:
+    The translator is growing slowly.  The runtime string space is
+	increasing.  Piping the output of 'oct' won't place "Phase 2"
+	messages in your output anymore.  It doesn't seem to work with
+	Manx C 3.4A ... :-(
+
+------------------------------------------------------------------
+02 JULY 1992:
+  DISTRIBUTION (1.94.3)
+
+  License:
+    A few people have asked by licensing.  I now have the correct lingo.
+	All the source files (I hope) have been updated to reflect this
+	clarification.
+
+    The translator is FREEWARE.  The translator and the support tools are
+	Copyright (C) 1989, 1990, 1991, 19992 by Brian J. Witt, ALL RIGHTS
+	RESERVED.  It may be freely distributed for non-commericial use only.
+	Anything else requires written permission from the author(s).
+	There is no warrenty and no guarentee of fitness.
+    This includes 'oct', 'prelink' and 'mkif'.   Not covered is the
+	DECUS 'cpp'. If you make modifications and/or improvements, I ask
+	that your changes be foled into the software tools.
+
+    The runtime system and its support files are in the public domain.
+	The runtime object and source code may be freely copied without
+	restriction.  There is no warrenty and no guarentee of fitness.
+	You may do with them as you see fit.  Any changes, however, should
+	be marked as not being included in the original source code.
+
+  Translator:
+    OCT deals with "{id foo; short xx[4];}"  doesn't error any more.  For
+	instance variables, you truely get "@sssss" in the string description
+	in the instance structure.  A sub-structure now is surrounded by
+	"{ ... }".  So "{id foo; struct node *node;}" will become "@{^}",
+	which is close to what it should really be.
+
+  Runtime:
+    The file subio.c has been updated to just print the curly braces
+	when they appear in a print template string.
+
+  Makefiles:
+    The Makefiles have been cleaned up a little bit.
+
+
+------------------------------------------------------------------
+19 APR 1992:
+  DISTRIBUTION (1.93.15):
+
+  include/objc/private/config.h
+    The list of environment variables to check to find the path of
+	the temp directory is now a file list.  These is a 'catch' at
+	the bottom of the file in case EV_TEMPDIR is left undefined.
+	Help will print all variables that will be checked.
+
+  Makefile
+    The Makefile variable 'LFLAGS' was used for linking programs.
+	But, it is supposed to be used for lex rules.  Now the variable
+	'LDFLAGS' is used (the better way).
+
+------------------------------------------------------------------
+19 APR 1992:
+  DISTRIBUTION (1.93.14):
+
+  OCT Grammar:
+    Moving towards the Objective-C grammar under NeXT version 2, the
+    @abstract directive is now @protocol.
+
+------------------------------------------------------------------
+09 AUG 1991:
+  DISTRIBUTION (1.93.13B):
+
+  Command Lines :
+    There are Makefiles for ATT&T UNIX and SunOS4 included.  Manx Amiga
+	Makefiles are always there :-).
+
+	The -I option to specify include directories has the space after
+	it removed in the Makefiles.  However, OCT will  read the next arg
+	if there is nothing after the "-I", it reads the next arg.
+	Unfortuneately, not all C compilers are this nice...
+
+  Runtime Substrate:
+    A file may now have a class definition and main() inside of it.
+	Before, the startup code was acknowledging the class.  Thanks to
+	Dan Banay for this bug report!
+	
+	Dan also pointed out how to add variable argument lists.  The switch
+	USE_STDARG in oct/include/octhead.h controls this.  __STDC__ turns
+	it on automagically.  USE_STDARG assumes an ANSI-C <stdarg.h> file
+	and vprintf() and cousins exist.
+
+    Printing objects (via "oc_show") isn't the greeatest techniquie
+	in the world.  Feel free to hack.
+
+------------------------------------------------------------------
+12 MAY 1991:
+  DISTRIBUTION (1.93.12):
+
+  TRANSLATOR :
+  	Now, you must place all functions after the @implementation clause
+	for class defining files, or after @includes() for non-class defining
+	files.  This way, the objC runtime includes are available.
+
+	When running cpp, the command line arg "-+" is added for you (see file
+	"xlator/config.h" for details).
+
+	If touuper('5') != '5', then define SW_NEED_2LO_2UP is config.h header.
+	This is used by Dynix users.
+
+------------------------------------------------------------------
+10 MAY 1991:
+  DISTRIBUTION (1.93.11):
+
+  class: BYTEARRAY:
+  	The string copmare now correctly searches for a whole matching
+	string, instead of just a few chars at the beginning.
+
+
+------------------------------------------------------------------
+29 APRIL 1991:
+  DISTRIBUTION (1.93.10):
+
+  TRANSLATOR:
+    If a structure element is the same name as a typedef, it is OK.
+
+
+------------------------------------------------------------------
+5 APRIL 1991:
+  DISTRIBUTION (1.93.7):
+    The UNIX version is now better working.  Makefile's still have
+	to be manually converted, though.  Anyone like the idea of
+	having "makefile.cpp" files?
+
+	Along with some beta-testers, the dependence on the NULL ptr
+    holding a NULL ptr is being removed. "the sparc is lint in
+	hardware" -- db.
+
+  TRANSLATOR:
+    When parsing "compare( [obj value], [there value] )" the comma
+	in the middle would not be output.  The comma now appears!
+	Also, better processing of exprs inside of for() and if()
+	statements, and the expr that follows!
+
+	The @public directive is now implemented.  This means a class
+	may reference instance vars defined by its superclasses if
+	they want them accessed.  Be carefull here, since these superclass
+	accesses will hardcode offsets into the code.
+
+  FOUNDATION CLASSES:
+    There is now a linked-list class and a List class.  The List class
+	is modeled after List on the NeXT.
+
+------------------------------------------------------------------
+15 NOV 1990:
+  DISTRIBUTION (1.92.6):
+  	More files have been placed in the file "whole.zoo".  Amiga specific
+	files have been placed in "amibin.zoo".  This includes executable
+	version of all programs that the user can build themselves.
+	Also, macro files for Manx's sdb program are included here.
+	This should make moving the system to a non-Amiga base easier.
+
+  TRANSLATOR:
+  	The grammar trace option is now -zt.  Affects only 'oct' hackers.
+
+
+------------------------------------------------------------------
+11 NOV 1990:
+  CLASS SYSTEM:
+  	The new class system handles misc system interfacing stuff.
+	This is my own extension, based loosely on the System class in
+	Actor by The Whitewater Group (R).  UNTESTED!  Class System can
+	beep and inspect/modify (real soon) the .info file for the project
+	(application datafile).  On the NeXT this uses NXReadDefault().
+	UNTESTED!
+	
+	The method dumpDictionary: has been moved from Object into System.
+
+  SUBSTRATE:
+  	The defines PTR2INT() and OC_HASH_MASK are added for better
+	portability.  PTR2INT converts pointers into generic integer
+	things, usually a long.  The hash mask is to keep the return
+	values the same when treated as a short.  Hash value should
+	always be positive.
+
+  CPP:
+  	The cpp program has been augmented to trim away the slash-slash
+	comment.  (Cmd line option "-+", GNU cpp compatible.)  Compiles are
+	now quieter. Comment lines like below don't cause warnings anymore.
+		//	This isn't going to mess up.
+	
+	The cpp program provided here is no longer compatible with the
+	standard cpp program, even though the name remains the same... :-(.
+
+------------------------------------------------------------------
+23 OCT 1990:
+
+  DISTRIBUTION:
+  	The layout of the files in the distribution has been changed:
+	the directories are now "flatter" than before.  The source for
+	'cpp' is stored in the "xlator/ccpp" directory.
+
+------------------------------------------------------------------
+15 OCT 1990:
+
+  CPP:
+  	Yes, my version of Decus 'cpp' now accepts #import directives.
+	Unmodified source from a NeXT will now be accepted.  The current cpp
+	program has stack overflow checking enabled.  A stack of 12000 is very
+	nice.  The cpp program will not read any environment variables.
+
+------------------------------------------------------------------
+08 OCT 1990:
+
+  TRANSLATOR:	1.92.5
+  	For the Amiga, we now search the Manx environment variables, then
+	search ENV: for getenv() requests.  This means Lattice people can
+	interface with O.C.T.
+	The definition for 'errno' is included from <errno.h>.  This makes
+	good for Microsoft C :-).
+
+  RUNTIME SUBSTRATE:
+  	Many of the structures have been changed to be more NeXT like.
+	This means the structures (and field elements) are less StepStone
+	like.  Any complaints?
+
+------------------------------------------------------------------
+20 SEPT 1990:
+
+  COLLECTION CLASSES:
+  	The method [aCollection copy] now copies the collection object
+	and the object used to support the collection.  Things in the
+	collection are NOT copied (a bug fix, I hope).  The isCopyOf:
+	method works in conjuction with this logic.
+
+  AMIGA CLASSES:
+  	The ENode and EList classes have been moved to the Amiga-specific
+	directory.  Even though the Node structures are included, their
+	use is superceded by the List foundation class.
+
+------------------------------------------------------------------
+10 SEPT 1990:
+
+  SUBSTRATE:
+  	Printing of type RECT and type VECT will now print numbers instead
+	of trying to print strings.  Also, the print file (subio.c) is now
+	a "C" file instead of being translated.  Boolean variables (BOOL)
+	are type "o".  So FALSE prints as "o0".
+
+  TRANSLATOR:	1.92.2
+  	Warning 9 (Mismatch in argument type:) will appear if the storage
+	class varies for a method definition.  Also, if the parameter
+	name varies among a method's definition, warnings appear.  This
+	warning is superious, and shouldn't even be noted.  The definition
+	used is the first one encountered.  The translator still needs
+	some work here..
+
+------------------------------------------------------------------
+30 JUNE 1990:
+
+  TRANSLATOR:	1.92.1
+  	Private methods are now accepted by the translator without
+	generating a warning.  If the method begins with an underscore (_)
+	then is doesn't need to be included in the public interface section.
+
+
+------------------------------------------------------------------
+04 MAY 1990:
+
+  TRANSLATOR:	1.92.0
+  	The instance variables for your class are always available to
+	you.  You reference them by name only, no qualifiers are necessary.
+	To reach instance variables of any parent classes, you must
+	qualify the reference with "self->".
+
+  CLASSES:
+  	After a little review of the classes on the NeXT computer, I've
+	noticed that the Collection category of classes has been replaced
+	by the single class List.  I follow this closely, except that
+	methods for set addition (addIfAbset:) have been pushed down to
+	the class Collection.
+
+	Current element count is now "(int) count".
+
+------------------------------------------------------------------
+

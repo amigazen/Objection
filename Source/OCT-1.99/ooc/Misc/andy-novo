@@ -1,0 +1,35 @@
+Path: csus.edu!wupost!uunet!hsi!stpstn!andyn
+From: andyn@stpstn.UUCP (Andy Novobilski)
+Newsgroups: comp.lang.objective-c
+Subject: Re: Manual (and other programming aids)
+Message-ID: <8367@stpstn.UUCP>
+Date: 16 Sep 91 16:17:37 GMT
+References: <12SEP199116373876@cc.weber.edu>
+Reply-To: andyn@novotech.com (Andy Novobilski)
+Organization: NovoTech, 88 Doolittle Dr., Bethany, CT  06524
+Lines: 22
+Keywords: Programming, Objective-C, Reusable Components
+
+In article <12SEP199116373876@cc.weber.edu> swillden@cc.weber.edu (Shawn) writes:
+>I'm doing some programming on a NeXT and I need to learn a little about
+>Objective-C and the NeXT Interface Builder to do it.  The manuals I have are
+>the ones that came with the machine and they tell me nothing.  Where could I
+>get my hands on some manuals? 
+
+For information on programming in Objective-C in general, you can check out 
+a series of articles I wrote for the first three issues of "Object Magazine."  
+Although they are tested with Stepstone's version of the compiler, they 
+should work with the NeXT version of Objective-C as is.  The important point 
+is that the articles document one style for writing reusable applications
+in Objective-C.
+
+If you have questions, please use the mail addresses below as it's where I'm 
+spending most of my time these days.  
+
+Andy Novobilski
+----
+andyn@novotech.com         NovoTech
+(203)393-3729              88 Doolittle Dr.
+(203)393-3730 (fax)        Bethany, CT 06524
+
+

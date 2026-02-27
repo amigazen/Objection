@@ -1,0 +1,179 @@
+####################################################
+#	:bk=0
+#
+#	Makefile for dependency graph example from Ch. 9,
+#	Dr. Cox's OOP bbok [1986]. Defines the classes
+#	Graph and Node.
+#
+#	This makefile takes .m files and moves directly into .o files.
+#
+#	This program may be debugged under MANX's sdb product like:
+#		sdb -s/methods!/maker main16 depends
+#	where -s specifies source directories.  Do a "G app_main",
+#	start stepping message expressions!
+#
+#	Since the class libraries are updated periodically, you might
+#	want a make rule to delete the executables.  Sometimes I copy
+#	the class libraries to RAM: for faster access.
+#
+#	28-oct-89	bjw 	Adapted makefile.
+#	12-jan-90	bjw 	Added tree.m series.
+#	16-april-90	bjw 	Not dependent on oc-lib.
+#	19-feb-91   bjw     UNIX verison of making.
+#
+
+## vvvvvvvvvvvvvvvvvvv  User Servicable Parts Follow  vvvvvvvvvvvvvvvvvv */
+
+#A # ---- AMIGA  -------------------------------------
+#A 
+#A CC = cc
+#A LN = ln
+#A LEX = flex
+#A LFLAGS = -g
+#A LIBS = -locCltn -locbase -locsubs 
+#A DELETE = delete quiet
+#A CLONE  = copy clone
+#A RENAME = rename
+#A CLIB   = tree.o -lc
+#A 
+#A TMPDIR = t:
+#A OOCINC = ooc:include/
+#A OOCBIN = Haven:bins/
+#A # OOCLIB = ooc:include/
+#A OOCLIB = LIB:
+#A 
+#A # -------------------------------------
+#A 
+#A #	Some actual include files:
+#A RELEASE = $(OOCINC)objc/release.h
+#A 
+#A #	The programs we create:
+#A OCT = oct
+#A PLN = prelink
+#A OCT_CPP = oct-cpp
+#A 
+#A CFLAGS = $(MODEL) -n -DNO_PROTOTYPE
+#A CF_STACK +m
+#A 
+
+
+# ---- UNIX  -------------------------------------
+
+.SUFFIXES: .o .c .h .m
+
+CC = cc -c
+LN = cc
+LEX = lex
+# MODEL = -g
+MODEL = 
+LIBS = -locCltn -locbase -locsubs 
+DELETE = rm -f
+CLONE = cp
+RENAME = mv
+CLIB   =
+
+TMPDIR = /usr/tmp/
+OOCINC = $(HOME)/myoct/include/
+OOCBIN = $(HOME)/bin/
+OOCLIB = $(HOME)/myoct/lib/
+
+LFLAGS = $(MODEL) -L $(OOCLIB)
+
+# -------------------------------------
+
+#	Some actual include files:
+RELEASE = $(OOCINC)objc/release.h
+
+#	The programs we create:
+OCT = oct
+PLN = prelink
+OCT_CPP = oct-cpp
+
+CFLAGS = $(MODEL) -DNO_PROTOTYPE -I../usr/include -I$(OOCINC)
+CF_STACK =
+
+##
+## ^^^^^^^^^^^^^^^^  No User Servicable Parts Beyound  ^^^^^^^^^^^^^^^^^ */
+##
+
+
+# -------------------------------------
+
+OBJS = Graph.o Node.o Tree.o
+
+ALL_METHODS = Graph.m Node.m Tree.m
+
+
+# -------------------------------------
+#
+#	--- New rules ---
+#
+#     (Seems SysVR2 won't place .o file where I want it, use rename.)
+.m.o :
+	$(OCT) -o $(TMPDIR)XX.c $*.m
+	$(CC) $(CFLAGS) $(TMPDIR)XX.c
+	$(RENAME) XX.o $*.o
+
+#A .m.o :
+#A 	$(OCT) -o $(TMPDIR)XX.c $*.m
+#A	$(CC) $(CFLAGS) -o $*.o $(TMPDIR)XX.c
+
+# -------------------------------------
+#
+#	--- Top Level Controls ---
+#
+all :	main16 hw16
+
+clean :
+	-$(DELETE) *.bak *.o main16 main16.dbg
+	-$(DELETE) hw16 hw16.dbg
+
+zoo :	zoofile
+
+
+# -------------------------------------
+#
+#	--- project: MAIN ---
+#
+main16 :	$(OBJS) main.o ww.o
+	$(LN) $(LFLAGS) -o main16 $(OBJS) main.o ww.o $(LIBS) $(CLIB)
+
+ww.o : 	ww.c
+	$(CC) $(MODEL) ww.c
+
+ww.c :	Makefile
+	prelink ww.c main.m $(ALL_METHODS)
+
+Graph.o :	Graph.m Graph.h
+Node.o :	Node.m Node.h
+Tree.o :	Tree.m
+main.o :	main.m
+
+
+# -------------------------------------
+#
+#	--- project: HELLO WORLD ---
+#
+hw16  :	newbyte.o hw.o ww_hw.o $(OBJS)
+	$(LN) $(LFLAGS) -o hw16 newbyte.o hw.o ww_hw.o $(OBJS) $(LIBS) $(CLIB)
+
+ww_hw.o :	ww_hw.c
+	$(CC) $(MODEL) ww_hw.c
+
+ww_hw.c :	Makefile
+	prelink ww_hw.c hw.m tree.m newbyte.m
+
+
+newbyte.o :	newbyte.m
+hw.o :	hw.m
+
+
+# -------------------------------------
+#
+#	--- project: Zoo file ---
+#
+zoofile :
+	$(CLONE) Makefile mk-amiga
+	zoo -add ram:D *.m *.h mk-amiga
+	@$(DELETE) mk-amiga
+

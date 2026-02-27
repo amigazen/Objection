@@ -1,0 +1,213 @@
+
+Article 985 (17 more) in comp.object:
+From: jsweet@slsaux.arc.nasa.gov (John Sweet)
+Newsgroups: comp.object,comp.lang.c++
+Subject: Re: Objective C vs. C++, Recommendations?
+Summary: Praise the Lord !!!
+Message-ID: <44039@ames.arc.nasa.gov>
+Date: 2 Mar 90 03:54:14 GMT
+Organization: NASA - Ames Research Center
+Lines: 125
+
+
+   Though I walk in the Valley of Early-Binding
+and "Real-time" systems, the Lord is at my side.
+   I shall lay down my debugger, and walk the
+paths of righeousness.
+   Objective-C is my sheppard, and I do not want.
+
+
+Balenced Credentials:
+   Six-years C, C++, Objective-C programming on
+Vax, Sun, Mac, DOS, Real-time boards.
+   Written several compilers, "C" language
+extensions, yacc/lex type stuff.
+   Two-years of 80-hour/week experience for a small
+"start-up" developing a 'real-world' commercial 
+product in Objective-C (w/database&windows).
+   Two-months of 80-hour/week work to create
+my own personal, C++ compiler. (At the time
+I wanted to really know C++, and I didn't know
+about GNU).
+
+  Obviously, the deciding factor in you're 
+decision should be your "application".  This
+sounds terribly wishy-washy, but you will chose
+in your context for your context.  Since there
+are infinite application contexts, we must find
+an abstraction for our basis of generalization.
+
+  I propose we use "boundedness".
+
+  If your application is "user-bounded", as
+opposed to interrupt-latency-bounded, then
+the time it takes for the user to move the
+mouse is very large relative to the time
+it takes for Objective-C to dispatch a message.  
+This means that the time/keystrokes/clicking
+it takes for the user to complete a task, 
+dominates the equation:
+
+ Task Time = UserTime + ComputeTime + I/O_Time
+
+  The last time I was a USER, the quantity on
+the left hand side of this equation was very
+important to me.
+
+Why choose Objective-C?
+   -  StepStone is an excellent company.
+   -  Next has chosen Objective-C.
+   -  IBM (I believe) has just announced a
+        new Unix platform which comes standard
+        with Objective-C.
+
+   These reasons are political, and, in my
+opinion, balance the explicit (or implicit) 
+endorsements by AT&T, Apple, and GNU.
+
+   - Objective-C is an abstract superset of 
+C++, (By this I mean that everything you can 
+do in C++, i.e. static binding without the 
+message dispatcher, except for inline functions 
+- which is not really an abstraction - you can
+do in Objc, but they are not gramatically supersets).
+   - Self-referential applications are more
+powererful. (Don't throw away your symbol
+table at compile-time in the name of efficiency
+and then torture yourself writing lines of code 
+to regenerated it).
+   - Professionally maintained, supported,
+and documented Class library.  (Like Smalltalk
+the best OOPL's come complete with libraries
+of Inheritable Objects created by wise parental
+units).
+   - Stepstone has ported its Class libraries
+to a large number of platforms, and assists
+companies in porting to new platforms.  (This 
+includes a cut of any royalties on the new machine).
+   - You can buy and use off the shelf C-libraries 
+from Doctor Dobbs, et al, just like C and C++.
+   - The mesage dispatcher frees you from 
+compile-time circular references and those
+really nasty C++ makefiles with all their
+dependencies to ensure that their compiler's
+contextually bloated symbol table is loaded
+with all those constants.
+
+   - This make OOPs very difficult:
+
+#define OffsetOfFooMethod	16
+(*(myPseudoObject->vfunc_table[OffsetOfFooMethod]))( arg0, arg1 );
+   /* I left out the casts and time-hashed function names */
+
+(NOTE: if you looked up the offset of the foo method
+at run-time, and allowed different classes to (without
+expanding the consumer's context) implement foo at
+different offsets in their virtual function table
+(i.e. their virtual interface), then you would be
+going down the OOP road and feeling glad, glad, glad..)
+
+  - This makes OOPs much easier:
+
+  if ( [anyInstance respondsTo:"foo"] == YES )
+	[ anyInstance foo ];
+
+  It's kindof like when you're looking at that
+loop wondering why, no matter how you program
+it, one boundary condition or the other messes you
+up...
+  And then you realize that, if you declare another
+variable and keep arround that essentail piece of
+information that, by throwing it away, was making
+your life so difficult...
+  Sometimes that essential piece of information
+has a larger context than a for loop...
+  C++ programmers wake up!!!
+  By throwing away you symbol table at compile time
+you are making your life more difficult than it
+need be.
+  Try Objective-C.
+
+		Good luck,
+			j.s.s.
+
+
+  At times it is difficult to tell the saved from
+the damned when they are all talking in tongues.
+End of article 985 (of 1010)--what next? [^Nnpq] 
+Searching...
+Article 1000 (15 more) in comp.object:
+From: wdr@wang.com (William Ricker)
+(SAME) Subject: Re: Objective C vs. C++, Recommendations?
+Message-ID: <1990Mar6.144317.9223@wang.com>
+Date: 6 Mar 90 14:43:17 GMT
+Organization: Wang Labs, Lowell MA, USA
+Lines: 65
+
+jsweet@slsaux.arc.nasa.gov (John Sweet) writes:
+[technical reasons omitted]
+>Why choose Objective-C?
+>   -  StepStone is an excellent company.
+>   -  Next has chosen Objective-C.
+>   -  IBM (I believe) has just announced a
+>        new Unix platform which comes standard
+>        with Objective-C.
+  called RSX-6000, a RISC platform, with amazing claimed MIPS. 
+  Supposedly bought the NextStep package of Objective-C and NeXT's
+  windowing system, a nice combination.  Do see the interface-builder
+  demo on NextStep.  Draw your windows & menus & boxes, connect them to 
+  (new) object-classes, and fill-in bodies for (automagically created)
+  methods matching the menu & window ops.  
+
+Add:
+  -   Oracle said in their presentation at CASE: The Next Generation 
+        (a commercial "symposium") that their CASE*<mumble> offereings
+        are implemented in "C and Objective-C".
+
+>   These reasons are political, and, in my opinion, 
+>balance the explicit (or implicit) 
+>endorsements by AT&T, Apple, and GNU.
+
+This list may be getting to critical mass, where companies may now consider
+Objective-C a politically (=business decision) safe alternative.
+
+
+>   - Objective-C is an abstract superset of 
+>C++, (By this I mean that everything you can 
+>do in C++, i.e. static binding without the 
+>message dispatcher, except for inline functions 
+
+Comment: Do not judge Objective-C by only Cox's book; the book documents
+the pre-NeXT version of the language.  Not only does Objective-C 4.0 have
+the static-binding option mentioned above, but it also fixes the name-space
+problem which is obvious to casual readers of the Cox book who consider 
+building large systems.
+
+>   - Self-referential applications are more > powererful.
+As are languages with some support for persistent objects, which Objective-C
+does have, in part because it doesn't throw-away its symbol table.
+
+>   - Professionally maintained, supported, >and documented Class library. 
+Hear, hear!  Between Stepstone's Software-ICs and the NextStep interface
+builder and display-postscript interface, you get a wonderful package.
+
+>  C++ programmers wake up!!! 
+>  By throwing away you symbol table at compile time
+>you are making your life more difficult than it
+>need be.
+>  Try Objective-C.
+
+Amen.
+
+My biases: I was very happy as an Objective-C 4.0 Beta site, and wish I had
+a development plan to use it for.  (I don't recommend using Beta anything,
+but I recommend Objective-C 4.0.) Unfortunately for me, the RSX-6000 and 
+NeXT aren't immediately seen as strategic platforms for our software, so I've
+only gotten demos of NextStep/InterfaceBuildinger or whatever they call it.
+But I know enough PostScript & ObjectiveC to know the demo I saw wasn't smoke
+and mirrors but a real program.
+
+Bill Ricker
+wdr @ wang.com
+End of article 1000 (of 1010)--what next? [^Nnpq] 
+

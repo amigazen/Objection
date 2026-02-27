@@ -1,0 +1,341 @@
+From unisoft!mtxinu!ucbvax!tut.cis.ohio-state.edu!cs.utexas.edu!uunet!hsi!stpstn!andyn Thu Jun 21 05:11:18 PDT 1990
+
+Article: 1754 of news.newusers.questions
+From: andyn@stpstn.UUCP (Andy Novobilski)
+Newsgroups: news.newusers.questions
+Subject: Re: A Newsgroup for Objective C?
+Message-ID: <5224@stpstn.UUCP>
+Date: 18 Jun 90 17:27:56 GMT
+References: <VASULKA.90Jun16011026@pacific.pacific.mps.ohio-state.edu> <2691@mrsvr.UUCP>
+Reply-To: andyn@stepstone.com (Andy Novobilski)
+Distribution: usa
+Organization: The Stepstone Corporation, Sandy Hook, CT 06482
+Lines: 32
+
+In article <2691@mrsvr.UUCP> chandra@mrsvr.UUCP (B. Chandramouli) writes:
+>From vasulka@pacific.pacific.mps.ohio-state.edu (Charlie Vasulka):
+>> From m100-2ai@WEB.berkeley.edu writes:
+>>    Is there a news group on the programming language objective C,
+>>    something like, comp.lang.obj.c (or a variant)? ...  By the way, it
+>>    is Objective C I want, not C++, C, but Objective C.
+>> 
+>> No.
+>
+> How about creating one?
+>
+> chandra
+
+We would be happy to sponser the vote gathering process.  It will take
+a few days to gather the information on the correct netiquette and to
+begin the process.  
+
+Currently, there is an Objective-C mailing list.  Interested parties
+can contact us at aMessage@stesptone.com or hotline@stepstone.com to
+be added to the list.
+
+Any questions, please let me know.
+
+Andy Novobilski
+
+
+-- 
+Andy Novobilski     | The Stepstone Corp.  | When talking the next Meadow 
+andyn@stepstone.com | 75 Glen Rd.          | Party slate, it's Opus for 
+(203)426-1875       | Sandy Hook, CT 06482 | Pres. before it's too late !!!.
+
+From csusac!ucdavis!ucbvax!tut.cis.ohio-state.edu!zaphod.mps.ohio-state.edu!rpi!uupsi!sunic!EB.se!kenneth 7 Oct 90 18:33:58 GMT
+From: kenneth@EB.se (Kenneth Persson)
+Newsgroups: comp.lang.objective-c
+Subject: Re: Requirements for Class Variables for Objective-C
+Keywords: class variables
+Message-ID: <kenneth.655324438@exklusiv>
+Date: 7 Oct 90 18:33:58 GMT
+References: <5638@stpstn.UUCP> <270A66D0.14263@ics.uci.edu>
+Sender: news@EB.se (EB Signal News server)
+Organization: EB Signal AB, Stockholm, Sweden
+Lines: 38
+
+I first replied to the author of the original article, but this
+is the place for discussion:
+
+rmyers@ics.uci.edu (Richard E. Myers) writes:
+
+>In answer to your first two questions, I believe class variables would
+>be useful and that case one would be the better system.
+
+>>** 1 -- each subclass has its own copy of its parent's class variables
+>> 
+>>   2 -- all subclasses share a single copy of their parent's class variables
+
+I would prefer case 2!
+
+>  I think at run time each subclass should be thought of as distinct
+>from its parent and thus have it's own variables...
+
+Inheritance is just an implementation technique to minimize redundant code.
+At run time there is no subclasses or superclasses, just objects (and classes
+that I think of as objects too). If you have class hierarchy (bad example):
+
+ Picture
+ |      \
+TextPic GeometricPic
+
+you want them to share the same Printer. etc etc.
+
+Note that you can simulate class variables with the static mechanism.
+Since every class is declared in it's own file a static works like
+a class variable, with the restriction that it's not inherited. If
+you supply the class with a factory method that return the static
+you can use it in subclasses too. |+cPrinter| and |+cPrinter: aPrinter|.
+
+--
+      +-------------------------+--------------------------+
+      |  Kenneth Persson        |  email: kenneth@eb.se    |
+      |  EB Signal AB, Sweden   |  voice: +46 8 726 2267   |
+      +-------------------------+--------------------------+
+
+From: lane@SUMEX-AIM.STANFORD.EDU (Christopher Lane)
+Newsgroups: comp.sys.next
+Subject: re: methods with arbitrary # of args? How?
+Message-ID: <MailManager.656015936.5474.lane@ssrg-next-1.stanford.edu>
+Date: 15 Oct 90 18:38:55 GMT
+References: <3860@network.ucsd.edu>
+Sender: Christopher Lane <lane@ssrg-next-1.stanford.edu>
+Organization: Internet-USENET Gateway at Stanford University
+Lines: 35
+
+In <3860@network.ucsd.edu>, pbiron@weber.ucsd.edu writes:
+>Is it possible to define an obj-c method which takes an arbitrary
+>number of arguments (ala normal C functions which use varargs.h)?
+
+#import <stdarg.h> /* actually imported by Object.h file anyway */
+#import <objc/Object.h>
+
+@interface MyObject : Object { }
+
+- myMethod:arg1, ...;
+
+@end
+
+@implementation MyObject
+
+- myMethod:arg1, ...
+{
+	va_list	ap;
+
+	va_start(ap, arg1);
+	/* f = va_arg(ap, type); */
+	va_end(ap);
+
+	return self;
+}
+
+@end
+
+To be able to figure out the number of arguments actually given at runtime,
+you have to either include that information in the value of 'arg1', pass and
+test for an explicit NULL at the end of the list of arguments or pass off the
+whole lot to something else that handles multiple arguments (e.g vsprintf).
+
+- Christopher
+-------
+
+From csusac!babbage!brian Mon, 22 Oct 90 22:11:27 PST
+Received: by rael.UUCP (0.44/0.44)
+	id AA00000; Mon, 22 Oct 90 22:11:27 PST
+Received: from babbage.ecs.csus.edu by csusac.ecs.csus.edu (5.61/1.34)
+	id AA00218; Tue, 16 Oct 90 00:35:05 -0700
+Received: by babbage.ecs.csus.edu (5.61/1.34)
+	id AA21963; Mon, 15 Oct 90 23:11:35 -0700
+Date: Mon, 15 Oct 90 23:11:35 -0700
+Message-Id: <9010160611.AA21963@babbage.ecs.csus.edu>
+From: csusac!babbage.ecs.csus.edu!brian (Brian Witt)
+To: ali@CS.Stanford.EDU, rael!oct, slc.slac.Stanford.EDU!rkitts@csusac.edu,
+        uunet.uu.net!seer!bll@csusac.edu,
+        slacvm.bitnet!rzbth@labrea.stanford.edu, well.sf.ca.us!shf
+Subject: Amiga OCT update
+
+Greetings!
+
+There is another update to the Amiga OCT system.  This time
+we *CAN* handle  #import  directives  !!!!
+There will be copies at the BADGE meeting Oct 18th.
+
+
+-----------------------------------------------------------------
+    You are what you click | (and if you click it twice...)
+         brian witt        |   brian@babbage.ecs.csus.edu
+-----------------------------------------------------------------
+
+Xref: csusac comp.sys.next:6329 comp.lang.objective-c:42
+From: lerman@stpstn.UUCP (Ken Lerman)
+Newsgroups: comp.sys.next,comp.lang.objective-c
+Subject: Re: probate
+Message-ID: <5688@stpstn.UUCP>
+Date: 16 Oct 90 11:17:38 GMT
+References: <3861@network.ucsd.edu>
+Reply-To: lerman@stpstn.UUCP (Ken Lerman)
+Organization: The Stepstone Corporation, Sandy Hook, CT 06482
+Lines: 33
+
+In article <3861@network.ucsd.edu> pbiron@weber.ucsd.edu (Paul Biron) writes:
+->
+->I'm trying to figure out an "elegent" way to keep a sub-class
+->from inheriting methods from its super-class.  In this case,
+->I'm making a Stack class out of the List class.  Since a
+->Stack should specifically deny "random" access to its elements,
+->I need a way to keep it from inheriting ObjectAt:, etc.
+->
+->So far, all I've done is defined these kinds of methods like:
+->
+->- ObjectAt:(int)num
+->{
+->	fputs ("Stack does not recognize selector ObjectAt:\n", stderr) ;
+->	kill (getpid (), SIGIO) ;
+->}
+->
+[...]
+->Paul Biron      pbiron@ucsd.edu        (619) 534-5758
+->Central University Library, Mail Code C-075-R
+->Social Sciences DataBase Project
+->University of California, San Diego, La Jolla, Ca. 92093
+
+At Stepstone, we write:
+    return [self shouldNotImplement:_cmd from:Object];
+
+or:
+    return [self notImplemented:_cmd];
+
+depending on the situation.
+
+In this matter, I write only for myself; not for Stepstone.
+
+Ken
+
+From: mikeg@stpstn.UUCP (Mike Goda)
+Newsgroups: comp.lang.objective-c
+Subject: Availability of Objective-C
+Message-ID: <5708@stpstn.UUCP>
+Date: 23 Oct 90 10:57:50 GMT
+Reply-To: mikeg@stepstone.com.UUCP (Mike Goda)
+Organization: The Stepstone Corporation, Sandy Hook, CT 06482
+Lines: 31
+
+In response to an earlier posting to the objective-c news group, someone 
+inquired about the commercially supported availability of Objective-C(TM)
+compilers on various platforms. Well, here is the list and who you can get 
+it from:
+
+
+Objective-C Compiler is currently available on:
+-----------------------------------------------
+
+VENDOR                   PLATFORM
+------                   --------
+
+Stepstone            Sun 3 SunOS 3.n and 4.0.n and 4.1
+Stepstone            Sun 386i SunOS 4.0.n
+Stepstone            Sun 4 SunOS 4.0.n and 4.1
+Stepstone            VAX stations under ULTRIX 3.0
+Stepstone            DEC stations under ULTRIX 2.0
+Stepstone            HP 9000 Series HP-UX 6.5 and 7.0
+Stepstone            Apollo Domain 9.7, 10.1, 10.2
+IBM and Stepstone    PC-AT (or compatible) DOS 3.3, 4.0.1 with MSC
+IBM and Stepstone    PS/2 (or compatible) OS/2 1.1 with MSC
+Stepstone            IBM PC-RT, PS/2 and RISC SYSTEM/6000 AIX 
+Stepstone            Data General AViiON systems under DG/UX 4.30
+Stepstone            SCO UNIX System V/386 Version 3.2
+NeXT                 NeXT
+DCL Japan	     Sony NeWS 
+-- 
+The Stepstone Corporation                    Michael Goda
+75 Glen Rd.                                  mikeg@stepstone.com
+Sandy Hook, CT 06482                         uunet!stpstn!mikeg
+(203) 426-1875    fax (203)270-0106
+
+From: mikeg@stpstn.UUCP (Mike Goda)
+Newsgroups: comp.lang.objective-c
+Subject: reading material on Objective-C
+Message-ID: <5752@stpstn.UUCP>
+Date: 31 Oct 90 22:02:54 GMT
+Reply-To: mikeg@stepstone.com.UUCP (Mike Goda)
+Organization: The Stepstone Corporation, Sandy Hook, CT 06482
+Lines: 17
+
+>> I am working on the NeXT with its Objective-C programming language.  I
+>> am looking for some additional reading material on Obj-C and object
+>> oriented programming.  I would appreciate it if any reader of the
+>> group would  recommend some good books on the subjects.  Thank you.
+
+A book published by Addison Wesley called "Applications in Object Oriented
+Programming" has two chapters on OOP with Objective-C. Chapter 1 is about
+a manufacturing simulation library called BLOCS.  Chapter 2 mentions the
+Military Management Information System (SITMAP) application built with both
+Objective-C and ICpak201.
+
+>> Please send all response to lue@isr.recruit.co.jp
+-- 
+The Stepstone Corporation                    Michael Goda
+75 Glen Rd.                                  mikeg@stepstone.com
+Sandy Hook, CT 06482                         uunet!stpstn!mikeg
+(203) 426-1875    fax (203)270-0106
+
+From: mikeg@stpstn.UUCP (Mike Goda)
+Newsgroups: comp.lang.objective-c
+Subject: reading material on Objective-C
+Message-ID: <5752@stpstn.UUCP>
+Date: 31 Oct 90 22:02:54 GMT
+Reply-To: mikeg@stepstone.com.UUCP (Mike Goda)
+Organization: The Stepstone Corporation, Sandy Hook, CT 06482
+Lines: 17
+
+>> I am working on the NeXT with its Objective-C programming language.  I
+>> am looking for some additional reading material on Obj-C and object
+>> oriented programming.  I would appreciate it if any reader of the
+>> group would  recommend some good books on the subjects.  Thank you.
+
+A book published by Addison Wesley called "Applications in Object Oriented
+Programming" has two chapters on OOP with Objective-C. Chapter 1 is about
+a manufacturing simulation library called BLOCS.  Chapter 2 mentions the
+Military Management Information System (SITMAP) application built with both
+Objective-C and ICpak201.
+
+>> Please send all response to lue@isr.recruit.co.jp
+-- 
+The Stepstone Corporation                    Michael Goda
+75 Glen Rd.                                  mikeg@stepstone.com
+Sandy Hook, CT 06482                         uunet!stpstn!mikeg
+(203) 426-1875    fax (203)270-0106
+
+From: bnfb@cs.washington.edu (Bjorn Freeman-Benson)
+Newsgroups: comp.object
+Subject: Re: COBOL? (Is an object-oriented language necessary?)
+Message-ID: <13653@june.cs.washington.edu>
+Date: 7 Nov 90 17:06:59 GMT
+References: <694@ghp.UUCP> <1864.2736eae0@iccgcc.decnet.ab.com>
+Reply-To: bnfb@june.cs.washington.edu (Bjorn Freeman-Benson)
+Organization: University of Washington, Computer Science, Seattle
+Lines: 21
+
+In article <1864.2736eae0@iccgcc.decnet.ab.com> klimas@iccgcc.decnet.ab.com writes:
+>	Basically, OO in a language that doesn't properly support it 
+>	is a real problem!
+
+Hogwash!  Fancy tools do not a craftsperson make.
+Better yet, read the article in CACM which was a reprint/improvement
+of the paper in OOPSLA'86 titled "An Object-Oriented Approach to a
+Large Scientific Application".  Jonathan Jacky and Ira Kalet wrote a
+large radiation therapy treatment planning program in PASCAL,
+definitely not an object-oriented language.  The conclusion on page 374
+of the OOPSLA version is "We learned that object-oriented programming is
+useful for ..., and does not require the support of a special programming
+language.  Our experience confirms that of others who have attempted an an
+object-oriented style in the context of traditional programming
+environments [references CACM Oct 1982 re a object-oriented project
+in FORTRAN].  We feel that it is important to distinguish between
+object-oriented design, and object-oriented languages...
+Programming tools can provide many conveniences, but in our view
+they are really central to the object-oriented approach.
+
+Bjorn N. Freeman-Benson
+

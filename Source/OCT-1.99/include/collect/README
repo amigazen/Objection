@@ -1,0 +1,13 @@
+ooc:include/collect:
+====================
+
+This directory contains public interfaces for the COllection Phylum
+as documented in [Cox86].  Since the current release from StepStone
+(version 4) has generalized these classes, I have also moved them to
+the side.  They are included mostly for reference purposes.
+
+The import directives have been removed from these header files.
+
+--- brian witt (July 14, 1990)
+--- brian witt (September 19, 1993)
+

@@ -1,0 +1,60 @@
+From daemon Mon Jan  7 20:23 PST 1991
+Received: from UUNET.UU.NET by babbage (5.61/1.34)
+	id AA25065; Mon, 7 Jan 91 20:23:03 -0800
+Received: from hsi.hsi.com by uunet.UU.NET (5.61/1.14) with UUCP 
+	id AA29415; Mon, 7 Jan 91 23:22:15 -0500
+Received: by hsi.hsi.com.HSI.COM (smail2.5)
+	id AA11911; 7 Jan 91 20:01:54 EST (Mon)
+Received: from aspen.stepstone.com 
+	by stepstone.com (3.2/smail2.5/9-18-88)
+	id AA01328; Mon, 7 Jan 91 11:26:00 EST
+Received: by aspen.stepstone.com (4.0/SMI-4.0)
+	id AA06308; Mon, 7 Jan 91 11:25:55 EST
+Date: Mon, 7 Jan 91 11:25:55 EST
+From: andyn@stepstone.com (Andy Novobilski)
+Message-Id: <9101071625.AA06308@aspen.stepstone.com>
+To: andyn@stepstone.com, blenko-tom@cs.yale.edu, brian@babbage,
+        brocher@urz.unibas.ch, cohill@vtserf.cc.vt.edu, glang@autodeski.com,
+        jb@computer-science.strathclyde.ac.uk, kwolf@zip.eecs.umich.edu,
+        melling@haydn.psu.edu, pintado@cgeuge51.bitnet, rashidi@gw.wmich.edu,
+        sierka@ncar.ucar.edu, sjk%onecom@uunet.UU.NET,
+        ntpdvp1!willr@uunet.UU.NET
+Subject: Objective-C Sample Source
+Status: R
+
+
+Greetings.
+
+Enclosed with this email is the source code that goes
+with the JOOP article entitled:
+
+"A Pictorial Design Notation for Software-ICs."         
+
+published in the July/Aug 1990 Issue (Vol 3, No2).  I
+hope it proves useful for taking a look at an alternate
+approach for structuring Objective-C based apps.  
+
+A second set of source will follow at a later time.  This
+is the source from the sample application in the second
+edition of "Object-Oriented Programming: An Evolutionary
+Approach" (Cox & Novobilski) in Chapter nine.  Unfortunatly,
+it requires ICpak 201 to completely build, but what the
+heck, it might help.
+
+As I mentioned in the README file, I'm open to discussions
+on the form and reasoning behind what was done, but not
+really interested in providing help on porting this to
+other platforms.  My apologizes for taking so long to       
+provide this code, but my boss found something to do with
+the free time I thought I had after completing my last
+project.  Oh well .....
+
+Best of luck, and Happy New Year,
+Andy, the programmer
+Fred, the Betta fish,
+and my other fish,
+Fred, the Algea-Eater
+
+===source=follows,=remove=this=line=and=above=befor=unsharring====
+
+

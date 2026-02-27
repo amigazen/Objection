@@ -1,0 +1,38 @@
+From csusac!nextnet.ccs.csus.edu!wittbj Sat, 11 Jan 92 17:14:32 PST
+Received: by rael.UUCP (V1.08/Amiga)
+	id AA00000; Sat, 11 Jan 92 17:14:32 PST
+Received: from csus.ccs.csus.edu by csusac.ecs.csus.edu (5.61/1.34)
+	id AA16831; Thu, 9 Jan 92 09:22:19 -0800
+Received: from nextnet.ccs.csus.edu by csus.edu with SMTP id AA25788
+  (5.65c/IDA-1.4.4 for <csusac!rael!aleks>); Thu, 9 Jan 1992 09:25:23 -0800
+Date: Thu, 9 Jan 92 09:14:48 PST
+Message-Id: <9201091714.AA29612@nextnet.ccs.csus.edu>
+From: csusac!nextnet.ccs.csus.edu!wittbj (brian witt)
+To: brian@babbage.ecs.csus.edu, rael!aleks
+Subject: NEXT objc
+
+Newsgroups: comp.lang.objective-c
+Path: csus.edu!wupost!psuvax1!news
+From: melling@cs.psu.edu (Michael D Mellinger)
+Subject: Re: Re:novice
+In-Reply-To: bbrot@rigby's message of 6 Jan 92 10:31:24 GMT
+Message-ID: <-d4Hfwhw4@cs.psu.edu>
+Sender: news@cs.psu.edu (Usenet)
+Nntp-Posting-Host: sunws5.sys.cs.psu.edu
+Organization: Penn State Computer Science
+References: <2615@rosie.NeXT.COM>
+Date: Wed, 8 Jan 1992 18:51:36 GMT
+Lines: 11
+
+
+In article <2615@rosie.NeXT.COM> bbrot@rigby (Bruno Brottier) writes:
+
+   NeXT Objective-C compiler is written in C and based on GNU-C compiler.
+   Ask them for sources
+
+The NeXT Objective-C compiler is located on
+
+     nova.cc.purdue.edu:pub/next/2.0-release/sources
+
+-Mike
+

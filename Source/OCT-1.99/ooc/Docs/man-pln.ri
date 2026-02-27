@@ -1,0 +1,82 @@
+.!	MAN-PRELINK.RI		Man page for OOC Prelinker              Aug 89, bjw
+.!
+.!
+.!
+.! --------------
+.!
+.vs progname "prelink"
+.vs product "Object Oriented C"
+.!
+.! --------------
+.!
+.source manual.rinc
+.!
+.! --------------
+.!
+.header /${progname}(OOPS)//${vers}/
+.footer /%//Page #/
+.!
+.! +++++++++++++++++++++++++
+.!
+.section Name
+${progname} - Invokes prelinker for O.O.C. Translator
+.!
+.! +++++++++++++++++++++++++
+.!
+.section Syntax
+.bold
+${progname}
+C__outfile M__infile.. otherfiles..
+.!
+.! +++++++++++++++++++++++++
+.!
+.section Description
+.!
+Invokes the prelinker for the ${product} system.
+The output file
+.filename listfile
+is created with a list of pointers to classes required
+to build the final application.
+The list is used to ensure the needed classes are
+extracted from the ${product} libraries.
+.sp
+.!
+The inputs to
+.program ${progname}
+are the class filenames and other files using message-expressions
+created by the user for their application.
+A list is built of all the classes and all their superclasses.
+.sp
+.!
+The output
+.filename listfile
+must be passed to the C compiler, and then included during
+the link phase.
+This will cause the linker to extract the proper classes
+from the library.
+And then when the application starts running,
+the substrate has a list of all the classes so they can be initialized.
+For an example, see oct(OOPS)
+.sp
+.!
+The are no options.
+.!
+.! +++++++++++++++++++++++++
+.!
+.section Diagnostics
+If the "must init" file can't be located, awarning message is displayed.
+.!
+.! +++++++++++++++++++++++++
+.!
+.section Files
+AMIGA: ooc:include/mustinit.ooc
+.br
+UNIX:  /usr/local/include/mustinit.ooc
+.!
+.! +++++++++++++++++++++++++
+.!
+.section See Also
+cc(CP), oct(OOPS)
+.br
+.!
+.!  *** EOJ

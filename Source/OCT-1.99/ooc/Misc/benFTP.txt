@@ -1,0 +1,39 @@
+Path: csusac!ucdavis!ucbvax!tut.cis.ohio-state.edu!zaphod.mps.ohio-state.edu!wuarchive!uunet!lll-winken!ames!haven!umd5!terminus.umd.edu!dzoey
+From: dzoey@terminus.umd.edu (Joe Herman)
+Newsgroups: comp.object
+Subject: Ed Berard's OOPS posting available via anonymous FTP
+Message-ID: <7792@umd5.umd.edu>
+Date: 3 Jan 91 13:55:30 GMT
+Sender: news@umd5.umd.edu
+Organization: University of Maryland DOSIP-CSC
+Lines: 27
+Originator: dzoey@terminus.umd.edu
+
+A copy of Ed Berard's postings on OOPS topics is available via anonymous
+ftp from terminus.umd.edu.  This is a copy of the articles from the
+mail server at unisoft!seer.  Here is a directory listing.
+
+-rw-rw-r--  1 root        17767 Jan  3 08:35 OODBMS
+-rw-rw-r--  1 root        69137 Jan  3 08:38 OORA
+-rw-rw-r--  1 root          405 Jan  3 08:50 README
+-rw-rw-r--  1 root        28469 Jan  3 08:18 domain-analysis
+-rw-rw-r--  1 root        25095 Jan  3 08:17 intro
+-rw-rw-r--  1 root        60604 Jan  3 08:32 languages
+-rw-rw-r--  1 root        44424 Jan  3 08:40 life-cycle
+-rw-rw-r--  1 root        27756 Jan  3 08:43 methodologies
+-rw-rw-r--  1 root        56657 Jan  3 08:38 motivation
+-rw-rw-r--  1 root         9270 Jan  3 08:36 oo-design
+-rw-rw-r--  1 root        12341 Jan  3 08:33 readings
+-rw-rw-r--  1 root         1559 Jan  3 08:14 recursive-parallel
+-rw-rw-r--  1 root         3496 Jan  3 08:13 references
+-rw-rw-r--  1 root        43322 Jan  3 08:34 testing
+-rw-rw-r--  1 root        25631 Jan  3 08:12 whatis
+
+			-- Joe Herman
+
+dzoey@terminus.umd.edu
+
+
+-- 
+"Everything is wonderful until you know something about it."
+

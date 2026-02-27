@@ -1,0 +1,155 @@
+%			BADGE Object Oriented with C talk.
+%			April 1990, Palo Alto, CA.
+%
+%
+\nopagenumbers
+\magnification=\magstep2
+\font\headfont=cmr17
+\font\manual=cmr10 scaled\magstep1
+\font\medfont=cmr10
+\font\codefont=cmr9
+\font\smallfont=cmr7
+%
+%
+\def\therefore{.$\!\cdot\!$.$\;$}
+\def\qed{\quad\vrule height.6ex width.8ex depth.9ex}		% Q.E.D.
+\def\bullindent{\indent\hang}
+\def\codeblock#1{\codefont\tt \baselineskip=10pt plus1pt {#1}}
+%
+\headline={\smallfont \rightline{Brian Witt}}
+\footline={\smallfont BADGE Talk\hss By courtesy of $-$\folio$-$ Amiga\TeX \hss April 1990}
+%
+% ----------------------------------
+%
+\manual
+
+{\headfont{\underbar{Intro to Object Oriented Happiness:}} }
+
+%
+% ----------------------------------
+%
+\bigskip
+\bigskip
+{\narrower
+\obeylines
+\item{$\bullet$} The more inheritance, the better!
+\bullindent {\medfont { Combine data structure with storage system.}}
+\bullindent {\medfont {\sl Reusability } $-$ all other methods still avail.}
+\bullindent {\medfont {\sl Reliability } %
+  $-$ most of class is debugged and proven.}
+\bullindent {\medfont {\sl Object Oriented } %
+  $-$ If system changes, tiny code change.}
+\bigskip
+
+\item{$\bullet$} Objects are your friends.
+\bullindent {\medfont Polymorphism: various objects responding %
+ to same message.}
+\bigskip
+
+\item{$\bullet$} Objects combine data and operation methods.
+\bullindent {\medfont Access through well defined, public methods.}
+\bigskip
+
+\item{$\bullet$} Class Hierarchy refines operations available.
+\bullindent \hbox{\medfont {\sl Sub-classes:}\quad %
+ \vtop{\hbox {refine operations of super-class,} %
+ \hbox {preconditions not stronger,} \hbox {postconditions not weaker.}}}
+\bigskip
+
+\item{$\bullet$} Inherit features, or use client-server relation.
+\bullindent \hbox{\medfont\vtop { %
+  \hbox {Compose modules to meet requirements.} %
+  \hbox {Externally modify class with new methods.} }}
+
+\bigskip
+
+\smallskip
+}
+%
+% ----------------------------------
+%
+\vfill\eject
+%
+%
+% ----------------------------------
+%
+\manual
+{\headfont{\underbar{Object C Extensions:}} }
+%
+% ----------------------------------
+%
+\bigskip
+{\narrower
+\obeylines
+\item{$\bullet$} Message Expression (ala {\sl Smalltalk}):
+\bullindent {\medfont\tt <expr>\quad ::= %
+  \vtop{\hbox{<assign-expr>\quad |} %
+   \hbox {<direct-dcl> "(" {<ident-list>} ")" \quad | } %
+   \hbox {<direct-dcl> "[" {<const-expr>} "]" \quad | } %
+   \hbox {"[" <direct-dcl>\quad <msg-expr-list> "]" . } }
+\medskip
+ <msg-expr-list> \/ ::= %
+  \vtop{\hbox{ method-name \quad | } %
+   \hbox{$\lbrace$ colon-method <expr> $\rbrace$ $\ldots$ . } }
+  }
+\bigskip
+
+\item{$\bullet$} Small variation on {\bf K \& R ``C''} code.
+\bullindent {\medfont Message expression within square brackets,}
+\bullindent {\medfont At-sign ({\tt @}) introduces translator directives.}
+\bigskip
+
+%-- \bullindent \hbox{\medfont {\sl Sub-classes:}\quad %
+%--  \vtop{\hbox {refine operations of super-class,} %
+%--  \hbox {preconditions not stronger,} \hbox {postconditions not weaker.}}}
+
+\item{$\bullet$} Message expressions are space seperated:
+\smallskip %
+{\codeblock{
+\#include <objc/Sequence.h>
+\#include <objc/PointXY.h>
+@includes
+\medskip
+// \quad Just a sample...
+void my\_test()
+$\lbrace$
+ \quad  id \quad obj, targ, dest;
+ \quad  int \enskip x\_coord, y\_coord;
+\medskip
+ \quad  targ = [Sequence new]; \quad /*~No arguments~*/
+ \quad  dest = [target find:nil];   /*~One arg~*/
+ \quad  targ = [PointXY x:x\_coord y:y\_coord ];  /*~2~args~*/
+ \quad  [targ setXY:90 :40 ];
+\smallskip
+$\rbrace$
+
+\medskip }}
+\normalbaselines
+\bigskip
+
+\item{$\bullet$} Example method for AmigaDOS string hash:
+\smallskip %
+{\codeblock{
+- (unsigned) hash
+$\lbrace$
+  \qquad unsigned \quad res;
+  \qquad char \qquad *str = [self str];
+\medskip
+  \qquad res = hashdir( str ); \enskip /*~Ask Neil~for~help~*/
+\medskip
+  \qquad return( (res \% 72) $+$ 6 );
+$\rbrace$
+
+\medskip }}
+\bigskip
+
+\smallskip
+}
+%
+% ----------------------------------
+%
+\vfill\eject
+%
+%
+\end
+%		--- end of job.

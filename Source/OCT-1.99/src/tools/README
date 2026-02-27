@@ -1,0 +1,9 @@
+oct/tools:
+==========
+
+This directory contains some misc tools to use with the classes
+and methods.  The usefullness of 'mkif' is dubious; Stu rewrote
+the entire system.  He also has an 'awk' script to do a much
+better job.  Install the executable somewhere reachable.
+
+--- brian witt, 18-April-90

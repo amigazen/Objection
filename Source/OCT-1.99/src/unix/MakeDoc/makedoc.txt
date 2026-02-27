@@ -1,0 +1,198 @@
+
+
+
+
+
+
+_m_a_k_e_d_o_c - _E_x_t_r_a_c_t _c_o_m_m_e_n_t_s _f_r_o_m _O_b_j_e_c_t_i_v_e _C _s_o_u_r_c_e _a_n_d  _g_e_n_-
+_e_r_a_t_e _d_o_c_u_m_e_n_t_a_t_i_o_n.
+
+mmmmaaaakkkkeeeeddddoooocccc [ ----cccc ] [ ----DDDD _n_a_m_e[=_d_e_f] ] [ ----IIII _d_i_r_e_c_t_o_r_y ] [ ----oooo  _o_u_t_-
+_f_i_l_e ] [ ----CCCC _c_l_a_s_s_f_i_l_e ] [ ----MMMM _m_e_t_h_o_d_f_i_l_e ]  _s_o_u_r_c_e_f_i_l_e ...
+
+_M_a_k_e_d_o_c _s_e_a_r_c_h_e_s _f_o_r _c_o_m_m_e_n_t_s,  _m_e_t_h_o_d  _n_a_m_e_s  _a_n_d  _f_u_n_c_t_i_o_n
+_n_a_m_e_s  _w_i_t_h_i_n _t_h_e _s_o_u_r_c_e _f_i_l_e_s _s_p_e_c_i_f_i_e_d _a_n_d _g_e_n_e_r_a_t_e_s _d_o_c_u_-
+_m_e_n_t_a_t_i_o_n _i_n _L_a_T_e_X _f_o_r_m_a_t.   _T_h_e  _r_u_l_e_s  _u_s_e_d  _t_o  _d_e_t_e_r_m_i_n_e
+_w_h_e_t_h_e_r  _a  _c_o_m_m_e_n_t  _i_s  _t_r_a_n_s_f_e_r_r_e_d  _t_o _t_h_e _o_u_t_p_u_t _f_i_l_e _a_r_e
+_d_e_s_c_r_i_b_e_d _b_e_l_o_w.
+
+     Each input file must have an extension of either ....mmmm, ....cccc
+or  ....hhhh and should consist of either C or objective C source.
+_M_a_k_e_d_o_c will produce an output file  with  an  extension  of
+....tttteeeexxxx  for  each valid input file.  However, if _f_i_l_e is ----, or
+if no files are specified, input  comes  from  the  standard
+input  and  output is directed to standard output so _m_a_k_e_d_o_c
+can be used as a filter.  By default, the output  file  will
+be  ready  to be used as input to LATEX.  However, if either
+the ----cccc or ----oooo options are present, then the output file  gen-
+erated is intended to be used as an include file in a larger
+document.   The  ----oooo  option  generates  a  LATEX  file  that
+includes all of the generated ....tttteeeexxxx files.
+
+     There are many options:
+
+----CCCC _c_l_a_s_s_f_i_l_eGenerate a class hierarchy diagram and place the
+          results   in   _c_l_a_s_s_f_i_l_e.   If  _c_l_a_s_s_f_i_l_e  already
+          exists, it will not be recreated. If the ----oooo option
+          is  in  effect,  _c_l_a_s_s_f_i_l_e will be included at the
+          appropriate point.
+
+----DDDD _n_a_m_e[=_d_e_f]]Define the symbol _n_a_m_e to the  C  preprocessor
+          _c_p_p(1).   Using  this option caused _m_a_k_e_d_o_c to run
+          all source files through _c_p_p first.   This  option
+          is currently unavailable.
+
+----IIII _d_i_r_e_c_t_o_r_yInclude _d_i_r_e_c_t_o_r_y in the search path  for  class
+          names.   _D_i_r_e_c_t_o_r_y  will  also be passed to _c_p_p if
+          necessary.
+
+----MMMM mmmmeeeetttthhhhooooddddffffiiiilllleeeeNot used.
+
+_M_a_k_e_d_o_c _s_e_a_r_c_h_e_s _f_o_r _c_o_m_m_e_n_t_s _i_n _s_p_e_c_i_f_i_c  _p_l_a_c_e_s  _w_i_t_h_i_n  _a
+_s_o_u_r_c_e  _f_i_l_e.  _M_u_l_t_i_p_l_e _c_o_m_m_e_n_t_s _s_e_p_a_r_a_t_e_d _b_y _w_h_i_t_e_s_p_a_c_e _a_r_e
+_c_o_n_c_a_t_e_n_a_t_e_d.  _C_o_m_m_e_n_t_s _c_o_n_s_i_s_t_i_n_g _o_f _s_t_r_i_n_g_s _o_f '-' _o_r  '*'
+_a_r_e  _r_e_m_o_v_e_d.   _B_o_t_h  _s_t_a_n_d_a_r_d  _C _a_n_d _O_b_j_e_c_t_i_v_e _C _c_o_m_m_e_n_t_i_n_g
+_c_o_n_v_e_n_t_i_o_n_s _a_r_e _s_u_p_p_o_r_t_e_d.
+
+     Any comment within the scope of any syntatic unit, i.e.
+a function or a structure definition, is always ignored.
+
+     Any comment outside of the scope of any  syntatic  unit
+
+
+
+                      November 7, 1989
+
+
+
+
+
+                           - 2 -
+
+
+that  starts  with  a  backslash ('\\\\') is treated as a LATEX
+directive and will be printed immediately.
+
+     Any comment that preceeds the @_i_m_p_l_m_e_n_t_a_t_i_o_n  directive
+is  taken  to  be the _I_n_t_r_o_d_u_c_t_i_o_n of document for the class
+and is printed immediately after the header.       The  com-
+ment  may  only  be  separated  from  the directive by white
+space, otherwise it will be flushed.
+
+     Comments which precede method or  function  definitions
+are  taken  to be the documentation for that method or func-
+tion and are printed after the method or  function  name  in
+the output file.
+
+     Makedoc has a rudimentary macro  substitution  capabil-
+ity.   Macro expansion takes place when ever the dollar sign
+symbol ('$$$$') followed  by  a  single  digit  is  encountered
+within  a  comment.  For method and function definitions, $$$$0000
+represents the actual method or function name.  In the  case
+of  method  names,  arguments  are  stripped.  Arguments are
+represented as $$$$1111 through $$$$9999.  Only the first nine arguments
+can  be displayed in this manner.  In the case of the intro-
+ductory comments, $$$$0000 will expand to the class  name.   A  $$$$_n
+token  will be silently stripped if argument number _n is not
+present in the method or function definition.
+
+     To get a dollar sign to appear in the output,  use  two
+dollar signs in a row, eg: $$$$$$$$.
+
+     _M_a_k_e_d_o_c automatically escapes any LATEX special charac-
+ter  found  in  macro  arguments.   It  is up to the user to
+escape these characters everywhere else.
+
+
+_T_h_e _l_e_x_e_r _i_s _t_o_o _s_t_u_p_i_d _t_o _d_e_a_l _w_i_t_h _f_u_n_c_t_i_o_n _a_r_g_u_m_e_n_t_s.
+
+     The present method of using the description environment
+for  method  declarations  needs  to  be redone because some
+method declarations are rather long.
+
+     Portability to systems other than  Suns  has  not  been
+taken into consideration.
+
+     Macro substitution works with  ``classic''  C  function
+defintions, but not for the ANSI style.  The position of the
+argument is determined from its type declaration,  not  from
+the function's parameter list.
+
+_A_u_t_o_m_a_t_i_c _d_o_c_u_m_e_n_t_a_t_i_o_n _o_f _i_n_s_t_a_n_c_e _v_a_r_i_a_b_l_e_s.
+
+     Preprocessing source through CPP if desired.
+
+
+
+
+
+
+                      November 7, 1989
+
+
+
+
+
+                           - 3 -
+
+
+_c_p_p(_1), _L_A_T_E_X
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                      November 7, 1989
+
+

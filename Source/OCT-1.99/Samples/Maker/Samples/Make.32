@@ -1,0 +1,127 @@
+####################################################
+#	:bk=0
+#
+#	Makefile for dependency graph example from Ch. 9,
+#	Dr. Cox's OOP bbok [1986]. Defines the classes
+#	Graph and Node.
+#
+#	This makefile takes .m files and moves directly into .o files.
+#
+#	Large Code & Data, 32 INTS. 	Large Code & Data, 32 INTS.
+#	Large Code & Data, 32 INTS. 	Large Code & Data, 32 INTS.
+#	Since the class libraries are updated periodically, you might
+#	want a make rule to delete the executables.  Sometimes I copy
+#	the class libraries to RAM: for faster access.
+#
+#
+#	01-oct-89	bjw 	Large code & data, 32 INT from 30-sept version.
+#	14-oct-89	bjw 	Using more symbols.
+#	12-jan-90	bjw 	Added tree.m series.
+#	24-jan-90	bjw 	Merged 'makefile' back into this file.
+#	16-april-90	bjw 	Not dependent on oc-lib.
+#   Use LDFLAGS for linking, not LFLAGS (that's for LEX)
+#       June 92,        bjw
+#   20-nov-92   bjw     Added "norun" method.
+#
+
+# -------------------------------------
+
+CC = cc
+LN = ln
+OCT = oct
+LDFLAGS = -g
+
+TEMPDIR = t:
+OOCINC = ooc:include/
+OOCBIN = sys:bins/
+
+#	Some actual include files:
+TREEINC = sys:usr/include/tree.h
+RELEASE = $(OOCINC)objc/release.h
+
+# -------------------------------------
+
+OBJS = graph.o node.o tree.o
+LIBS = -locbasel32 -locsubsl32
+
+ALL_METHODS = graph.m node.m tree.m
+
+MODEL  = +CDL
+CFLAGS = $(MODEL) -n -DNO_PROTOTYPE
+LDFLAGS = -g
+CLIB   = -lcl32
+
+# -------------------------------------
+#
+#	--- New rules ---
+#
+.m.o :
+	$(OCT) -o $(TEMPDIR)XX.c $*.m
+	$(CC) $(CFLAGS) -o $*.o $(TEMPDIR)XX.c
+
+# -------------------------------------
+#
+#	--- Top Level Controls ---
+#
+all :	main32 hw32
+
+clean :
+	-delete #?.bak #?.o main32 main32.dbg
+	-delete hw32 hw32.dbg
+
+zoo :	zoofile
+
+noruns :
+	$(DELETE) main16 hw16 speed16
+
+help :
+	@echo "all  -- build dependency and hello-world examples."
+	@echo "zoo  -- package source into .zoo file."
+	@echo "clean -- delete backup and object files."
+	@echo "noruns - delete produced executables only."
+
+# -------------------------------------
+#
+#	--- project: MAIN ---
+#
+main32 :	$(OBJS) main.o ww.o
+	$(LN) $(LDFLAGS) -o main32 $(OBJS) main.o ww.o $(LIBS) $(CLIB)
+
+ww.o : 	ww.c
+	$(CC) $(MODEL) ww.c
+
+ww.c :	makefile
+	prelink ww.c main.m $(ALL_METHODS)
+
+graph.o :	graph.m
+node.o :	node.m
+tree.o :	tree.m
+main.o :	main.m
+
+
+# -------------------------------------
+#
+#	--- project: HELLO WORLD ---
+#
+hw32 :	newbyte.o hw.o ww_hw.o $(OBJS)
+	$(LN) $(LDFLAGS) -o hw32 newbyte.o hw.o ww_hw.o $(OBJS) $(LIBS) $(CLIB)
+
+ww_hw.o : ww_hw.c
+	$(CC) $(MODEL) ww_hw.c
+
+ww_hw.c :
+	prelink ww_hw.c hw.m newbyte.m
+
+newbyte.o :	newbyte.m
+hw.o 	: hw.m
+
+
+# -------------------------------------
+#
+#	--- project: Zoo file ---
+#
+zoofile :
+	copy make.32 to mk-amiga
+	zoo -add ram:D *.m *.h mk-amiga
+	@delete mk-amiga
+

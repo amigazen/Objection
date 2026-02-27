@@ -1,0 +1,244 @@
+From csusac!babbage.ecs.csus.edu!brian Wed, 29 May 91 18:54:11 PST
+Received: by rael.UUCP (V1.08/Amiga)
+	id AA00000; Wed, 29 May 91 18:54:11 PST
+Received: from babbage.ecs.csus.edu by csusac.ecs.csus.edu (5.61/1.34)
+	id AA05365; Wed, 29 May 91 12:50:45 -0700
+Received: by babbage.ecs.csus.edu (5.61/1.34)
+	id AA23596; Wed, 29 May 91 12:50:34 -0700
+Date: Wed, 29 May 91 12:50:34 -0700
+Message-Id: <9105291950.AA23596@babbage.ecs.csus.edu>
+From: csusac!babbage.ecs.csus.edu!brian (Brian Witt)
+To: rael!aleks
+Subject: inside objC
+
+Path: csusac!ucdavis!ucbvax!cis.ohio-state.edu!zaphod.mps.ohio-state.edu!swrinde!elroy.jpl.nasa.gov!jarthur!uunet!hsi!stpstn!lerman
+From: lerman@stpstn.UUCP (Ken Lerman)
+Newsgroups: comp.lang.objective-c
+Subject: Re: Implementation of Objective C
+Message-ID: <7104@stpstn.UUCP>
+Date: 28 May 91 13:42:33 GMT
+References: <1991May27.073640.13936@dit.upm.es>
+Reply-To: lerman@stpstn.UUCP (Ken Lerman)
+Organization: The Stepstone Corporation, Sandy Hook, CT 06482
+Lines: 219
+
+In article <1991May27.073640.13936@dit.upm.es> esink@turia.dit.upm.es (Eric W. Sink) writes:
+->
+->Greetings all !  I recently posted a request for an Objective C
+->grammar to c.l.objective-c.  Well, I should have phrased my
+->question better, and I've come up with a few more.  I'm toying around
+->with the idea of implementing an ObjC compiler, but I currently know
+->little about the language.  I haven't had a chance to buy Cox's book
+->yet.  I do have ``Intro to Objective C on the NeXT Machine'', by
+->Gerrit Huizenga.  The information I'm looking for needs to be a bit
+->more precise.   Anyone willing to give answers to the following : ?
+
+->1.  What new keywords (in the ANSI C sense of a keyword) are added to
+->ANSI C ?  Which of the following are keywords, and which are not :
+->@interface, @implementation, @end, @selector, self, super, id, SEL,
+->nil, Object, new, free
+
+If it begins with @, it is a keyword.  Otherwise, it is NOT.  That is
+from a language standpoint.  From a practical standpoint, it would be
+bad form to (anbd might generate errors) to redefine id in some weird way.
+
+
+->2.  Is Object (the class) declared somewhere, or does the compiler
+->simply recognize it as already existent ?  If it is declared and
+->implemented somewhere using Objective C, why can't other root classes
+->exist ?  What does its declaration look like (I want to know how to
+->parse a class declaration which has no super class)
+
+@interface Object
+{
+@public
+	struct _SHARED *isa;
+	unsigned short	attr;
+	unsigned short	objID;
+}
+
+Note that the Objective-C language and runtime permit you to have more
+than one root class.  It is a quirk (feature ?) of Stepstone's
+Objective-C 4.0 (and subsequent) implementation that it tests that there is an instance variable named "isa".
+
+->
+->3.  I assume that a 'message send' is a primary expression, as it
+->appears in the ANSI C grammar.  In other words, the following
+->expressions are all possible :
+->
+->   [ obj msg][12] = 33; /* assume the method returns (int *) */
+->   [ obj msg]();        /* assume the method returns a func ptr */
+->   x = a + *([obj msg]); /* again, method returns (int *) */
+
+Yes, that is correct.
+
+->I also assume that the id and SEL elements of a message send are
+->postfix expressions, so the following is legal :
+
+->   id foo();
+->   SEL bar();
+->   [foo() bar()];
+
+Yes for the receiver, NO for the selector.  The selector is "looked
+up" at compile time.  If you want to do [foo() bar()] you must do a
+little more work and use [foo() perform:bar()].
+
+
+->4.  Is a class (factory) object represented differently than an
+->instance ?
+
+NO.
+
+->  Are messages to a class object dispatched differently ?
+
+NO.
+
+->How is new implemented ?
++ new
+{ 
+    id newObject = (*_alloc)((SHR)self, 0); 
+    return newObject;
+}
+
+_alloc is a vector to alloc which uses malloc.
+
+->  What other factory methods are implemented
+
++  initialize;
++  poseAs: aFactoryId;
++ (unsigned ) ndxVarSize;
++  new;
++  new: (unsigned) arg;
++  free;
++  readFrom:(STR )aFileName;
++ (SHR ) class;
++ (SHR ) self;
++ (SHR ) superClass;
++ (BOOL) isSubclassOf: aClass;
++ (BOOL ) instancesRespondTo:(STR )aSelector;
++ (IMP ) instanceMethodFor:(SEL )aSelector;
+
+>by Object ?  isa (what does isa return, a factory object ? )?
+
+isa is an instance variable of Object.  (See above)
+
+
+
+
+->5.  My biggest question :  How exactly does dispatching work ?  I
+->assume that every instance is a dynamically allocated region of memory
+->which contains all the instance variables PLUS a pointer to some data
+->structure.  I assume for now that this data structure is in fact the
+->factory object for the class of the instance, and that factory objects
+->contain the 1. dispatch table as well as a pointer to the 2. super class,
+->but it doesn't matter, as long as those two items are available
+->to each instance.  The dispatch table associates message selectors
+->with methods for the given class, so we take the message being sent,
+->convert it to a SEL, use the SEL as the index into the table and get
+->the address of the method.  Arguments have to get pushed onto the
+->stack (right to left ?), and the receiving object gets pushed (first
+->or last ?), and we call the method.  My questions :  how do we convert
+->the method name to a SEL ?  The manner in which this conversion occurs
+->is very important, because every source file which uses this class
+->must arrive at the same SEL for the same method name, and most
+->importantly, that SEL must be the same as the one calculated during
+->the actual genertion of the dispatch table, which I assume is
+->generated while compiling the @implementation of the class. (sentence
+->way to long, sorry)  What happens if the source file we are compiling,
+->uses many classes, and a given method foo: appears in more than one
+->place in the class hierarchy (assume that the various uses of foo: are
+->not inherited versions of the same method, but are quite distinct
+->methods along totally different lines of inheritance, but simply
+->happen to have the same name).  Now, how do we know which foo: to use
+
+The question of which foo: to use is a problem.  If they are declared
+the same, it is easy.  If they are different, the current
+implementation gives a warning and then uses one or the other.  If you
+want to use the one associated with Apple, declare the receiver to be
+an Apple * instead of an id, and you will get it (and no warning).
+
+->?  How do we map to a SEL ?  How to we type check arguments ?  How do
+->we know the type of the resulting message send ?  Is SEL of type
+->int (a table index requiring scaling) or of type char *, (a table
+->offset requiring no scaling).
+
+Unfortunately, this subject is a little too complex to describe here.
+Why not get a University license which will include the source to the
+runtime and read the code.  Or buy a PC copy for a few hundred dollars
+(I'm not in sales, so I can't give you a price).  The source of the runtime should be all you need to figure this stuff out.
+
+->  Consider the following example :  Is this code legal Objective C ?
+->  Since I see so many problems with it, I'm beginning to speculate
+->  that ObjC simply prohibits behavior like this...
+->
+->@interface classone : Object
+->{
+->  int x,y;
+->}
+->- (long *) foo:(int) v1 :(short) v2;  /* This is foo:: */
+->@end
+->
+->@interface classtwo : Object
+->{
+->   long a,b,c,d,e,f,g;
+->}
+->- bar;
+->- qwerty:vary;
+->- (short) foo:(int) a1 :(short) a2;  /* This is a distinct foo:: */
+->@end
+->
+->@interface classthree : classone
+->- (short) foo:(short) v1 : (long) v2; /* Can I override a method with
+->a new method of different type ? */
+->@end
+->
+->int main()
+->{
+->  id objekt;
+->  int k;
+->
+->  k = [objekt foo:11:22];
+->  
+->  /* What is the type of the rhs of this
+->  assignment ? What is the SEL ? To what do we convert the arguments
+->  for pushing onto the stack ? */
+->}
+
+As stated above, you will get a warning concerning the ambiguous
+selector.  I'm not sure whether you will get errors or warnings caused
+by the types of the arguments not matching the selector type or not.
+If you do not, and you are on a platform using ANSI C, you might get
+automatic type conversion caused by message prototyping.  On a
+non-ANSI platform, chars and shorts are automatically promoted to
+ints.  floats are promoted to doubles.
+
+->
+->I plead for patience with respect to my terribly trivial questions.
+->BTW, the few ObjC features exemplified in Huizenga's notes appear to
+->be enough for a usable language.  I speculate that ObjC doesn't
+->contain that much more (or else it would be the melting pot that C++
+->is).  Am I right ?
+
+I am not familiar with Huizenga's notes.  From a language standpoint,
+Objective-C doesn't contain much more than you've discussed.  But the
+runtime libraries can take a while to master.
+
+->
+->I really like the looks of Objective C.  I have some experience
+->implementing oo languages, but not compiled ones.  Separate
+->compilation does seem to offer some problems.  I was considering
+->implementing a subset of C++, but I'm leaning towards Objective C
+->instead.
+->
+->Thanks in advance for any replies !
+->
+->Eric
+->
+->
+->Eric W. Sink                     | "If no one is criticizing |Opinions
+->Departamento de Telematica       | your work, it is possible |mine -
+->Universidad Politecnica de Madrid| that you are not doing    |all of
+->esink@turia.dit.upm.es           | anything." -George Verwer |them.
+
+Ken
+

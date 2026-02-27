@@ -1,0 +1,66 @@
+Path: csusac!ucdavis!ucbvax!decwrl!uunet!hsi!stpstn!andyn
+From: andyn@stpstn.UUCP (Andy Novobilski)
+Newsgroups: comp.lang.objective-c
+Subject: Re: Newcomer to Objective C
+Message-ID: <6704@stpstn.UUCP>
+Date: 21 Mar 91 14:23:00 GMT
+References: <1991Mar13.010421.26793@agate.berkeley.edu> <1991Mar18.220111.12719@thunder.mcrcim.mcgill.edu>
+Reply-To: andyn@stepstone.com (Andy Novobilski)
+Distribution: usa
+Organization: The Stepstone Corporation, Sandy Hook, CT 06482
+Lines: 53
+
+In article <1991Mar18.220111.12719@thunder.mcrcim.mcgill.edu> groleau@Damrod.McRCIM.McGill.EDU (Francois Groleau) writes:
+>In article <1991Mar13.010421.26793@agate.berkeley.edu> c60c-3ia@web-1f.berkeley.edu (Centurion) writes:
+>>
+>>I am new to Objective C, and hence I do not know Anything about Objective C.  
+>>I am an experienced C and Pascal prgrammer, however.  I would be grateful 
+>>if anyone can give me the following information:
+>>
+>>	1.  Books on Objective C.  I have seen lots of books on C++ and I 
+>>own one of them, but so far I have not seen a single book on Objective C.
+>
+>	I had the same problem.  I was told by my local computer bookstore
+>that there is really only one book on Objective C, that is:
+>
+> ...
+
+There are several books being published by Addison-Wesley this year that
+might help:
+
+1. "Object-Oriented Programming:  An Evolutionary Approach, 2nd Ed."
+   by Cox and Novobilski.  We updated the second edition to give
+   better coverage of the language features and available tools.
+
+2. "Objective-C:  Object-Oriented Programming Techniques" by Pinson
+   and Wiener (Addison-Wesley).  The catalog says that the book presents 
+   basic concepts, an accurate description of Objective-C (both Stepstone's 
+   and NeXT's) and illustrates programming in Objective-C through examples.
+
+3. "An Introduction to Object-Oriented Programming" by Budd (Addison-
+   Wesley).  This book has been recently talked about in the comp.lang.c++ 
+   as providing a general intro to OOP in a language independent manner 
+   (ie, it talks about C++, Smalltalk, Objective-C, and Object Pascal).
+
+4. There are also several case study style books that have small sections
+   on objective-c.
+
+You might also look into books that talk about Smalltalk programming,
+since Objective-C's treatment of the concept of object is almost the
+same.  Specifically, do a literature search on Model/View/Controller
+since it is a very powerful way to organize and implement object-
+based systems.
+
+Finally, I would also be happy to send a copy of the Objective-C source 
+code from my Aug/Sep JOOP article to anyone who would like it.  (This is 
+the same code that was available last fall).  We are not on the internet, 
+so if anyone would like to place that code into an archive somewhere thats 
+appropriate, please let me know.
+
+Good luck,
+Andy N.
+-- 
+Andy Novobilski     | The Stepstone Corp.  | Object-Oriented Programming:
+andyn@stepstone.com | 75 Glen Rd.          | TV Network scheduling based on 
+(203)426-1875       | Sandy Hook, CT 06482 | the number of insulted viewers.
+

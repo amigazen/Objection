@@ -1,0 +1,10 @@
+oct/Amiga:
+==========
+
+This directory contains methods that are unique to the Amiga Exec
+and AmigaDOS systems.  For other systems, they are some more sample
+code to examine.  Modify the makefile to store the library in some
+standard place (like LIB:).  There will probably be more classes
+here in the future.
+
+--- brian witt, 18-April-90

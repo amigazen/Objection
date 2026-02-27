@@ -1,0 +1,252 @@
+#############################################
+#		:bk=0 :ts=8
+#	Makefile for OO "C" translaor
+#	To install locally, set LEX to you lexer program (lex for Unix).
+#	Set CC and LN to start just a compile and to just link a program.
+#	TEMP is just a temp file somewhere.  OOCINC specifies tree where
+#	ooc include files are located.  OOCBIN where executable files
+#	will be stored.
+#
+#	This version is responsible for the translator.
+#		sept 89,		bjw
+#	Prelinker added again.  Creates file "prelink" in $(PLN).
+#		Sept 89,		bjw
+#	Use more symbols, less hardcoded dependencies
+#		Oct 89, 		bjw
+#	Renamed from "OOC" to "OCT" (Objective C Translator).
+#		Nov 89,  		bjw
+#	Added class.c (class output routines)
+#		March 90,		bjw
+#   Changed "files.h" into "config.h" file; included by oct.h header.
+#       May 28, 1991,   bjw
+#   Added mystrs.c for total ANSI string function compatibility.
+#       May 30, 1991,   bjw
+#
+
+## vvvvvvvvvvvvvvvvvvv  User Servicable Parts Follow  vvvvvvvvvvvvvvvvvv */
+
+# ---- AMIGA  -------------------------------------
+#A 
+#A CC = cc
+#A LN = ln
+#A LEX = flex
+#A LDFLAGS = -g
+#A LIBS = tree.o -lc
+#A DELETE = delete quiet
+#A CLONE  = copy clone
+#A RENAME = rename
+#A 
+#A #  Filename Extension (Object file and Executable):
+#A OE = .o
+#A EE =
+#A 
+#A WILD_ALL = #?
+#A WILD_BAK = $(WILD_ALL).bak
+#A WILD_OBJ = $(WILD_ALL)$(OE)
+#A TMPDIR = t:
+#A OOCINC = ooc:include/
+#A OOCBIN = Haven:bins/bin/
+#A OOCLIB = ooc:include/
+#A 
+#A # -------------------------------------
+#A 
+#A #	Some actual include files:
+#A TREEINC = dh4:usr/include/tree.h
+#A RELEASE = $(OOCINC)objc/release.h
+#A TEMP = $(TMPDIR)cpp-temp.c
+#A 
+#A #	The programs we create:
+#A OCT = oct
+#A PLN = prelink
+#A OCT_CPP = oct-cpp
+#A TEST_FILE = /test/t6.m
+#A 
+#A #	non-generated OOC files; string ops BUILTIN, sdb stuff, pack strs.
+#A CFLAGS = +x5 -n -DNO_PROTOTYPE +Q
+#A CF_STACK = +m
+#A 
+#A #	for Generated "C" files (flex): string ops BUILTIN, lots optimize,
+#A #	"-Y140" increase switch symbol table
+#A GCFLAGS = +x5,3 -Y140 -DNO_PROTOTYPE
+#A 
+#A #  Flex flags:
+#A FFLAGS =
+#A
+
+# ---- UNIX  -------------------------------------
+
+CC = cc -c
+LN = cc
+LEX = lex
+MODEL = -g
+LDFLAGS = $(MODEL)
+LIBS = tree.o -ll
+DELETE = rm -f
+CLONE = cp
+RENAME = mv
+
+#  Filename Extension (Object file and Executable):
+OE = .o
+EE =
+
+WILD_ALL = *
+WILD_BAK = $(WILD_ALL).bak $(WILD_ALL)~
+WILD_OBJ = $(WILD_ALL)$(OE)
+TMPDIR = /usr/tmp/
+OOCINC = $(HOME)/myoct/include/
+OOCBIN = $(HOME)/bin/
+OOCLIB = $(HOME)/myoct/lib/
+
+# -------------------------------------
+
+#	Some actual include files:
+TREEINC = $(OOCINC)tree.h
+RELEASE = $(OOCINC)objc/release.h
+TEMP = $(TMPDIR)cpp-temp.c
+
+#	The programs we create:
+OCT = oct
+PLN = prelink
+OCT_CPP = oct-cpp
+TEST_FILE = ../collect/Set.m
+
+#	non-generated OOC files; string ops BUILTIN, sdb stuff, pack strs.
+CFLAGS = $(MODEL) -DNO_PROTOTYPE -I../usr/include -I$(OOCINC)
+CF_STACK =
+
+#	for Generated "C" files (flex): string ops BUILTIN, lots optimize,
+GCFLAGS = $(CFLAGS)
+
+#  Flex flags:
+FFLAGS =
+
+
+##
+## ^^^^^^^^^^^^^^^^  No User Servicable Parts Beyound  ^^^^^^^^^^^^^^^^^ */
+##
+
+
+# -------------------------------------
+#
+#	--- Reference Symbols ---
+#
+
+ALLSRC = gram0.c main.c symbol.c file.c strs.c select.c gram.c expr.c mdef.c\
+		class.c error.c info.c hate.c tree.c mystrs.c
+MOBJ   = gram0.o main.o file.o strs.o symbol.o select.o gram.o expr.o mdef.o\
+		class.o error.o hate.o info.o  mystrs.o
+GOBJ   = scan.o
+CSRC    = scan.c
+
+ALLHEADR = oct.h $(OOCINC)objc/private/config.h 
+
+# -------------------------------------
+#
+#	--- Rules ---
+#
+
+.l.o:
+	$(LEX) $(FFLAGS) $*.l
+	@echo "done $(LEX)ing..."
+	@-$(DELETE) $*.c
+	@$(RENAME) lex.yy.c $*.c
+	$(CC) $(GCFLAGS) $*.c
+
+
+# -------------------------------------
+#
+#	--- The controllers ---
+#
+all :	$(OCT) $(PLN)
+
+help :
+	@echo "Makefile for Object C translator"
+	@echo "make install  -- Ensure /bin version is up to date"
+	@echo "make tags     -- Update vi C-tags file"
+	@echo "make clean    -- Delete all object files, etc"
+	@echo "make zoofile  -- Package up source and Makefile"
+	@echo "make test     -- Test our xlator on one module"
+
+install :	$(OCT) $(PLN)
+	$(CLONE) $(OCT)  $(OOCBIN)$(OCT)
+	$(CLONE) $(PLN)  $(OOCBIN)$(PLN)
+	$(CLONE) ccpp/cpp $(OOCBIN)$(OCT_CPP)
+
+
+tags :	$(ALLHEADR) error.h Makefile
+	ctags $(ALLSRC)
+
+
+clean :
+	-$(DELETE) $(WILD_OBJ) $(WILD_BAK) $(TMPDIR)ot$(WILD_ALL) testout.i
+	-$(DELETE) $(CSRC)
+	-$(DELETE) $(OCT) $(PLN)
+
+test :	$(OCT)
+	-$(DELETE) $(TMPDIR)ot$(WILD_ALL)
+	$(OCT) -l -w2 -zt -zk -zd $(TEST_FILE)
+
+#u 	$(RENAME) /usr/tmp/ot* testout.i
+
+
+# -------------------------------------
+#
+#	---   Projects  ---
+#
+
+$(OCT) :	$(GOBJ) $(MOBJ) tree.o
+	$(LN) $(LDFLAGS) -o $(OCT) $(MOBJ) $(GOBJ) $(LIBS)
+
+
+# -------------------------------------
+#
+#	--- Underworld relations ---
+#
+# scan.o :	$(ALLHEADR) scan.c 
+# scan.c :	$(ALLHEADR) scan.l
+scan.l :	$(ALLHEADR) gram.h
+
+
+main.o : $(ALLHEADR) $(RELEASE) error.h $(OOCINC)objc/objc.h $(OOCINC)octhead.h
+
+class.o :	$(ALLHEADR) gram.h error.h $(TREEINC) $(OOCINC)objc/objc.h
+hate.o :	$(ALLHEADR) gram.h error.h $(TREEINC)
+strs.o :	$(ALLHEADR)
+symbol.o :	$(ALLHEADR) $(TREEINC) gram.h $(OOCINC)objc/objc-class.h error.h
+select.o :	$(ALLHEADR) error.h
+file.o : 	$(ALLHEADR)
+info.o :	$(ALLHEADR) error.h
+mdef.o :	$(ALLHEADR) gram.h error.h
+gram0.o :	$(ALLHEADR) gram.h
+
+
+# ----------------------------------
+#	"+m"	stack overflow checking.
+expr.o :	$(ALLHEADR) error.h gram.h
+	$(CC) $(CFLAGS) $(CF_STACK) expr.c
+
+gram.o : 	$(ALLHEADR) gram.h error.h
+	$(CC) $(CFLAGS) $(CF_STACK) gram.c
+
+
+# -------------------------------------
+#
+#	---   Prelinker  ---
+#
+$(PLN) :	pln.o mystrs.o
+	$(LN) -o $(PLN) pln.o mystrs.o $(LIBS)
+
+pln.o : 	$(RELEASE) $(OOCINC)octhead.h
+mystrs.o : 	$(ALLHEADR)
+
+
+# -------------------------------------
+#
+#	---   Zoo file  ---
+#
+zoofile :
+	$(CLONE) Makefile mk-amiga
+	zoo -add ram:X scan.l *.c *.h mk-amiga
+	zoo -delete ram:X scan.c
+	@$(DELETE) mk-amiga ram:X.bak
+

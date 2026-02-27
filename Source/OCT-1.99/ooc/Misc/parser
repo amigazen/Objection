@@ -1,0 +1,33 @@
+From csusac!babbage.ecs.csus.edu!brian Sun, 21 Jul 91 20:49:11 PST
+Received: by rael.UUCP (V1.08/Amiga)
+	id AA00000; Sun, 21 Jul 91 20:49:11 PST
+Received: from babbage.ecs.csus.edu by csusac.ecs.csus.edu (5.61/1.34)
+	id AA15301; Tue, 16 Jul 91 11:32:27 -0700
+Received: by babbage.ecs.csus.edu (5.61/1.34)
+	id AA25531; Tue, 16 Jul 91 11:30:29 -0700
+Date: Tue, 16 Jul 91 11:30:29 -0700
+Message-Id: <9107161830.AA25531@babbage.ecs.csus.edu>
+From: csusac!babbage.ecs.csus.edu!brian (Brian Witt)
+To: rael!aleks
+Subject: mathparser
+
+Newsgroups: comp.sys.amiga.programmer
+Path: csusac!csus.edu!wuarchive!uunet!sugar!peter
+From: peter@Sugar.NeoSoft.com (Peter da Silva)
+Subject: Re: Math Parser
+Message-ID: <1991Jul15.123714.11757@Sugar.NeoSoft.com>
+Organization: Sugar Land Unix -- Houston, TX
+References: <ad99s461.7727@sycom.UUCP>
+Date: Mon, 15 Jul 1991 12:37:14 GMT
+
+In article <ad99s461.7727@sycom.UUCP> ad99s461@sycom.UUCP (Alex Deburie) writes:
+> Does anyone out there know where I might get my hands on a Math Parser. I've
+> been going nuts trying to get something to work correctly.
+
+And if you don't want to use a recursive-descent one, get hold of Horowitz
+and Sahni "Fundamentals of Data Structures" for a handy little operator-
+precedence one.
+-- 
+Peter da Silva.   `-_-'   <peter@sugar.neosoft.com>.
+                   'U`    "Have you hugged your wolf today?"
+

@@ -1,0 +1,11 @@
+ooc/test:
+=========
+
+This directory contains various files that excersize the translator.
+They're useful when making changes or fixing bugs.  The files t1.m to
+t5.m are short and quite rugged in their expressions.  If you're
+chasing bugs, introduce a/some statement(s) into one of the files
+and examine using 'make suite'.  The .m files are useful only when
+changing the translator; their methods are non-sense.
+
+--- brian witt, 18-April-90

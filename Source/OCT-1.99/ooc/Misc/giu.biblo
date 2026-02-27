@@ -1,0 +1,107 @@
+From pacbell!att!tut.cis.ohio-state.edu!unmvax!uokmax!uokmax.ecn.uoknor.edu!randy Wed Apr 11 00:23:38 PDT 1990
+
+Many of the people who sent me references asked for a summary of what I got.
+Well, to make it easy on myself, I am posting it. Below is a list of references
+sent to me, plus a few I dug up myself. Not all of these will go into my paper,
+but they might be handy for someone else's future reference.
+
+[1]  Cox, B. and Hunt, B. Objects, icons, and software  ICs.
+     Byte (August 1986).
+
+[2]  Dodani, M. et al. Separation  of  powers.  Byte  (March
+     1989).
+
+[3]  Schumucker, K. Using objects to package user  interface
+     functionality.  ACM SIGGRAPH Workshop on Software Tools
+     for User Interface Development.
+
+[4]  Myers, B. and Szekely,  P.  A  user  interface  toolkit
+     based  on graphical objects and constraints. OOPLSA '88
+     Proceedings.
+
+[5]  Fishman, D. H.  et  al.  Overview  of  the  Iris  DBMS.
+     Object-Oriented  Concepts, Databases, and Applications.
+     Kim, Won and Lochovsky,  F.  H.  ed.   Addison  Wesley,
+     1989.
+
+[6]  Brown, J. R. and Cunningham, S.  Programming  the  User
+     Interface: Principles and Examples. Wiley, 1989.
+
+[7]  Garg, P. K. Abstraction methods in HyperText.  Communi-
+     cations of the ACM (1988), pp. 862-870.
+
+[8]  Kelly, C. D. and Taylor, R. N. et al. Design principles
+     behind   Chiron:  a  UIMS  for  software  environments.
+     Proceedings, 10th International Conference on  Software
+     Engineering, (1988), pp. 367-376.
+
+[9]  Barth, P. S. An object-oriented approach  to  graphical
+     interfaces.  ACM  Transactions  on Graphics 5, 2 (April
+     1986), pp. 142-172.
+
+[10] Gettys, J. and Scheifler, R. W. The  X  window  system.
+     ACM  Transactions on Graphics 5, 3 (July 1986), pp. 79-
+     109.
+
+[11] Jacob R. J. K. A  specification  language  for  direct-
+     manipulation   user  interfaces.  ACM  Transactions  on
+     Graphics 5, 4 (October 1986), pp.  283-317.
+
+[12] Card, S. K. and Henderson, Jr., D. A. Rooms: the use of
+     multiple  virtual workspaces to reduce space contention
+     in a window-based graphical user interface.  ACM  Tran-
+     sactions on Graphics 5, 3 (July 1986), pp. 211-243.
+
+[13] Booch, G. Object-oriented  development.  IEEE  Transac-
+     tions on Software Engineering SE-12, 2 (February 1986),
+     pp. 211-221.
+
+[14] Rathke, C. Human-computer communication meets  software
+     engineering.   Proceeding, 9th International Conference
+     on Software Engineering, (1987), pp. 216-224.
+
+[15] Coutaz, J. The construction of user interfaces and  the
+     object  paradigm.   ECOOP  '87  European  Conference on
+     Object-Oriented Programming, Be'zivin, J.,  Hullot,  J.-
+     M.,  Cointe, P., and Lieberman, H. ed. (1987), pp. 121-
+     130.
+
+[16] England, D. A user interface design tool. ESEC '87  1st
+     European  Software  Engineering Conference, Nichols, H.
+     K., and Simpson, D. ed.  (1987), pp. 110-117.
+
+[17] Rovira, C.-A. Rovira diagrams. Computer Language  7,  1
+     (January 1990), pp. 59-67.
+
+[18] Bulman, D. M. An object-based development  model.  Com-
+     puter Language 6, 8 (August 1989), pp. 49-59.
+
+[19] Gamma, E., Marty, R., and Weinand, A. Design and imple-
+     mentation  of ET++, a seamless object-oriented applica-
+     tion framework. Structured Programming 10, 2 (1989).
+
+[20] Nahaboo, C. GWM manual, the X11 generic window manager.
+     (1989).
+
+[21] Peterson, C. D. Athena widget set -- C language  inter-
+     face. (1989).
+
+[22] Olsen,  D.  B.  MIKE:  The  menu  interaction   kontrol
+     environment. ACM Transactions on Graphics 5, 4 (October
+     1986), pp. 318ff.
+
+[23] Buxton, W. and Myers, B. A. Creating highly interactive
+     and  graphical  user  interfaces by demonstration. SIG-
+     GRAPH '86 Conference Proceedings, (1986), pp. 249ff.
+
+
+Thanks to all who sent me material; your help was and is invaluable.
+
+Randy
+-- 
+Randy J. Ray       University of Oklahoma, Norman Campus	(405)/325-5370
+!chinet!uokmax!randy	randy@uokmax.uucp    randy@uokmax.ecn.uoknor.edu
+Flaming makes you feel better, sorta like popping the little plastic bubbles
+in packaging material.	-Tim Perala
+
+

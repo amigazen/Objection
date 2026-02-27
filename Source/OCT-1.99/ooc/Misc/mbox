@@ -1,0 +1,1702 @@
+Path: csusac!ucdavis!ucbvax!agate!shelby!msi.umn.edu!noc.MR.NET!gacvx2.gac.edu!scott
+From: scott@mcs-server.gac.edu (Scott Hess)
+Newsgroups: comp.sys.next
+Subject: Re: Objective C class libraries
+Message-ID: <SCOTT.90Dec3121001@mcs-server.gac.edu>
+Date: 3 Dec 90 20:10:01 GMT
+References: <1990Dec3.145326.18906@noose.ecn.purdue.edu>	<9676@darkstar.ucsc.edu>
+Organization: Gustavus Adolphus College
+Lines: 37
+Nntp-Posting-Host: mcs-server.gac.edu
+In-reply-to: isbell@ucscf.UCSC.EDU's message of 3 Dec 90 16:24:34 GMTLines: 37
+
+In article <9676@darkstar.ucsc.edu> isbell@ucscf.UCSC.EDU (Art Isbell) writes:
+
+   For those of you who are NeXT developers, have you found the Objective C
+   classes provided by NeXT to be sufficient?  Because reusability of code is
+   supposed to be a feature of object oriented design, have you found that
+   purchasing/obtaining classes defined by others (Stepstone, etc.) has been
+   beneficial as opposed to your reinventing someone else's wheel?  I would be
+   interested in your experiences and recommendations.
+
+I once started a post of the Stepstone Foundation Library (actually,
+reverse engineering it from their documentation, as we don't have it
+anywhere, here), and actually got quite far.  I stopped, though, when
+I realized that most of the stuff is supplied in some form or another
+by NeXT's ObjC class library.  Most of the array and collection stuff
+is handled by List and Storage, Set by HashTable.  All you miss are
+Point, Rect, and String.  I'll admit that the NeXT stuff is not so
+flexible . . .
+
+But, the reason I don't care is because I also realized that in many of
+these cases, the C end of the deal was much more natural than Objective-C.
+I found my String class simply wasn't really more useful than the use of
+the string library, and it limited from doing stuff which I liked to do
+(which would probably be the positive side :-).  Also, since there's
+no garbage collection, it really didn't give you a whole lot (since
+you still had to make sure things were allocated/freed, and the like -
+though the Objective-C-iffied versions looked nicer).
+
+One thing that we are lacking on the NeXT is time.  Given time, I would
+bet there will be more class libraries.  Right now, though, there's not
+been the time for people to end up with a decent class that they think
+the net might like to use and modify, so no one has really done it.
+--
+scott hess
+scott@gac.edu
+Independent NeXT Developer	(Stuart)
+GAC Undergrad			(Horrid.  Simply Horrid.  I mean the work!)
+<I still speak for nobody>
+
+From csusac!babbage.ecs.csus.edu!brian Tue, 4 Dec 90 01:08:15 PST
+Received: by rael.UUCP (0.44/0.44)
+	id AA00000; Tue, 4 Dec 90 01:08:15 PST
+Received: from babbage.ecs.csus.edu by csusac.ecs.csus.edu (5.61/1.34)
+	id AA13905; Tue, 27 Nov 90 10:42:14 -0800
+Received: by babbage.ecs.csus.edu (5.61/1.34)
+	id AA04011; Tue, 27 Nov 90 10:42:49 -0800
+Date: Tue, 27 Nov 90 10:42:49 -0800
+Message-Id: <9011271842.AA04011@babbage.ecs.csus.edu>
+From: csusac!babbage.ecs.csus.edu!brian (Brian Witt)
+To: rael!oct
+Subject: processor name
+
+Sun uses "mc68000" for the 68K. Please update cpp to include
+this.
+
+Found in Sun's RPC 3.9 sources.
+
+--- brian
+
+- Path: csusac!ucdavis!csus.edu!wuarchive!sdd.hp.com!think.com!mintaka!spdcc!iecc!compilers-sender
+- From: lupine!rfg@uunet.UU.NET (Ron Guilmette)
+- Newsgroups: comp.compilers
+Subject: Re: Hash specifics
+Keywords: design
+Message-ID: <2979@lupine.NCD.COM>
+Date: 13 Dec 90 06:25:10 GMT
+References: <9012112133.AA00452@rbbb.Eng.Sun.COM>
+Sender: compilers-sender@iecc.cambridge.ma.us
+Reply-To: lupine!rfg@uunet.UU.NET (Ron Guilmette)
+Organization: Network Computing Devices, Inc., Mt. View, CA
+Lines: 69
+Approved: compilers@iecc.cambridge.ma.us
+
+In article <9012112133.AA00452@rbbb.Eng.Sun.COM> chased@Eng.Sun.COM (David Chase) writes:
++CACM 33:6 (June 1990) "Fast Hashing of Variable Length Strings"
++by Peter K. Pearson.
++
++He discusses use of hash functions of the form:
++
++  h = 0;
++  n = length(string);
++
++  for i = 1 through n do
++    h = Table [ h XOR string [i]];
++  enddo;
++
++  return h;
+
+Some time back, I wrote a program which used the following hash function
+to try (for a given input set of input strings) to find an "efficient"
+hash function for the given set (and some particular table size).
+
+I defined "efficiency" somewhat arbitrarily as the number members of the
+input (key) set divided by the number of "probes" (or "key comparisons")
+which would be needed to find each and every member of the input set in
+the hash table exactly once.  (Note that I was assuming that the hash
+table in question would be the kind used in compilers & assemblers; i.e.
+one which would be fully "precomputed" ahead of time and used only for
+lookups, and NEVER for ADDS or DELETES.)
+
+static unsigned hash (const char *s, unsigned prime)
+{
+  unsigned ret_val = 0;
+
+  for (; *s; s++)
+    ret_val = (*s ^ ret_val) * prime;
+  return ret_val & hash_mask;
+}
+
+This hash function takes a second parameter `prime' which is used to help
+produce `well mangled' output keys from the input keys (i.e. strings).
+Knuth documents that fact that using prime numbers in hash functions is
+known to tend to make these functions more "efficient" (i.e. it tends to
+make the output keys more evenly distributed over the range).
+
+(Note also that this function assumes that `hash_mask' is some constant
+defined earlier on.  Typically, it has a value like 2**N-1, where N is
+some integer.  The `primary' hash table size is 2**N.)
+
+The program I wrote tried various values for `prime' up to some fixed
+limit (i.e. 8k).  I ran the program for various sets of input strings
+(both large and small) and for various table sizes.
+
+The program reported the "efficiency" rating of the primes tested.
+Curiously, the number 47 always rated in the top 10 regardless of the set
+of input keys used or the primary table size used.  I have no explanation
+for this.
+
+Moral of the story: If you need a reasonably efficient hashing function
+for some arbitrary set of strings (e.g. identifiers or keywords), and if
+you need it fast, use the function shown above and substitute `47' for
+`prime'.
+
+P.S.  The above code is not copyrighted, but its `look & feel' may be. :-)
+
+-- 
+
+// Ron Guilmette  -  C++ Entomologist
+// Internet: rfg@ncd.com      uucp: ...uunet!lupine!rfg
+-- 
+Send compilers articles to compilers@iecc.cambridge.ma.us or
+{ima | spdcc | world}!iecc!compilers.  Meta-mail to compilers-request.
+
+Xref: csusac gnu.announce:68 comp.lang.eiffel:1049 comp.lang.c++:7466 comp.object:2192
+Path: csusac!ucdavis!uop!milton!dali.cs.montana.edu!uakari.primate.wisc.edu!zaphod.mps.ohio-state.edu!think.com!snorkelwacker.mit.edu!ai-lab!ai.mit.edu!gnulists
+From: om%icsi.Berkeley.EDU@ucbvax.berkeley.edu (Stephen M. Omohundro)
+Newsgroups: gnu.announce,comp.lang.eiffel,comp.lang.c++,comp.object
+Subject: Sather, a new object oriented language
+Message-ID: <gnusenet-9701@pasteur.Berkeley.EDU>
+Date: 12 Dec 90 22:55:27 GMT
+Reply-To: om%icsi.Berkeley.EDU@ucbvax.berkeley.edu (Stephen M. Omohundro)
+Followup-To: comp.lang.eiffel,comp.lang.c++,comp.object
+Organization: International Computer Science Institute, Berkeley, Ca.
+Lines: 75
+Approved: info-gnu@prep.ai.mit.edu
+To: gnu-announce@ucbvax.berkeley.edu
+Originator: om@icsib19
+
+--text follows this line--
+This note is a preliminary announcement of a new object-oriented
+language called Sather under development at the International Computer
+Science Institute. We will probably have an initial release of the
+compiler and library classes sometime in the next several months. We
+would therefore like to get feedback on the manual both for content
+and readability.  PostScript copies of the manual are available by
+electronic mail from om@icsi.berkeley.edu.
+
+Sather is based on Eiffel but is more concerned with efficiency and
+less with some of the formal and theoretical issues addressed by
+Eiffel. The language is much smaller than the current Eiffel,
+it eliminates over 40 keywords and simplifies the syntax and
+inheritance rules. Several features were added to increase efficiency
+and to simplify programming. Efficient arrays are built into the
+language itself (objects may have a dynamically allocated array
+portion after their static features). The typing scheme allows the
+programmer to distinguish between dispatched and non-dispatched
+declarations. As in C++ local variables may be declared at the point
+of use. Sather classes may have shared variables which are accessible
+from every instance of that class. For efficiency reasons, the
+exception handling mechanism based on setjump and long-jump has been
+eliminated and the garbage collector is not based on the Dijkstra
+algorithm. Many cosmetic issues have been changed (eg. more than one
+class may be defined in a file).
+
+Like Eiffel, Sather code is compiled into portable C and efficiently
+links with existing C code. The Sather compiler is written in Sather
+and has been operational for several months, though it is still being
+improved. Preliminary benchmarks show a performance improvement over
+Eiffel of between a factor of 4 and 50 on basic dispatching and
+function calls. On the Stanford Self benchmarks (including 8 queens,
+towers of hanoi, bubblesort, etc), Sather is slightly faster than C++,
+though this is probably due to the C compiler's better ability to 
+optimize for a Sparcstation than the C++ compiler.
+
+Our plans are to make the Sather compiler and libraries publicly
+available under a license whose only restriction is acknowledgement of
+the use of Sather and of the authors of any classes used in a program.
+We would like to establish a repository for efficient, reusable, well
+written, publicly available, classes for most of the important
+algorithms in computer science. There are currently about 120 classes
+in the library. Some examples of classes being worked on include:
+
+base: integers, strings, random number generation, etc.
+compiler: classes used in the compiler
+connectionist: back propagation, radial basis functions, competitive 
+   learning, Kohonen nets, perceptrons and other neural network 
+   algorithms
+datastr: various hash tables, priority queues, union find, lists based
+   on amortized doubling of extendible arrays, gap lists, binary trees,
+   bit_vectors, stacks, queues, sorts, etc.
+debugger: classes used in interpreter/debugger
+geometry: vectors, boxes, balls, Delaunay triangulation, Voronoi
+   diagrams, kd-trees, point location, etc.
+grammar: deterministic finite automata, dfa minimization, parsers,
+   string search algorithms
+graph: minimal spanning tree, depth first search, connected
+   components, max flow, shortest path, etc.
+graphics: plotting routines, ray tracing, modelling, graphics pipeline
+imageproc: bitmaps, dithering, filtering, FFT, etc.
+interface: XView classes, PostScript and Framemaker output
+numerical: matrix classes (SVD etc.), special functions, complex
+   numbers, linear programming, conjugate gradient optimization, etc.
+statistics: least squares fits, density estimators, nonlinear
+   regression, hidden markov models, nearest neighbor classifiers, 
+   decision tree induction, etc.
+
+The libraries are growing quickly and will collect together classes
+from many authors under the same unrestrictive license. A GNU emacs
+editing mode for Sather exists. We are working on a combination
+interpreter, debugger, and browser. A parallel extension of Sather for
+shared memory machines is also under development.
+
+--Stephen Omohundro
+
+
+- From uflorida!travis!gcx1.ssd.csd.harris.com!jason Fri Dec 14 13:38:59 PST 1990
+Subject: license agreeement
+
+#! /bin/sh
+#		"End of archive 1 (of 5)."
+# Contents:  Calendar.h Date.h DateP.h DayName.c DayName.h DayNameP.h
+#   Gravity.c Gravity.h GravityP.h Imakefile MANIFEST README
+#   StrInRect.h StrInRectP.h StrTable.c StrTable.h StrTableP.h
+#   Xdiary.ad arrow_l.xbm arrow_r.xbm cal.icon common.h diary.h
+#   diary.icon patchlevel.h resource.h template.c template.h
+# Wrapped by jason@hcx2 on Thu Dec  6 12:49:20 1990
+#
+#  xdiary version 1.0 -- An X application which displays a calendar in one of
+#                      two formats and/or an interactive daily dairy.
+#
+#  Author: Jason Baietto, jason@ssd.csd.harris.com
+#  xdiary Copyright 1990 Harris Corporation
+#
+#
+PATH=/bin:/usr/bin:/usr/ucb ; export PATH
+if test -f 'Calendar.h' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'Calendar.h'\"
+else
+echo shar: Extracting \"'Calendar.h'\" \(4040 characters\)
+sed "s/^X//" >'Calendar.h' <<'END_OF_FILE'
+X/*
+X * Author: Jason Baietto, jason@ssd.csd.harris.com
+X * xdiary Copyright 1990 Harris Corporation
+X *
+X * Permission to use, copy, modify, and distribute, this software and its
+X * documentation for any purpose is hereby granted without fee, provided that
+X * the above copyright notice appear in all copies and that both that
+X * copyright notice and this permission notice appear in supporting
+X * documentation, and that the name of the copyright holder be used in
+X * advertising or publicity pertaining to distribution of the software with
+X * specific, written prior permission, and that no fee is charged for further
+X * distribution of this software, or any modifications thereof.  The copyright
+X * holder makes no representations about the suitability of this software for
+X * any purpose.  It is provided "as is" without express or implied warranty.
+X *
+X * THE COPYRIGHT HOLDER DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+X * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, AND IN NO
+X * EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY SPECIAL, INDIRECT OR
+X * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM ITS USE,
+X * LOSS OF DATA, PROFITS, QPA OR GPA, WHETHER IN AN ACTION OF CONTRACT,
+X * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH
+X * THE USE OR PERFORMANCE OF THIS SOFTWARE.
+X */
+X
+X#ifndef _CalendarWidget_h
+X#define _CalendarWidget_h
+X
+X#include <X11/Core.h>
+X#include "StrInRect.h"
+X#include "Date.h"
+X
+X/* 
+X   Calendar.h -- Public Include File.
+X   Author: Jason Baietto
+X   Date:   September 16, 1990
+X*/
+
+-----------
+
+--- brian
+
+From daemon Mon Jan  7 20:23 PST 1991
+Received: from UUNET.UU.NET by babbage (5.61/1.34)
+	id AA25065; Mon, 7 Jan 91 20:23:03 -0800
+Received: from hsi.hsi.com by uunet.UU.NET (5.61/1.14) with UUCP 
+	id AA29415; Mon, 7 Jan 91 23:22:15 -0500
+Received: by hsi.hsi.com.HSI.COM (smail2.5)
+	id AA11911; 7 Jan 91 20:01:54 EST (Mon)
+Received: from aspen.stepstone.com 
+	by stepstone.com (3.2/smail2.5/9-18-88)
+	id AA01328; Mon, 7 Jan 91 11:26:00 EST
+Received: by aspen.stepstone.com (4.0/SMI-4.0)
+	id AA06308; Mon, 7 Jan 91 11:25:55 EST
+Date: Mon, 7 Jan 91 11:25:55 EST
+From: andyn@stepstone.com (Andy Novobilski)
+Message-Id: <9101071625.AA06308@aspen.stepstone.com>
+To: andyn@stepstone.com, blenko-tom@cs.yale.edu, brian@babbage,
+        brocher@urz.unibas.ch, cohill@vtserf.cc.vt.edu, glang@autodeski.com,
+        jb@computer-science.strathclyde.ac.uk, kwolf@zip.eecs.umich.edu,
+        melling@haydn.psu.edu, pintado@cgeuge51.bitnet, rashidi@gw.wmich.edu,
+        sierka@ncar.ucar.edu, sjk%onecom@uunet.UU.NET,
+        ntpdvp1!willr@uunet.UU.NET
+Subject: Objective-C Sample Source
+Status: R
+
+
+Greetings.
+
+Enclosed with this email is the source code that goes
+with the JOOP article entitled:
+
+"A Pictorial Design Notation for Software-ICs."         
+
+published in the July/Aug 1990 Issue (Vol 3, No2).  I
+hope it proves useful for taking a look at an alternate
+approach for structuring Objective-C based apps.  
+
+A second set of source will follow at a later time.  This
+is the source from the sample application in the second
+edition of "Object-Oriented Programming: An Evolutionary
+Approach" (Cox & Novobilski) in Chapter nine.  Unfortunatly,
+it requires ICpak 201 to completely build, but what the
+heck, it might help.
+
+As I mentioned in the README file, I'm open to discussions
+on the form and reasoning behind what was done, but not
+really interested in providing help on porting this to
+other platforms.  My apologizes for taking so long to       
+provide this code, but my boss found something to do with
+the free time I thought I had after completing my last
+project.  Oh well .....
+
+Best of luck, and Happy New Year,
+Andy, the programmer
+Fred, the Betta fish,
+and my other fish,
+Fred, the Algea-Eater
+
+===source=follows,=remove=this=line=and=above=befor=unsharring====
+exit
+
+Path: csusac!ucdavis!ucbvax!agate!apple!usc!zaphod.mps.ohio-state.edu!rpi!batcomputer!cornell!uw-beaver!ubc-cs!mprgate.mpr.ca!proton!wittkopf
+From: wittkopf@proton.mpr.ca (Kevin Wittkopf)
+Subject: OO Software Libraries
+Message-ID: <1991Mar20.154019@proton.mpr.ca>
+Date: 20 Mar 91 23:40:19 GMT
+Reply-To: wittkopf@proton.mpr.ca (Kevin Wittkopf)
+Organization: MPR Teltech Ltd.
+Lines: 28
+
+
+I'm currently developing an OO software library tool, consisting of a 
+repository of (potentially) reusable classes, coupled with query
+mechanisms for locating the components. I'm now in the process of 
+locating any useful, publicly available classes and/or class libraries
+to create an initial population of components in the tool. The general
+domain is telecommunications applications, but general-purpose classes
+will be included as well. The tool currently supports c++, eiffel, and
+objective-C, but support for additional languages may be added in the 
+future.
+
+I'm interested in any email and/or FTP addresses of publicly-available 
+classes or class libraries that might be useful (I currently have libg++ 
+and NIH libraries, as well as some communications and graphics-based 
+classes developed in-house). 
+
+Also, if there is anyone doing similar work, I'd be interested in 
+hearing about it.
+
+Thanx in advance.
+
+
+
+--
+Kevin Wittkopf                  | Voice : (604) 293-6087
+MPR Teltech Ltd. 		| Fax   : (604) 293-5787
+8999 Nelson Way, Burnaby, BC    | E-Mail: wittkopf@proton.mpr.ca
+Canada, V5A 4B5                 |         proton.mpr.ca!wittkopf@uunet.uu.net
+
+Path: csusac!csuchico.edu!petunia!usc!zaphod.mps.ohio-state.edu!pacific.mps.ohio-state.edu!linac!att!pacbell.com!pacbell!m5!tma
+From: tma@m5.COM (Tim Atkins)
+Newsgroups: comp.lang.c++,comp.object,comp.lang.objective-c
+Subject: Re: Static typing and OOP efficiency
+Message-ID: <4679@m5.COM>
+Date: 22 Mar 91 20:02:30 GMT
+References: <1991Feb16.121825.15353@gpu.utcs.utoronto.ca> <27BFDF44.3EA6@tct.uucp> <PCG.91Feb19202728@odin.cs.aber.ac.uk> <27C523A2.2155@tct.uucp> <PCG.91Feb27190941@odin.cs.aber.ac.uk>
+Followup-To: comp.lang.c++
+Organization: Object Sciences Corp., Menlo Park, CA
+Lines: 51
+
+In article <PCG.91Feb27190941@odin.cs.aber.ac.uk> pcg@cs.aber.ac.uk (Piercarlo Grandi) writes:
+>
+>pcg> 3) Dynamic dispatchin can be made impressively fast, by the use of
+>pcg> various tricks (hashed tables, type deductive compilers, clever
+>pcg> linkers, hinting and caching).
+>
+>chip> There's no way, however, that the dynamic dispatching of
+>chip> Objective-C can outperform even a virtual C++ member function,
+>chip> much less a normal member function, assuming that the C++
+>chip> implementor was in her right mind when she wrote the code
+>chip> generator.
+>
+>As to dynamic overloading, C++ has an advantage in that it has manifest
+>types with bounded runtime overloading, while Objective C has latent
+>types with unbounded runtime overloading. This means that C++ can use
+>double indirection into vtbls, where Objective C has to use hash tables
+>or caching, hinting, and the like.
+>
+
+At my last company I spent a bit of time examining and working on improved
+runtime dynamic message binding schemes.  My final dispatcher for Objective
+C does a full run-time dynamic bind with only ~20% more time overhead
+than C++ uses for its limited form of dynamic binding with known type
+family and relative position of implementation info.  The principal change
+to the scheme used by Objective C and Smalltalk was to invert the conceptual
+lookup table so that the primary index is by message (selector) instead
+of by class.   Both classes and selectors are encoded as relative indices
+and the actual class/implementation list is further indexed by an
+augmented bit-vector with on-bits signifying that the corresponding class
+implements the message.    Therefore the principal space cost is the size
+of the bit vector.  At a modest decrease in efficiency the bit vector may
+be trimmed to only the set of classes that implement the message.  In space
+this dispatch mechanism is smaller than that of either Objective C or 
+C++.  The mechanism also does not preclude Multiple Inheritance as the standard
+Objective C mechanism does.  
+
+Of course the binding time is significantly improved in the presence of compile
+time type hints.  The dispatch time is constant unlike in the traditional 
+scheme and is twice as fast for a full dispatch as the speed acheived for
+a cache hit in the original Objective C dispatcher!
+
+
+One thing that seems to be forgotten in such comparisons is that the comparison
+should not be the ratio of d(A) to d(B) where d is dispatch speed and A and
+B are languages but should instead be the ration of (f + d(A)) to (f + d(B))
+where f is the time taken for the average method execution.  This of course
+assumes that f is comparable in both languages which is the case when 
+comparing Objective C and C++ for methods that do normal C-ish things.
+
+
+- Tim Atkins
+
+From: noren@dinl.uucp (Charles Noren)
+Newsgroups: comp.lang.objective-c
+Subject: Re: How's Stepstone/Objective-C doing?
+Message-ID: <1844@dinl.mmc.UUCP>
+Date: 12 Apr 91 16:50:23 GMT
+References: <1991Mar30.165230.11364@sugar.hackercorp.com> <6737@stpstn.UUCP> <SALC.91Apr9145833@aristotle.shearson.com>
+Reply-To: noren@dinl.UUCP (Charles Noren)
+Organization: Martin Marietta I&CS, Denver CO.
+Lines: 75
+
+In article <SALC.91Apr9145833@aristotle.shearson.com> salc@alfred.shearson.com writes:
+>Please explain why C++'s implementation of the object oriented paradigm cannot
+>be used to implement software ICs. Please explain why a library of C++ classes
+>(such as NIHCL or Interviews) is not useful in the same way that an
+>objective-c class library would be.
+
+I'll horn in on this conversation...
+I have used Objective-C and am currently using C++.
+C++ can be used to create software IC's with polymorphic member functions.
+NIHCL is a good example of such a software IC that corresponds with
+ICPak 101.  However, Objective-C has some significant advantages over
+C++ that should not be overlooked:
+
+1.  Objective-C from Stepstone comes with several mature, vendor supported
+    class libraries.  Comparing just the languages is much like getting
+    into arguments about which microprocessor chips are better.  What
+    really counts is the development environment your given.  With
+    Objective-C you get the vendor supported Foundation classes (similar
+    to C++'s NIHCL), the window class library and the 2-D graphics library.
+    It should also be noted that the Foundation Class library (ICpak 101)
+    comes bundled with Objective-C.  For C++ there is NIHCL (National
+    Institutes of Health Class Library), a Smalltalk-like class library.
+    We are using NIHCL in our project, and I think the developers of it
+    did a remarkable job!  HOWEVER, no C++ compiler that I know of supports
+    it.  Sure, it comes in the Saber C++ distribution (along with other
+    C++ compiler vendors), but it is listed as unsupported software -- i.e.
+    no guarantees that it will even compile under future compiler releases.
+    This does not give me a warm fuzzy feeling.  Also, because NIHCL is
+    unsupported, there is no vendor that I can call when I encounter
+    problems.  There is a nice book published by the makers of NIHCL, and
+    there is the source of NIHCL, but the NIHCL software is so large that
+    the current documentation needs to be expanded into many volumes before
+    I can begin to feel comfortable with NIHCL.  I've also found that not
+    all C++ (Cfront 2.0, 2.1 compatable) compilers will compile NIHCL.
+    The same problems with NIHCL goes with Interviews.
+
+    With the vendor supported class libraries from Stepstone, you can easily
+    give yourself an extra 6 month++ head start on a project over C++ just
+    because the classes libraries from Objective-C are mature and vendor
+    supported.
+
+2.  Langauge features.  Objective-C was easier to learn (for me at least) than
+    C++.  Objective-C has just a few additions to the C language.  With C++
+    I feel that there is much going behind the scenes that I sometimes lose
+    sleep wondering what I'm missing that will bite me later.  Objective-C also
+    has the ability to deal more directly with "meta-class" issues that C++
+    cannot directly handle.  I can ask if a class is derived from another class.
+    This can be done in C++, but only if you build that into each class (like
+    NIHCL).  I can also ask if an Objective-C class can respond to a given
+    method or member function and get a yes or no answer.  C++ does not do this.
+
+    Certainly C++ does have a lot of interesting features, such as multiple-
+    inheritence, operator overloading, etc. -- and being a hacker at heart I
+    love to play with these things.  C++ also supports stronger type-checking.
+    However, I personally prefer the the ability of getting to "meta-class" things
+    of Objective-C over the enhancements found in C++.
+
+3.  Tools.  The C++ development environment has made major strides in the past
+    six months!  We are using Saber C++ with its integrated development environment
+    (which includes an interpreter, debugger, classs browser) and it IS NICE.
+    However, I like the Stepstone class browser better (somewhere around here
+    I wrote a review about the Stepstone browser).
+
+These are some of my thoughts about the Objective-C/C++ religious war.  I'm biased
+towards Objective-C.  These opinions reflect that bias, but no one should dismiss
+using Objective-C.
+
+
+
+-- 
+Chuck Noren
+NET:     dinl!noren@ncar.ucar.edu
+US-MAIL: Martin Marietta I&CS, MS XL8058, P.O. Box 1260,
+         Denver, CO 80201-1260
+Phone:   (303) 977-1646
+
+Path: csusac!ucdavis!ucbvax!agate!bionet!uwm.edu!cs.utexas.edu!uunet!hsi!stpstn!lerman
+From: lerman@stpstn.UUCP (Ken Lerman)
+Newsgroups: comp.lang.objective-c,comp.lang.misc
+Subject: Re: Optional static typing limits
+Message-ID: <6785@stpstn.UUCP>
+Date: 18 Apr 91 11:52:12 GMT
+References: <LIBERTE.91Apr16164831@babbage.ncsa.uiuc.edu>
+Reply-To: lerman@stpstn.UUCP (Ken Lerman)
+Organization: The Stepstone Corporation, Sandy Hook, CT 06482
+Lines: 52
+
+In article <LIBERTE.91Apr16164831@babbage.ncsa.uiuc.edu> liberte@ncsa.uiuc.edu (Daniel LaLiberte) writes:
+|>
+|>----- file A.h ----------
+|>// interface of class A
+|>
+|>#include "B.h"   // A needs to include B's interface
+|>
+|>@interface A:Object
+|>{
+|>	B *b;   // instance variable b is a pointer to B
+|>	...
+|>}
+|>
+|>----- file B.h ----------
+|>// interface of class B
+|>
+|>#include "A.h"   // B needs to include A's interface  <-- *ERROR*
+|>
+|>@interface B:Object
+|>{
+|>	A *a;   // instance variable a is a pointer to A
+|>	...
+|>}
+|>
+|>Dan LaLiberte
+|>National Center for Supercomputing Applications
+|>liberte@ncsa.uiuc.edu
+
+A (not very nice) way of handling this in Stepstone's Objective-C
+compiler is to write struct __objcA *a and struct __objcB *b to
+declare the instance variables.
+
+A better way would be for the compiler to permit @interface A {} @end
+to be an incomplete definition of class F which could be completed
+later on.
+
+A further deficiency of Objective-C regarding automatic and static
+instances of objects (those that are declared Object foo, instead of
+Object *foo) is that the compiler doesn't automatically call an
+initializer for them so that only the isa pointer is set.  This
+implies that the writer of the class must know that it will be used
+this way.
+
+I personally don't use them and suggest that others avoid them, also.
+
+
+Ken
+
+Disclaimer: In case you haven't noticed, I work for Stepstone.  I
+don't speak for them in this matter.
+
+lerman@stepstone.com
+
+From csusac!babbage.ecs.csus.edu!brian Sat, 4 May 91 10:47:00 PST
+Received: by rael.UUCP (V1.08/Amiga)
+	id AA00000; Sat, 4 May 91 10:47:00 PST
+Received: from babbage.ecs.csus.edu by csusac.ecs.csus.edu (5.61/1.34)
+	id AA24289; Thu, 2 May 91 18:32:42 -0700
+Received: by babbage.ecs.csus.edu (5.61/1.34)
+	id AA16427; Thu, 2 May 91 18:32:30 -0700
+Date: Thu, 2 May 91 18:32:30 -0700
+Message-Id: <9105030132.AA16427@babbage.ecs.csus.edu>
+From: csusac!babbage.ecs.csus.edu!brian (Brian Witt)
+To: akl@mace.cc.purdue.edu, bdwf@babbage.ecs.csus.edu, rael!oct,
+        jtsv16.jts.com!gil@nexus.yorku.ca, ll@babbage.ecs.csus.edu,
+        netcom.com!rkitts@ucbvax.berkeley.edu, ramsey@rhrk.uni-kl.de,
+        tc.fluke.com!db@unify.com, well.sf.ca.us!shf@ucbvax.berkeley.edu
+Subject: OCT beta 10
+
+Annoucing OCT beta 10!!
+
+Here it is, ready for Lattice and Sparc inspection.
+The NULL Ptr that ate Sacramento has been vindicated!
+
+In between class assignments, I have repackaged the
+translator and stored it as a .zoo file in "/OCT/beta"
+directory (it's 450K).  TYpe out the README file first.
+Protect your current Makefile's, please!!!
+
+Changes include handling of two dimensional arrays (like argv[][]).
+Better handling of expr/blocks after for() and if().
+The whole system has a first-time purging of dependence
+on the NULL ptr holoding a NULL ptr.  Please try it out
+and see what remains to be fixed.  I probably won't
+have time to make any changes until about May 10.
+
+Please send comments and code updates.  Those received from
+for updates to scan.l have not been applied -- sorry.
+Also, tolower() will still be given non-alpha chars.
+
+----------------------------------------------------------------
+         brian witt         |   brian@babbage.ecs.csus.edu
+    You are what you click  |  (and if you click it twice...)
+  Not representing Cal State Sacramento, the ECS dept, or Iraq
+----------------------------------------------------------------
+
+From csusac!nextnet.ccs.csus.edu!wittbj Sat, 12 Oct 91 14:11:48 PST
+Received: by rael.UUCP (V1.08/Amiga)
+	id AA00000; Sat, 12 Oct 91 14:11:48 PST
+Received: from csus.ccs.csus.edu by csusac.ecs.csus.edu (5.61/1.34)
+	id AA28311; Sat, 5 Oct 91 13:05:11 -0700
+Received: from nextnet.ccs.csus.edu (cube01.ccs.csus.edu) by csus.edu with SMTP id AA00547
+  (5.65c/IDA-1.4.4 for <csusac!rael!oct>); Sat, 5 Oct 1991 13:00:04 -0700
+Date: Sat, 5 Oct 91 12:55:47 PDT
+Message-Id: <9110051955.AA00884@nextnet.ccs.csus.edu>
+From: csusac!nextnet.ccs.csus.edu!wittbj (brian witt)
+To: rael!oct
+Subject: ICpak201
+
+Path: csus.edu!ucdavis!ucbvax!cis.ohio-state.edu!zaphod.mps.ohio-state.edu!qt.cs.utexas.edu!cs.utexas.edu!uunet!hsi!stpstn!lerman
+From: lerman@stpstn.UUCP (Ken Lerman)
+Newsgroups: comp.lang.objective-c
+Subject: Re: ICpak201
+Keywords: user interface framework, application framework, Objective-C
+Message-ID: <8625@stpstn.UUCP>
+Date: 3 Oct 91 18:36:59 GMT
+References: <1991Sep30.154350.2984@ugle.unit.no>
+Reply-To: lerman@stpstn.UUCP (Ken Lerman)
+Organization: The Stepstone Corporation, Sandy Hook, CT 06482
+Lines: 30
+
+In article <1991Sep30.154350.2984@ugle.unit.no> olek@zevs.ifi.unit.no (Ole Kvaernoe) writes:
+|>I am trying to get some detailed information regarding ICpak201 (v.2) from Stepstone.  Can anyone help me?
+
+If you send me your FAX number or mail address, I can supply you
+detailed information.
+
+|>
+|>1) Is the complete source code to the framework classes included, or just a description of the method interface to each class?
+
+Complete source code is included.
+
+|>   
+|>2) Have any of you seen any articles regarding ICpak201 lately?
+|>
+|>3) Can someone send me a "listing" of the complete class hierarcy?  How many classes and methods are involved?
+
+I believe there are 58 classes with a total of over 1000 methods.
+
+For more information, call or write Stepstone.
+
+Kenneth Lerman
+The Stepstone Corporation
+75 Glen Road
+Sandy Hook, CT 06482
+
+(203)426-1875
+(203)270-0106 (FAX)
+
+Ken
+lerman@stepstone.com
+
+From csusac!nextnet.ccs.csus.edu!wittbj Wed, 26 Feb 92 21:59:40 PST
+Received: by rael.UUCP (V1.08/Amiga)
+	id AA00000; Wed, 26 Feb 92 21:59:40 PST
+Received: from csus.ccs.csus.edu by csusac.ecs.csus.edu (5.61/1.34)
+	id AA04179; Thu, 20 Feb 92 17:14:22 -0800
+Received: from nextnet.ccs.csus.edu (cube01.ccs.csus.edu) by csus.edu with SMTP id AA14982
+  (5.65c/IDA-1.4.4 for <csusac!rael!aleks>); Thu, 20 Feb 1992 17:04:19 -0800
+Date: Thu, 20 Feb 92 17:01:49 PST
+Message-Id: <9202210101.AA04881@nextnet.ccs.csus.edu>
+From: csusac!nextnet.ccs.csus.edu!wittbj (brian witt)
+To: rael!aleks
+Subject: objC grammar
+
+Xref: csus.edu comp.sys.next.programmer:2923 comp.lang.objective-c:507
+Path: csus.edu!decwrl!mips!spool.mu.edu!umn.edu!umeecs!news
+From: gregor@oit.itd.umich.edu (Gregor Purdy)
+Newsgroups: comp.sys.next.programmer,comp.lang.objective-c
+Subject: Neat "feature" of NeXT Objective-C grammar
+Keywords: grammar, objective-c, NeXT
+Message-ID: <1992Feb15.192434.12903@zip.eecs.umich.edu>
+Date: 15 Feb 92 19:24:34 GMT
+Article-I.D.: zip.1992Feb15.192434.12903
+Sender: news@zip.eecs.umich.edu (Mr. News)
+Organization: University of Michigan EECS Dept., Ann Arbor, MI
+Lines: 89
+
+Friends--
+
+I just posted to sonata.cc.purdue.edu earlier today a small directory
+with a program for the NeXT in it. (/pub/next/submissions/ObjcGrammarTest.tar.Z
+
+This program demonstrates an interesting "feature" of the NeXT Objective-C
+grammar (under OS2.0, anyway). I haven't seen anyone use it, but I think
+there might be applications.
+
+Below is the README file:
+
+---------- Cut here ----------
+==================================================
+
+ObjcGrammarTest
+
+by Gregor N. Purdy
+
+1992 Feb 15 11:34-	Genesis.
+
+==================================================
+
+
+This program is a simple demonstration of something
+I thought seemed a little strange that is allowed
+by NeXT's Objective-C grammar. The grammar info is
+in the reference manual "Technical Summaries",
+chapter 3.
+
+I think there might be some applications where this
+form could actually make sense...
+
+Now, of course, all we need is the ability to do
+things like this:
+
+    [myObject putMail:theMail intoMailBox:theBox andBeep];
+                                                ^^^^^^^^
+
+Which are currently NOT allowed by the grammar, but could
+be added by adding one case on page 3-7 to the end of the
+definition of message-selector:
+
+	keyword-argument-list selector
+
+And a similarly-functioning line to method-selector on
+page 3-5:
+
+	keyword-selector selector
+
+
+Other Ideas:
+
+As far as the grammar goes, it would be VERY easy to
+add multiple inheritance to Objective-C:
+
+
+On page 3-4 inside the definitions of "class-interface"
+and "class-implementation", just replace "superclass-name"
+with "superclass-specifier" and then add the definitions:
+
+	superclass-specifier:
+		superclass-name
+		{ superclass-list }
+
+	superclass-list:
+		superclass-name
+		superclass-list, superclass-name
+
+Of course, the hard part is handling it in the runtime
+system...
+
+
+--Gregor
+
+
+===============
+End of file.
+===============
+---------- Cut here ----------
+
+Regards,
+
+--Gregor
+
+------------------------------------------------------------------------------
+Gregor N. Purdy                                               gregor@umich.edu
+
+greetings! I am a m@tating s_gnatu~e vrrus. Y*u can't resst hel#ing me +pread!
+------------------------------------------------------------------------------
+
+From csusac!nextnet.ccs.csus.edu!wittbj Wed, 26 Feb 92 21:59:45 PST
+Received: by rael.UUCP (V1.08/Amiga)
+	id AA00000; Wed, 26 Feb 92 21:59:45 PST
+Received: from csus.ccs.csus.edu by csusac.ecs.csus.edu (5.61/1.34)
+	id AA15051; Sun, 23 Feb 92 15:38:52 -0800
+Received: from nextnet.ccs.csus.edu (cube05.ccs.csus.edu) by csus.edu with SMTP id AA07242
+  (5.65c/IDA-1.4.4 for <csusac!rael!aleks>); Sun, 23 Feb 1992 15:39:14 -0800
+Date: Sun, 23 Feb 92 15:58:34 PST
+Message-Id: <9202232358.AA03539@nextnet.ccs.csus.edu>
+From: csusac!nextnet.ccs.csus.edu!wittbj (brian witt)
+To: rael!aleks
+Subject: GCC 2!
+
+Xref: csus.edu gnu.gcc.help:1685 gnu.gcc.announce:40 gnu.g++.announce:28
+Path: csus.edu!wupost!spool.mu.edu!agate!stanford.edu!bu.edu!ai-lab!ai.mit.edu!gnulists
+From: rms@gnu.ai.mit.edu (Richard Stallman)
+Newsgroups: gnu.gcc.help,gnu.gcc.announce,gnu.g++.announce
+Subject: GCC 2.0 released
+Message-ID: <1-9202220854.AA25765@mole.gnu.ai.mit.edu>
+Date: 22 Feb 92 08:54:57 GMT
+Article-I.D.: mole.1-9202220854.AA25765
+Followup-To: gnu.gcc.help
+Lines: 51
+Approved: info-gnu@prep.ai.mit.edu
+
+People have been waiting for GCC 2.0 for a year.  Now it's
+available for anonymous ftp from /pub/gnu/gcc-2.0.tar.Z
+on prep.ai.mit.edu.  There are no diffs from version 1--such
+diffs would be too large to be useful.
+
+
+Version 2 of GCC can generate code for the IBM PC/RT, the IBM RS/6000,
+the Motorola 88000, the Acorn RISC machine (not fully tested), the AMD
+29000 and the HP-PA (700 or 800), in addition to several machines
+supported by version 1 (Motorola 68000, Vax, Sparc, National
+Semiconductor 32000, Intel 386 and 860, and Mips).  Ports for the IBM
+370, the Intel 960, the Clipper, the Tron (a Japanese standard
+computer architecture) and the NCUBE are on their way, but there is no
+estimate of when they will be available.  Note that using GCC to
+compile for the HP-PA requires as yet unreleased versions of other GNU
+software such as the assembler and linker.
+
+Version 2 can generate output files in a.out, COFF, ECOFF, ELF, XCOFF,
+VAX-VMS and OSF-Rose formats when used with a suitable assembler.  It
+can produce debugging information in several formats: BSD stabs, COFF,
+ECOFF, ECOFF with stabs symbols, VAX-VMS and DWARF.  (We may support
+XCOFF for the RS/6000 in the future.)
+
+Version 2 can be easily configured as a cross-compiler, running on one
+platform while generating code for another.
+
+Version 2 supports compatible calling conventions for function calling
+and return values on the Sparc (unlike version 1) as well as the other
+machine types.
+
+Early testing of GCC Version 2.0 indicates that it produces faster
+code for SPARC computers than Sun's latest released compilers (both
+bundled and unbundled).  It is also the fastest known compiler for
+the Motorola 88k.
+
+
+In addition to ANSI C, GCC Version 2.0 includes support for the C++
+and Objective C languages.  Objective C is an object-oriented language
+which adds to C features similar to Smalltalk.  The front end for the
+Objective C language was donated by NeXT Computers, Inc., which uses
+GCC as the basis for their NeXTstep operating system.  (Run-time
+support for the Objective C language is still under development.)
+
+GCC extends the C language to support nested functions, non-local
+gotos, taking the address of program labels, and unnamed structures as
+function arguments (among other things).  There are also many new
+warnings for frequent programming mistakes.
+
+GCC Version 2 can produce position-independent code for several types
+of CPU: 68000, 88000, 80386, Sparc, and RS/6000.  Supporting PIC on
+additional suitable CPU types is not too difficult a task.
+
+From: ernest@pundit.cithep.caltech.edu (Ernest Prabhakar)
+Newsgroups: comp.lang.objective-c
+Subject: Re: Gnu EMACS and Objective-C ... i.e. Objective-C-mode.el
+Message-ID: <1992Feb28.185128.24607@cco.caltech.edu>
+Date: 28 Feb 92 18:51:28 GMT
+Article-I.D.: cco.1992Feb28.185128.24607
+References: <1992Feb27.155718.16814@allink.com>
+Sender: news@cco.caltech.edu
+Reply-To: ernest@pundit.cithep.caltech.edu (Ernest Prabhakar)
+Organization: California Institute of Technology, Pasadena
+Lines: 17
+Nntp-Posting-Host: pundit.cithep.caltech.edu
+
+In article <1992Feb27.155718.16814@allink.com> paul@allink.com (Paul B. Reiber  
+Jr.) writes:
+> I'm interested in finding what others have put together to help
+> Gnu EMACS support Objective-C as well as it supports C.
+
+There is already such a creature available on the NeXT archives:  
+objc-mode.tar.Z (sonata.cc.purdue.edu).  I find it very well written and  
+useful.
+
+- Ernie P.
+
+--
+Ernest N. Prabhakar                  Caltech High Energy Physics
+Member, League for Programming Freedom (league@prep.ai.mit.edu)
+CaJUN President        NeXTMail:ernest@pundit.cithep.caltech.edu
+"...and ourselves, your servants for Jesus sake." - II Cor 5:13a
+#import <std/disclaimer.h>
+
+From csusac!nextnet.ccs.csus.edu!wittbj Sun, 31 May 92 11:15:01 PST
+Received: by rael.UUCP (V1.08/Amiga)
+	id AA00000; Sun, 31 May 92 11:15:01 PST
+Received: from csus.ccs.csus.edu by csusac.ecs.csus.edu (5.61/1.34)
+	id AA11622; Fri, 29 May 92 10:19:30 -0700
+Received: from nextnet.ccs.csus.edu (cube05.ccs.csus.edu) by csus.edu with SMTP id AA21514
+  (5.65c/IDA-1.4.4 for <csusac!rael!aleks>); Fri, 29 May 1992 10:05:47 -0700
+Date: Fri, 29 May 92 10:26:24 PDT
+Message-Id: <9205291726.AA13870@nextnet.ccs.csus.edu>
+From: csusac!nextnet.ccs.csus.edu!wittbj (brian witt)
+To: rael!aleks
+Subject: 
+
+Path: csus.edu!wupost!spool.mu.edu!uwm.edu!linac!unixhub!kaon.slac.stanford.edu
+From: pfkeb@kaon.slac.stanford.edu (Paul Kunz)
+Newsgroups: comp.lang.objective-c
+Subject: Re: Protocols (was Re: Multiple inheritance question (categories?))
+Message-ID: <4067@unixhub.SLAC.Stanford.EDU>
+Date: 28 May 92 01:36:41 GMT
+Article-I.D.: unixhub.4067
+References: <1992May27.182053.14733@fnbc.com>
+Sender: news@unixhub.SLAC.Stanford.EDU
+Reply-To: pfkeb@kaon.slac.stanford.edu
+Lines: 21
+Nntp-Posting-Host: kaon.slac.stanford.edu
+
+In article <1992May27.182053.14733@fnbc.com> frank@fnbc.com (Frank Mitchell)  
+writes:
+> When was this feature added?  What compilers support this?
+> 
+> Can we expect it in NeXTstep 3.0?  (Please, please?)
+> 
+   Categories was added to Objective-C by NeXT with NeXTSTEP 2.0
+   Protocols was added with NeXTSTEP 3.0.
+
+   Another thing that is added is forward reference of a class, like
+C++ has.   Syntax is
+
+@class Matrix, View, Panel, TextField, NXColorPanel, SavePanel, MenuCell;
+@class GridView, DrawDocument, DrawPageLayout;
+
+(taken from Draw application).  This too comes with NeXTSTEP 3.0.
+
+--
+Paul F. Kunz	(NeXT mail ok)
+Stanford Linear Accelerator Center, Stanford University
+Voice: (415) 926-2884   (NeXT) Fax: (415) 926-3587
+
+From csusac!nextnet.ccs.csus.edu!wittb Sun, 7 Feb 93 19:08:15 PST
+Received: by rael.UUCP (V1.08/Amiga)
+	id AA00000; Sun, 7 Feb 93 19:08:15 PST
+Received: from csus.ccs.csus.edu by csusac.ecs.csus.edu (5.61/1.34)
+	id AA24475; Mon, 1 Feb 93 19:48:02 -0800
+Received: from nextnet.ccs.csus.edu by csus.edu with SMTP id AA27416
+  (5.65c/IDA-1.4.4 for <csusac!rael!aleks>); Mon, 1 Feb 1993 19:42:16 -0800
+Date: Mon, 1 Feb 93 19:41:08 PST
+Message-Id: <9302020341.AA17728@nextnet.ccs.csus.edu>
+From: csusac!nextnet.ccs.csus.edu!wittb (brian witt)
+To: rael!aleks
+Subject: objc tests
+
+Newsgroups: comp.lang.objective-c
+Path: csus.edu!decwrl!spool.mu.edu!yale.edu!newsserver.jvnc.net!gmd.de!Germany.EU.net!mcsun!sun4nl!dutrun!dutiws!dutiea!schuller
+From: schuller@dutiea.TWI.TUDelft.NL (Bart Schuller)
+Subject: Sample program for gnu-objc
+Message-ID: <C1MEw1.Lzz@dutiws.twi.tudelft.nl>
+Summary: this works with gcc-cc1obj 2.3.3
+Keywords: Objective C, GNU, sample
+Sender: news@dutiws.twi.tudelft.nl (Dutiws News Administration)
+Organization: Delft University of Technology
+Date: Fri, 29 Jan 1993 14:57:37 GMT
+Lines: 467
+
+Hello,
+
+Now that Objective C is available for free for a wide range of
+machines with gcc 2.3.3, you should have a way to test it as well.
+
+Here you find the sample program from the Objective C FAQ, rewritten
+specifically to work with gcc 2.3.3 cc1obj and libobjc.a .
+We have split it so that each class has two files, a header file and
+an implementation file (it doesn't seem to compile otherwise). We have
+also written Stack and Queue classes which can be used with the program.
+
+Dimitri Tischenko, dimitri@is.twi.tudelft.nl
+Bart Schuller, schuller@dutiea.twi.tudelft.nl
+
+The following files are included:
+Makefile sample.m Int.h Int.m Float.h Float.m Queue.h Queue.m Stack.h Stack.m
+
+-------------- 8< ---------------- 8< --------------- 8< -------------
+
+.SUFFIXES: .m
+CC=gcc
+CFLAGS = -g -Wall
+OBJS=sample.o Stack.o Queue.o Int.o Float.o
+sample : $(OBJS)
+	$(CC) $(CFLAGS) -o sample $(OBJS) -lobjc
+
+.m.o:
+	$(CC) $(CFLAGS) -c $*.m
+-------------- 8< ---------------- 8< --------------- 8< -------------
+// This is a comment.  Everything to the right of a double slash
+// is ignored (until an end of line is reached).
+
+/*
+ * This is too, that's what superset of ANSI C means; You can do
+ *  anything you can do in C in Objective-C.  (not to suggest that
+ *  you should, only that you could.)
+ */
+
+// The first thing we do is bring in some include files, as in
+// C.  However, we'll use the "import" statement which guarantees
+// that the file isn't included more than once.
+
+// <objc/Object.h> is not really needed, because it is #imported
+// by the Queue and Stack headers, but we (as object users) don't
+// necessarily know that, so it is good practice to #import it 
+// here.  (When the processer reaches #import <objc/Object.h>
+// in the Queue and Stack headers, it will not include it.)
+
+#import <stdio.h>
+#import "Stack.h"
+#import "Queue.h"
+#import "Int.h"
+#import "Float.h"
+
+// GNU gcc for some reason passes moral judgement on the useage
+// of #import, but still allows it.  They suggest you use #ifndefs
+// in all of your header files to eliminate multiple includes.
+
+// That brought in class definitions for Objects, Queues, and
+// Stacks.  Queue and Stack are classes of my own construction,
+// and I'm not going to go into details here.  You don't need
+// to know how they work.  The Object class is the basis for
+// all other classes, which is why it gets brought in first.
+
+// Classes are the one real extension which Objective C adds to
+// C.  A class is a description of a collection of data, like a
+// C structure, and the methods by which that data may be accessed
+// or manipulated.  Instances of a class are called objects, and
+// methods are invoked by sending messages to either the class itself,
+// to produce objects, or to those objects.  The recipient of a message
+// is called a "receiver".  The form of a message is:
+//
+//	[receiver method andMaybeSomeArguments]
+//
+// the receiver and method components are mandatory, as are 
+// the square brackets surrounding the message.  Additional
+// arguments may or may not be present, depending upon the
+// method definition.  Messages may appear anywhere a statement
+// is allowed in C.
+
+// Two simple Class definitions follow.  Both inherit
+// directly from the base class "Object".  This gives
+// them lots of nice properties, not the least of which
+// is the ability to be referenced by any pointer of the
+// generic object type "id".  All objects can be pointed
+// to by any id variable, and the default return type from
+// methods is id.  This allows messages to be embedded in
+// other messages, either as receivers or arguments.
+
+// PBS: these are in the files Int.m and Float.m
+
+void main()
+{
+// First we create instances of "Stack" and "Queue" data structures
+
+    id queue = [Queue new];
+    id stack = [Stack new];
+    int i;
+
+    for (i = 5; i > -6; --i)
+    {
+	// We alternate putting Int's and Floats onto the queue and
+	// stack, based on whether "i" is odd or even.  Whatever
+	// type goes on the queue, the opposite goes on the stack.
+
+	[queue put: (i & 1) ? [Int makeRoomFor: i] : [Float makeRoomFor: i]];
+	[stack put: (i & 1) ? [Float makeRoomFor: i] : [Int makeRoomFor: i]];
+    }
+    while ([stack size] && [queue size])
+    {
+	// The following illustrates run-time binding.  Will report be
+	// invoked for a Float object or an Int object?  We don't know
+	// ahead of time, but with run-time binding and polymorphism
+	// it works the way we like.  The burden is on the class
+	// implementor rather than the class user.  In fact, we
+	// could add another class (String?  Complex?) and toss
+	// instances onto the Stack and Queue without having to
+	// change the following lines at all.
+
+	// Both classes, Int and Float, just happen to implement the
+	// method 'report'.  They do not need to inherit from some
+	// object 'Reportable', only to implement the report method.
+	// If one did not implement the method, the message would
+	// not be sent.
+
+	printf("queue=");	[[[queue get] report] free];
+	printf(", stack=");	[[[stack get] report] free];
+	putchar('\n');
+    }
+}
+
+-------------- 8< ---------------- 8< --------------- 8< -------------
+#import <stdio.h>
+#import <objc/Object.h>
+
+@interface Int: Object	// Int is derived from Object
+{
+    int value;		// This is the data portion.  Like a struct.
+}
++ makeRoomFor: (int) i;
+- report;
+@end
+-------------- 8< ---------------- 8< --------------- 8< -------------
+#import <stdio.h>
+#import "Int.h"
+
+// An Int object allocates space for a single integer.
+// The "report" message causes it to report its value.
+// Everything between the @implementation and the @end
+// is part of the class definition...
+
+@implementation Int
+
+// The following are the method definitions.  The "+" means this
+// is a class method, i.e., a method that deals with classes instead
+// on instances.  In this case it is a factory method, or one which
+// creates and returns a new instance of a class  The body of the
+// method is between braces, like a C function.
+
+// Self is a special variable which may only be used within a method
+// and means the receiver of the message which invoked this method.
+// Super means that the search for the method for this message
+// starts in the parent class of the present implementation.  This
+// does not, necessarily, have any relation to the value of self.
+
++ makeRoomFor: (int) i
+{
+
+// we could have declared id anInstance, but if we know in advance
+// what kind of object will reside in the variable, we can help the 
+// compiler with type checking by declaring the class pointer instead.
+
+  Int *  anInstance;		
+							
+  anInstance  = [super new];
+  anInstance->value = i;  // we must reference value with the -> because
+  return anInstance;      // it's an instance variable of another object!
+}
+
+// It is standard for methods that do not need to return any
+// special value to instead return self.  This allows for a 
+// nested syntax of method calls.
+
+// The "-" in front of report means that it's an instance method,
+// i.e., how a particular object should respond.
+
+- report
+{
+  printf("%4d", value);
+  return self;
+}
+
+@end
+
+-------------- 8< ---------------- 8< --------------- 8< -------------
+#import <objc/Object.h>
+// Float is derived from Object
+//
+@interface Float: Object
+{
+  float value;
+}
++ makeRoomFor: (float) x;
+- report;
+@end
+
+-------------- 8< ---------------- 8< --------------- 8< -------------
+#import <stdio.h>
+#import "Float.h"
+// PBS: read the comments in Int.m first
+
+// Same for a Float object, but for the obvious difference that
+// it works with floats.
+// Note polymorphism -- methods have same names as in the Int class.
+
+@implementation Float
+
+// Sometimes a factory method is written in the following manner.  This
+// is not strictly correct, but since _self_ is a local variable, no 
+// harm is done.  It is also quite common to see this in code from the
+// net, so it is included here.  In this case _self_, which is a class,
+// is assigned to return a value from [super new], which is an instance.
+// It may even help the compiler optimize if there is no assignment to
+// self while in a class method.
+
++ makeRoomFor: (float) x
+{
+  self = [super new];
+  value = x;		// value is actualy shorthand for self->value,
+  return self;		// so in this case it works.
+}
+
+- report
+{
+  printf("%4.1f", value);
+  return self;
+}
+
+@end
+
+-------------- 8< ---------------- 8< --------------- 8< -------------
+// Queue.h
+// A FIFO object
+//
+// A minimal Queue implementation, just to make this sample program do
+// something.
+//
+// Best edited with tabstop=3
+
+#include <objc/Object.h>
+
+// First, we declare a struct for an element for our Queue.  Actualliy,
+// it's an implementation detail, but then, instance variable declararions
+// are a kind of implementation details, too.
+
+typedef struct _QueueEl
+{
+	id el;                   // the element itself
+	struct _QueueEl *next;   // the pointer to the next element
+} 
+  QueueEl, *QueueElPtr;
+
+@interface Queue:Object
+{
+	QueueElPtr first;       // always points fo first element
+	QueueElPtr last;        // always points to the (empty) last element
+	int size;               // element count
+}
+
++ new;                     // create a new Queue instance
+- put:object;              // add an object at the end of the queue
+- get;                     // retrieve the first object
+- (int)size;               // get the queue size
+@end
+
+-------------- 8< ---------------- 8< --------------- 8< -------------
+// Queue.m
+// Queue object: a FIFO
+// 
+// Best edited with tabstop=3
+
+#import "Queue.h"
+#import <sys/types.h>
+
+extern void* malloc(size_t);
+extern free(void *);
+
+@implementation Queue
+
++ new
+{
+	Queue * newQueue;
+	QueueElPtr newElPtr; 	// allocate a new element, will be "dummy"	
+	newElPtr = (QueueElPtr)malloc(sizeof(QueueEl));
+	if (!newElPtr) 			// if malloc failed
+		return [self error:"Could not new"]; // complain
+
+	newQueue = [super new]; 	// a new instance
+	newQueue->size = 0;			// the new element is a dummy
+	newQueue->first = newQueue->last = newElPtr;
+	first->next = NULL; 			// just to be "tidy"
+	return newQueue;				// we return the new instance
+}
+
+// free the queue but not the elements
+- free
+{
+	if (first) free(first);
+	if (last)  free(last);
+	return [super free];
+}
+
+// add an object at the end of the queue
+- put:object 
+{
+	QueueElPtr newElPtr;
+
+	newElPtr = (QueueElPtr)malloc(sizeof(QueueEl));
+	if (!newElPtr)
+	{
+		return [self error:"Out of space"];
+	}
+	last->el = object;		// the last element is always empty
+	last->next = newElPtr;	// let's point to the new empty one
+	last = newElPtr;			// which becomes the new last
+	last->next = NULL;		// we are tidy, remember
+	size++;						// we've added one element
+	return self;				// remember: if you have nothing
+									// interesting to return, return self!
+}
+
+// get the first element and delete it from the queue
+- get
+{
+	id object;
+	QueueElPtr tmp;
+	if (size)
+	{
+		size--;
+		object = first->el;
+		tmp = first;
+		first = first->next;
+		free(tmp);
+		return object;
+	}
+	else
+	{	
+		return nil;
+	}
+}
+
+- (int)size
+{	
+	return size;
+}
+
+@end
+
+-------------- 8< ---------------- 8< --------------- 8< -------------
+// Stack.h
+// A LIFO Object
+//
+// Best edited with tabstop=3
+
+#import <objc/Object.h>
+
+// This is a simple implementation of a Stack class,
+// just so we could test the sample program.
+
+@interface  Stack:Object
+{
+	int size;					// element count
+	int allocatedSize;		// room for elements
+	id *theArray;				// our resizable array
+}
+
++ new;							// create a new Stack instance
+- free;							// destroy the instance
+- put:object;					// push an object on the stack
+- get;							// pop an object off the stack
+- (int)size;					// get the stack size
+@end
+
+-------------- 8< ---------------- 8< --------------- 8< -------------
+// Stack.m
+// a LIFO object
+//
+// Best edited with tabstop=3
+
+#import <sys/types.h>
+#import "Stack.h"
+
+extern void* malloc(size_t);
+extern void* realloc(void*, size_t);
+extern free(void *);
+
+#define DEFAULTSTACKSIZE 1024
+
+@implementation Stack
+
++ new
+{
+	Stack * newStack;
+	newStack = [super new];
+	newStack->allocatedSize = DEFAULTSTACKSIZE;
+	newStack->theArray = (id *)malloc(sizeof(id) * allocatedSize);
+	if (!newStack->theArray)
+		return [self error: "Could not new"];
+	size = 0;
+	return newStack;
+}
+
+// free the stack but not the elements
+-free
+{
+	if (theArray) free(theArray);
+}
+
+// push an object on the stack
+- put:object
+{
+	theArray[size] = object;
+	if (++size > allocatedSize)
+	{
+		allocatedSize += DEFAULTSTACKSIZE;
+		theArray = (id *)realloc(theArray, sizeof(id)*allocatedSize);
+		if (!theArray)
+			return [self error: "out of space"];
+	}	
+	return self;
+}
+
+// pop an object off the stack
+- get
+{
+	if (size)
+	{
+		size--;
+		if (!size && (allocatedSize > DEFAULTSTACKSIZE))
+		{
+			allocatedSize = DEFAULTSTACKSIZE;
+			theArray = (id*)realloc(theArray, sizeof(id)*allocatedSize);
+		}
+		return theArray[size];
+	}
+	else
+	{	
+		if (allocatedSize > DEFAULTSTACKSIZE)
+		{
+			allocatedSize = DEFAULTSTACKSIZE;
+			theArray = (id*)realloc(theArray, sizeof(id)*allocatedSize);
+		}
+		return nil;
+	}
+}
+
+- (int)size;
+{	
+	return size;
+}
+@end
+
+-------------- 8< ---------------- 8< --------------- 8< -------------
+That's it.
+
+Bart Schuller,       schuller@dutiea.twi.tudelft.nl
+
+From seeker!pacbell!PacBell.COM!csn.org!root Mon, 6 Sep 93 16:09:49 PST
+Received: by rael.mystic.com (V1.08/Amiga)
+	id AA00000; Mon, 6 Sep 93 16:09:49 PST
+Received: by seeker.mystic.com (smail 3.1.22.1)
+	id <m0oYd35-0002i0C@seeker.mystic.com>; Fri, 3 Sep 93 08:27 PDT
+Received: from ns.PacBell.COM by gw.PacBell.COM (4.1/PacBell-08/05/93)
+	id AA08181; Fri, 3 Sep 93 05:56:58 PDT
+Received: from csn.org by ns.PacBell.COM (4.1/PacBell-06/08/93)
+	id AA05914; Fri, 3 Sep 93 05:56:57 PDT
+Received: from ale.UUCP by csn.org with UUCP id AA00802
+  (5.65c/IDA-1.4.4 for rael.mystic.com!aleks); Fri, 3 Sep 1993 06:57:31 -0600
+Received: from nextnet.ccs.csus.edu by ale (4.1/SMI-4.1)
+	id AA05303; Fri, 3 Sep 93 06:13:48 MDT
+Received: from csus.edu by csn.org with SMTP id AA03822
+  (5.65c/IDA-1.4.4 for <rael.mystic.com!aleks@pacbell.ns.com>); Thu, 2 Sep 1993 22:09:50 -0600
+Received: from nextnet.ccs.csus.edu by csus.edu with SMTP id AA06463
+  (5.65c/IDA-1.4.4 for <pacbell.ns.com!rael.mystic.com!aleks>); Thu, 2 Sep 1993 21:09:12 -0700
+Date: Thu, 2 Sep 93 21:02:22 PDT
+Message-Id: <9309030402.AA25702@nextnet.ccs.csus.edu>
+From: seeker!PacBell.COM!nextnet.ccs.csus.edu!wittb (brian witt)
+To: rael.mystic.com!aleks
+Subject: objc stuff
+
+> Newsgroups: comp.lang.objective-c
+> Path: csus.edu!wupost!howland.reston.ans.net!spool.mu.edu!bloom-beacon.mit.edu!news.kei.com!ub!galileo.cc.rochester.edu!rochester!news
+> From: mccallum@cs.rochester.edu (R. Andrew McCallum)
+> Subject: Re: Is there a List object with GCC 2.4.3???
+> Message-ID: <1993Aug18.143259.10018@cs.rochester.edu>
+> Sender: news@cs.rochester.edu (Usenet news)
+> Nntp-Posting-Host: ngoma.cs.rochester.edu
+> Reply-To: mccallum@cs.rochester.edu
+> Organization: University of Rochester Computer Science Dept
+> References: <1993Aug9.202141.28280@bmers95.bnr.ca>
+> Date: Wed, 18 Aug 1993 14:32:59 GMT
+> Lines: 34
+
+In article <1993Aug9.202141.28280@bmers95.bnr.ca> hlam@bmerh170.bnr.ca (Hayward  
+Lam) writes:
+> 
+> I am using Obj-C from gcc 2.4.3 to do some development. I
+> don't seem to find the List.h file.
+
+You get get a NeXT-compatible implementation of a List object as part of  
+libcoll.  Here's part of the README:
+
+------------------------------------------------------------------
+* Where can you get it?  How can you compile it?
+
+By anonymous ftp at iesd.auc.dk:pub/ObjC/libcoll-??????.tar.z,
+where ?????? is some string of numbers specifying its date.
+
+The library requires gcc-2.4.0 or higher.
+
+------------------------------------------------------------------
+* What is the Collection library?
+
+It's a library of Objective-C objects with similar functionality to
+Smalltalk's Collection objects.  It includes: Set, Bag, Array,
+LinkedList, LinkList, CircularArray, Queue, Stack, Heap, SortedArray,
+MappedCollector, GapArray and DelegateList.
+
+Outside of its main heirarchy it also includes List, HashTable and
+Storage objects compatible with NeXT's objects of the same name.
+
+
+--------------------------------------------------------------------------
+R. Andrew McCallum		ARPA: mccallum@cs.rochester.edu
+Computer Science Department	UUCP: uunet!rochester!mccallum
+University of Rochester		 VOX: (716) 275-2527
+Rochester, NY  14627		FEET: CSB  Rm. 625
+
+
+From seeker!pacbell!PacBell.COM!csn.org!root Mon, 6 Sep 93 16:09:55 PST
+Received: by rael.mystic.com (V1.08/Amiga)
+	id AA00000; Mon, 6 Sep 93 16:09:55 PST
+Received: by seeker.mystic.com (smail 3.1.22.1)
+	id <m0oYd37-0002hhC@seeker.mystic.com>; Fri, 3 Sep 93 08:27 PDT
+Received: from ns.PacBell.COM by gw.PacBell.COM (4.1/PacBell-08/05/93)
+	id AA08186; Fri, 3 Sep 93 05:57:01 PDT
+Received: from csn.org by ns.PacBell.COM (4.1/PacBell-06/08/93)
+	id AA05917; Fri, 3 Sep 93 05:56:59 PDT
+Received: from ale.UUCP by csn.org with UUCP id AA00810
+  (5.65c/IDA-1.4.4 for rael.mystic.com!aleks); Fri, 3 Sep 1993 06:57:33 -0600
+Received: from nextnet.ccs.csus.edu by ale (4.1/SMI-4.1)
+	id AA05309; Fri, 3 Sep 93 06:13:49 MDT
+Received: from csus.edu by csn.org with SMTP id AA07412
+  (5.65c/IDA-1.4.4 for <rael.mystic.com!aleks@pacbell.ns.com>); Thu, 2 Sep 1993 23:34:40 -0600
+Received: from nextnet.ccs.csus.edu by csus.edu with SMTP id AA10553
+  (5.65c/IDA-1.4.4 for <pacbell.ns.com!rael.mystic.com!aleks>); Thu, 2 Sep 1993 22:34:02 -0700
+Date: Thu, 2 Sep 93 22:27:12 PDT
+Message-Id: <9309030527.AA26025@nextnet.ccs.csus.edu>
+From: seeker!PacBell.COM!nextnet.ccs.csus.edu!wittb (brian witt)
+To: aspen.gvg.tek.com!michaelh
+Cc: rael.mystic.com!aleks
+Subject: please critique
+
+I sent this to comp.lang.objectivce-c.  Please critique and email your
+thoughts to me at work, OK?  I called from my folks house to Sac.
+
+--- brian
+
+====
+ Newsgroups: comp.sys.next.programmer,comp.lang.objective-c
+ Subject: Re: Making Obj-C faster?
+ Summary: Right tool for the application; read FAQs.
+ Expires: 
+ References: <53701@sdcc12.ucsd.edu>
+ Sender: 
+ Followup-To: comp.lang.objective-c
+ Distribution: na
+ Organization: California State University Sacramento, USA
+ Keywords: objective-C, dynamic binding, Smalltalk, Eiffel, C++
+
+
+ ( NOTE: This first part is a little religious.  But there is enough variety
+	 in languages that if you need a feature, like fast dispatching of
+	 methods, some language can probably do it for you.  And it is good
+	 to know what is available.)
+
+ To summarize: objective-C gets its style from dynamic binding.  Polymorphism
+ is important (at the center) of what objective-C does.  In C++ static
+ binding is the default, and the "virtual" keyword yields dynamic binding.
+ I wrote an objective-C work-alike, complete with runtime support.
+ It is a translator.  Unfortunately, I'm away from school, and I haven't
+ loaded it up yet...  :-(
+
+ If you don't need the "C" syntax, may I suggest two other languages.
+ Modula-3 is an excellent system with support for inheritance (not sure
+ about multiple, don't thing so), threads and generic parameters.  There
+ is a freeware implementation that runs under bsd unix (long filenames)
+ and converts modual-3 to plain C.  See "comp.lang.modula3"
+ Their slogan "Modula 3: safe and effective."
+
+ The other language is Eiffel, first presented by Bertram Meyers.  This
+ excellent language has method pre- and post- condition checking, as well
+ as class invariants (assertions which must be true on entrance and exit
+ to all methods).  This language was designed by a scientist for Better
+ Programming(tm), not by engineers doing systems work (K&R did a fine job and
+ I use C often), and not by a committee.  See "comp.lang.eiffel"  Bad part
+ is implementations must be precise: which is great for the programmer,
+ but bad for the compiler writer.
+
+ In article <53701@sdcc12.ucsd.edu> mstankus@oba.ucsd.edu (Mark Stankus) writes:
+ >I was wondering.... 
+ >One complaint is that obj-c is slower than C++.
+ >For example,
+ >
+ >-rank {return rank;}
+ >
+ >is basically a procedure call to return the value of a 
+ >data field of an object in an object oriented way.
+ >In C++, someone would use an inline statement. 
+  [..]
+ >2.  Maybe the compiler should try to do this anyways if it can
+ >    if an "optimization" flag is set.
+
+ The famous example is you have some geometric figure, and you want to
+ ask it to return its enclosed area.  Sqaures, circles and irregular
+ polygons all compute differently, and not much can be shared.  In C++
+ you jhave a virtual method, and there is no more discussion.
+
+ Eiffel has an optimize option that at compile time decides if inlining
+ is possible, given which classes an object might be at some given point in
+ the code, taking into account which class overrides a method.  C++ does
+ not "examine all your code including libraries and then make decisions,"
+ it's just a sophisticated text translator...  Objective-C doesn't either,
+ but relies on runtime to dynamically see what is has, and then make the
+ right decision (over and over again, each time the method gets called).
+
+ To write some preprocessor to grok this for your application might
+ prove troublesome.  It would be slow, and would have to re-generate
+ information the compiler builds itself.  Also, what is the label stored
+ in the object file for the method "(float) getDistanceTo:(id)" in the class
+ StellarGalaxy?  The compiler knows this one for sure.
+
+ An optimization I've heard about is to "hide" a little structure at each
+ method invokation (ie, each square-bracketted expr).  It holds the *class*
+ of the last object that was messaged, along with a pointer to the code.
+ Profiling has shown that for a given HLL statement, the class of object that
+ is messaged there, is usually the same as the class messaged there on the
+ the last attempt...  So, if the class of the current object matches that of
+ the last object, the code which does the method is therefore known and a
+ direct call is made.  Otherwise, a search must be performed, and the little
+ structure is updated.  For example, the method getAtomicWeight is usually
+ performed on an object of class PhysicalAtom.   This can speed up loops.
+
+ Objective-C has the notion of typing an object when it is declared.
+ This hints to the compiler which methods are legal, and given enough
+ information about which superclasses wil lbe linked in, the compiler
+ might be able to generate direct calls.  Of course, if you modify a
+ *superclass* to now intercept a message where before none of its child
+ classes had, then that direct call just bypassed the software change!  :^|
+
+ >Wouldn't this partially diffuse the static/binding
+ >debate in objective-c's favor?
+ >
+ >If I am all wet, so be it. 
+
+ You're not all wet, you're just curious.... :-)  For each problem, the
+ right tool should be used.  From the C++ programs I've worked on, I advise
+ if you are building an application with minimal reuse, C++ can be a fine
+ language.  One big makefile to correct inheritance/polymorphism changes.
+ If you have lots of physical RAM, Eiffel can generate correct programs
+ after a long startup code investment, but pays off in the medium run
+ (user enhancement time).  People have said Eiffel can be learned in about
+ the time to learn C++ completely.  If you're just not sure, try Smalltalk,
+ a LISP, or objective-C.  Some one said Smalltalk is easy for COBOL programmers
+ to use because it is so wordy (but in a familiar way).
+
+ It is the first of the month and the newsgroups should be posting FAQs.
+ Many of them talka about a language's pluses and minuses.
+
+ >Mark Stankus
+
+ --- brian witt
+

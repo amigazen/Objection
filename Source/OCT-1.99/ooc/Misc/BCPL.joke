@@ -1,0 +1,53 @@
+
+
+Article 11289 (62 more) in comp.sys.amiga.tech:
+From: rbabel@babylon.UUCP (Ralph Babel)
+Newsgroups: adsp.misc,comp.sys.amiga.tech,sub.sys.amiga
+Subject: New BCPL compiler available!
+Message-ID: <02009.AA02009@babylon>
+Date: 31 Mar 90 05:04:01 GMT
+Lines: 9
+
+After a long period of silence, Metacomco - creator of the
+AmigaDOS - has just released a new object-oriented version
+of their BCPL compiler, including source-level debugger and
+Global Vector Optimizer. Anyone out there who wants to buy
+my Lattice C 5.05 and C++?
+
+Ralph
+
+...!{cbmvax|nccnet}!cbmehq!babylon!rbabel
+End of article 11289 (of 11378)--what next? [^Nnpq] 
+Searching...
+Article 11352 (59 more) in comp.sys.amiga.tech:
+From: rbabel@babylon.UUCP (Ralph Babel)
+Newsgroups: adsp.misc,comp.sys.amiga.tech,sub.sys.amiga
+(SAME) Subject: Re: New BCPL compiler available!
+Message-ID: <02053.AA02053@babylon>
+Date: 3 Apr 90 03:11:42 GMT
+Lines: 22
+
+In article <4651@jhunix.HCF.JHU.EDU>
+barrett@jhunix.HCF.JHU.EDU (Dan Barrett) writes:
+
+> In article <02009.AA02009@babylon> rbabel@babylon.UUCP
+> (Ralph Babel) writes:
+>
+>> After a long period of silence, Metacomco - creator of the
+>> AmigaDOS - has just released a new object-oriented version
+>> of their BCPL compiler....
+>>
+>> Date: March 31, 1990
+>
+>        Oops!  One day too early?  :-)
+
+Sorry, different timezone, I forgot! :-)
+
+But - no joke! - The Austin Code Works offers BCPL source
+code for a BCPL compiler (see Dr. Dobb's January 1990).
+
+May BCPL rest in peace.
+
+Ralph
+End of article 11352 (of 11378)--what next? [^Nnpq] 
+

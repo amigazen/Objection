@@ -1,0 +1,97 @@
+From csusac!babbage.ecs.csus.edu!brian Wed, 29 May 91 18:54:05 PST
+Received: by rael.UUCP (V1.08/Amiga)
+	id AA00000; Wed, 29 May 91 18:54:05 PST
+Received: from babbage.ecs.csus.edu by csusac.ecs.csus.edu (5.61/1.34)
+	id AA05309; Wed, 29 May 91 12:46:22 -0700
+Received: by babbage.ecs.csus.edu (5.61/1.34)
+	id AA23567; Wed, 29 May 91 12:46:16 -0700
+Date: Wed, 29 May 91 12:46:16 -0700
+Message-Id: <9105291946.AA23567@babbage.ecs.csus.edu>
+From: csusac!babbage.ecs.csus.edu!brian (Brian Witt)
+To: rael!aleks
+Subject: re:oct
+
+- To: esink@dit.upm.es (Eric Wayne Sink)
+- Date: Wed, 29 May 91 12:40:55 PDT
+- In-Reply-To: <9105291245.AA29534@turia.dit.upm.es>; from "Eric Wayne Sink" at May 29, 91 2:45 pm
+
+Your first message:
+
+> I downloaded your OCT system to have a look at it.  It looks
+> very slick.  Just a quick question, does the NeXT ObjC compiler
+> make use of a prelinker ?  Does it also need startup initialization
+> of classes ?  Just curious...
+
+I don't believe the NeXT system requires any prelinking.  However,
+for ultimate copmatibility with any system, I _do_ have a prelinker.
+It merely constructs a list of class control blocks to inspect
+upon startup.  Most of these describe classes, so that is how I find
+out the classes included.  Othertimes, it just describes a module
+with routines in it (ie, main.m).  For both cases, the array of
+unimplemented selectors must be "bound" in (resolved).  To bind,
+the selector names are converted into unique values (SEL's).
+See file methods/subbind.c for details.
+
+On the NeXT, upon startup of the application, each class recieves
+the message "initialize."
+
+If you are serious about this stuff, I recommend either Dr. Cox's
+"object oriented programming: an evolutionary apoproach", 2ed,
+or the NeXT documentation set, about $130US.
+
+
+Your second message:
+
+> I have OCT mostly running on my Sun 3 here.  One comment I
+> feel compelled to make :
+> 
+> I don't know what behaviour is actually standard for string
+> functions and ctype macros, but on the Sun, the following
+> has caused some grief :
+> 
+> strlen, strcmp, strcat, and friends may not be passed a null
+> pointer.  If they receive a null pointer, they core dump.
+
+Yes, MANY people complained about this.  Pick up the beta version.
+Particularly, strdup() now used my own routines to deal with NULL ptrs.
+ 
+> tolower produces garbage if it receives something that is
+> already a lower case letter.
+
+A similar problem was mentioned by someone running a Sequent Symmetry
+system with the Dynix OS.  I've got some fixes, but haven't uploaded
+them.
+
+> Regards,
+> 
+> Eric
+
+Currently, I', working on improving the grammar.  Seems that if
+you try:
+
+@interface Foo : Object
+{
+	int    xxx, yyy;
+}
+- doit;
+@end
+
+@implementation Foo
+
+- doit
+{
+      myfunc( xxx, yyy, self );
+}
+@end
+
+Then 'yyy' won't be noticed as an instance variable, even though 'xxx'
+will be correctly translated.  The call to myfunc() should be:
+	myfunc( (self->xxx), (self->yyy), self );
+
+Would you like to be added to my mailing list???
+
+--- sometimes we must dance alone.
+--- brian
+
+
+

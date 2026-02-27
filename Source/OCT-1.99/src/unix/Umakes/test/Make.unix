@@ -1,0 +1,177 @@
+####################################################
+#	:bk=0
+#
+#	Makefile for test suite.
+#
+#	These programs may be debugged under MANX's sdb product like:
+#		sdb -s/methods!/maker main16 depends
+#	where -s specifies source directories.  Do a "G app_main",
+#	start stepping message expressions!
+#
+#	26-oct-89	bjw  	Initial comments.
+#	8-nov-90	bjw 	t4.m now compiles.  No more zoo method. use -zt.
+#
+
+## vvvvvvvvvvvvvvvvvvv  User Servicable Parts Follow  vvvvvvvvvvvvvvvvvv */
+
+#A # ---- AMIGA  -------------------------------------
+#A 
+#A CC = cc
+#A LN = ln
+#A OCT = /xlator/oct
+#A LEX = flex
+#A DELETE = delete quiet
+#A CLONE  = copy clone
+#A RENAME = rename
+#A
+#A # These are filename extensions for object and executables:
+#A OE = .o
+#A EE =
+#A 
+#A WILD_ALL = #?
+#A WILD_OBJ = $(WILD_ALL)$(OE)
+#A WILD_BAK = $(WILD_ALL).bak
+#A OOCINC = ooc:include/
+#A OOCBIN = Haven:bins/
+#A # OOCLIB = ooc:include/
+#A OOCLIB = LIB:
+#A 
+#A # -------------------------------------
+#A 
+#A #	Some actual include files:
+#A RELEASE = $(OOCINC)objc/release.h
+#A 
+#A CFLAGS = -DNO_PROTOTYPE -n
+#A CF_STACK = +m
+#A 
+#A LFLAGS = -g
+#A CLIBS = -lc
+#A LIBS = $(OOCLIB)ocbase.lib $(OOCLIB)ocsubs.lib $(CLIBS)
+#A 
+
+# ---- UNIX  -------------------------------------
+
+.SUFFIXES: .o .c .f .h. .y .l .m .s
+
+CC = cc -c
+LN = cc
+LEX = lex
+OCT = ../xlator/oct
+DELETE = rm -f
+CLONE = cp
+RENAME = mv
+
+# These are filename extensions for object and executables:
+OE = .o
+EE =
+
+WILD_ALL = *
+WILD_OBJ = $(WILD_ALL)$(OE)
+WILD_BAK = *.bak *~
+OOCINC = $(HOME)/myoct/include/
+OOCBIN = $(HOME)/bin/
+OOCLIB = $(HOME)/myoct/lib/
+
+
+# -------------------------------------
+
+#	Some actual include files:
+RELEASE = $(OOCINC)objc/release.h
+
+LIBS  = -locbase -locsubs
+MODEL = -g
+LFLAGS = $(MODEL) -L $(OOCLIB)
+
+CFLAGS = -DNO_PROTOTYPE -I ../usr/include -I $(OOCINC) $(MODEL)
+
+
+## ^^^^^^^^^^^^^^^^  No User Servicable Parts Beyound  ^^^^^^^^^^^^^^^^^ */
+
+OCTFLAGS = -w2 -zt -zd -zk 
+
+
+# -------------------------------------
+
+OBJS = test.o t7.o main.o
+COBJS = test.c t7.c main.c
+
+ALL_METHODS = test.m
+
+OSUITE = t1.o t2.o t3.o t4.o t5.o t6.o t7.o
+
+#----------------------------------------------------------
+#
+#	--- New rules ---
+#
+.m.c :
+	$(OCT) $(OCTFLAGS) $*.m
+
+
+#   Ignore errors from C compiler:
+#A .c.o :
+#A	-$(CC) -o $*.o $(CFLAGS) $*.c
+.c.o :
+	-$(CC) $(CFLAGS) $*.c
+
+
+#----------------------------------------------------------
+#
+#	--- Top Level Controls ---
+#
+all :	suite
+
+app :	main16
+
+clean :
+	-$(DELETE) $(WILD_BAK) $(WILD_OBJ) $(WILD_ALL).lst  main16 main16.dbg
+	-$(DELETE) $(COBJS)
+	-$(DELETE) t$(WILD_ALL).c t$(WILD_ALL)$(OE)
+
+
+suite : $(OSUITE)
+
+
+help :
+	@echo "app   -- generates test application"
+	@echo "clean -- cleans up from last test"
+	@echo "suite -- translator scrutiny [default]"
+
+#
+#	--- project: MAIN ---
+#
+main16 :	$(OBJS) ww.o
+	$(LN) $(LFLAGS) -o main16 ww.o $(OBJS) $(LIBS)
+
+ww.o : 	ww.c
+	$(CC) $(CFLAGS) ww.c
+
+ww.c :
+	prelink ww.c main.m $(ALL_METHODS)
+
+test.o :  	test.c
+main.o :	main.c
+t7.o 	:	t7.c
+
+test.c :  	test.m $(OCT) test.h
+main.c :	main.m $(OCT) t7.h test.h
+t7.c 	:	t7.m $(OCT) t7.h
+
+#
+#	--- project: Test Suites ---
+#
+t6.o :	t6.c
+t5.o :	t5.c
+t3.o :	t3.c
+t2.o :	t2.c
+t1.o :	t1.c
+t4.o :	t4.c
+
+
+t6.c :	t6.m $(OCT)
+t5.c :	t5.m $(OCT)
+t4.c :	t4.m $(OCT)
+t3.c :	t3.m $(OCT)
+t2.c :	t2.m $(OCT)
+t1.c :	t1.m $(OCT)
+
+

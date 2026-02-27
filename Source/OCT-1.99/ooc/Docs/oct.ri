@@ -1,0 +1,1496 @@
+.!	OOC Documentation: Overview, Usage and Description
+.!		This file, and the corresponding document produced from it,
+.! 		are copyright(c) 1989, 1990.
+.!
+.!	This document gives an overview and introduction the BARNEY OCT
+.!	system.  Some design ideas are highlighted.  Object layout is
+.!	described.
+.!
+.!
+.!	15-july-89	bjw 	Initial penning.[AB.1]
+.!	21-july-89	bjw 	Corrections after July BADGE meeting.[AB.2]
+.!	25-july-89	bjw 	Seperated future directions from reality.[AB.3]
+.!	27-july-89	bjw 	Added desc for other programs (makme).[AB.4]
+.!	03-aug-89	bjw 	Added compiler gotchas![AB.5]
+.!	09-aug-89	bjw 	Grammar touchups [AB.6]
+.!	17-aug-89	bjw 	"How to make a class" [AB.7]
+.!	1-sept-89	bjw 	Removed reference material.
+.!	21-sept-89	bjw 	@imp/@if [AO.0]
+.!	14-oct-89	bjw 	Major cleanup [AO.1]
+.!	07-nov-89	bjw 	Now named "OCT" (get out and vote!)
+.!	11-dec-89	bjw 	Reformatting [AO.3]
+.!	17-jan-90	bjw 	Beta Version [BG.1]
+.!	26-mar-90 	bjw 	Adding categories [BG.2]
+.!  25-may-90	bjw 	Broke out defines into "man-oct.rinc".
+.!	31-may-90	bjw 	Minor grammatical revisions.
+.!	9-sept-90	bjw 	Added flex copyright notice.
+.!
+.!
+.include man-oct.rinc
+.!
+.! --------------------------------
+.!   Include some real neat stuff:
+.!
+.!  These are used by PROFF.rinc
+.define boldon
+.bold on
+.en
+.define underon
+.underline on
+.en
+.!
+.include sys:usr/include/PROFF.rinc
+.!
+.! --------------------------------
+.!   The Documement:
+.center on
+.!
+.bold on
+.sp 3
+Object Oriented "C" Translator
+.sp 2
+Overview and Description
+.bold off
+.sp 4
+Based on Objective-C as described by Dr. Brad Cox
+.sp
+(similar to the NeXT computer version)
+.sp
+Currently available on Amiga and Xenix systems
+.sp
+.center off
+.sp 7
+.!
+.save
+.lm +6
+.rm -4
+.underon
+.sectaux 0 Abstract
+.underline off
+.justify
+.sp
+This document describes a system similar to Objective-C
+as outlined by Brad Cox [Cox86].
+The system combines version 2 classes and methods with version 4
+syntax.
+Ports to other bases are planned for the future.
+Herein is described the usage and structure of a "C" preprocessor
+for ${oo} programming.
+Future directions are discussed.
+A bibliography of related materials is also included.
+.!
+.restore
+.st -16
+.note 0 Legal Notices
+.center on
+.!
+This document copyright (_c) 1989, 1990 by Brian Witt.
+.sp
+C++ and UNIX are trademarks of AT&T/Bell Labs.
+.br
+Macintosh is a trademark licensed to Apple Computer Co.
+.br
+Eiffel is trademark Interactive Software Engineering, Inc.
+.br
+Objective-C and Software-IC are phrases coined by Dr. Brad Cox
+and trademarked by Productivity Products International, Inc.
+.br
+Smalltalk-80 is a trademark of ParcPlace Systems.
+.!
+.center off
+.endnote
+.!
+.! ---------------------
+.!
+.endsect
+.newsect Introduction
+.!
+Object oriented programming is now coming into acceptance in
+major computing circles.
+Software houses such as Microsoft and Borland International
+are finally offering ${oo} Pascal,
+years after Apple first made available Niklaus Wirth's Objective-Pascal
+for the Macintosh system.
+AT&T now offers an ${oo} version of "C" called C++ [Stro86].
+The NeXT computer has been designed around Objective-C version 4.
+Major companies are committing themselves to this new challange.
+.!
+  The computers of today are finally overcoming many of the "drawbacks"
+that have long putoff serious consideration
+of an ${oo} system [Cox86].
+Large memories, fast disks, graphic diplays, and capable processors are
+today reaching a financially feasible level to make the ideas of
+${oo} possible for the masses.
+.!
+.!
+  This programming language is an attempt at hybriding a medium
+level language with ${oo} constructs.
+The goal is to provide flexibility with classical (?) ${oo}
+programming layout (ala Smalltalk).
+The translator accepts the hybrid language and ensures
+its output is complete, legal "C" code.
+The translator system is model after Objective-C as presented
+by Dr. Cox in [Cox86].
+This author's particular system is currently in the public domain.
+.!
+  The alpha releases of ${shname} started in August 1989.
+The first Amiga "release" was January 1990,
+along with the Xenix/386.
+The planned rollout schedule is as follows.
+An MS-DOS version should appear after the summer of 1990.
+A second Amiga version should also appear about this time,
+and will be released to Fred Fish.
+.!
+.!
+.sect 1 1 Why?
+.!
+   Initially this system is destined for very limited release as
+much of the knowledge here came from the cookbook of [Cox86].
+Dr. Cox provided the recipe and I merely followed his directions therein.
+I have legal concerns about distributing the method code that's
+been typed in, nearly verbatim, out of [Cox86].
+His coding style is rather distasteful (his being very text-space conscious),
+and I've tried to correct some stylistic differences.
+Since there is little an ${oo} system can do without support classes (like 
+.class Array
+and
+.class Set)
+, these classes have to be included somehow.
+Most of the syntax is version 4
+with classes and methods from version 2.
+But the system is moving towards the version 4 class ${heir}.
+.!
+.!
+.need 5
+.underline all
+.underline
+  Why am I doing this?
+.underline words
+My personal favorite for object oriented systems is
+Eiffel by Bertrand Meyer [Meyer88]: ${agc} is a must,
+and static method checking increases program reliability.
+(But a 180K executable just for "hello world" is little excessive!)
+This system, on the other hand, is rather crude:
+no garabage collection, opaque error messages,
+and a design that encourages bypassing
+the data hiding rules of ${oo} systems.
+However, this system provides a good feel for the paradigms
+in an object based system.
+Thus, the basic ideas can be exercised and demonstration systems built.
+Perhaps a few ideas can be spawned with this system,
+and a dream become reality...
+The author's personal interest is in operating systems,
+and someday he'd like to construct a layered, ${oo} operating system
+based on the concepts presented here.
+.!
+.need 5
+  Also noteworthy is the "commercial viability"
+of entering the Amiga market.
+Since there are not tens of millions of installed machines,
+small companies probably see the Amiga market as
+"not worth their time."
+As such, the products Amiga owners want just have to be written
+by Amiga programmers instead of waiting for a vendor to sell the
+application.
+(Fred Fish was very insightful about the need for public domain
+software for the Amiga.)
+For the vendors, supporting different platforms may be too much
+overhead for them to cost-effectively manage.
+As a side note,
+in Novemeber 1989 Dataquest estimated that after 2-1/2 years
+OS/2 had an installed base of 180,000 units.
+(I don't know the percentage of these OS/2 systems that were
+"promotion packages.")
+Would you write software for this small base?
+By this date, Commodore-Amiga had shipped over a million total of
+the A500, A1000 and A2000 models,
+all running the same multi-tasking operating system.
+.!
+.!
+.need 6
+.underline all
+.underline
+  Why is source code being distributed?
+.underline words
+Someone may want
+things setup just a little different.
+There are also many lessons to be learned from creating ${oo} systems.
+Do you think adding ${agc} would be easy?
+Well, try it and find out for yourself!
+Initially, the translator was mostly a
+.program bison
+and
+.program flex
+grammar with a little glue code from me.
+Now, only the FSF's scanner is used.
+As a *big* "thank you, I want to return the favor"
+to Stallman and Fred Fish,
+source code is graciously included.
+.!
+.!
+.need 8
+.sect 1 2 Background
+  I've enjoyed the excellent material available on ${oo} techniques.
+The 1981 August Byte issue on Smalltalk-80, and Dr. Cox [Cox86],
+were first to change my thinking.
+Books about Smalltalk [Budd87]
+have also given me insight to the implementation difficulties involved.
+The first section of [Meyer88] fuels the object-drive paradigm
+and shows how top-down programming fails for non-trival projects.
+.!
+
+.sect 1 3 Big Copyright Notices
+.sp
+.save
+.nf
+.br
+flex - tool to generate fast lexical analyzers
+.br
+.br
+Copyright (c) 1987, the University of California
+.br
+The United States Government has rights in this work pursuant to
+contract no. DE-AC03-76SF00098 between the United States Department of
+Energy and the University of California.
+.br
+This program may be redistributed.  Enhancements and derivative works
+may be created provided the new works, if made available to the general
+public, are made available for use by anyone.
+.br
+.br
+ver   date  who    remarks
+---   ----  ------ -------------------------------------------------------
+04b 30sep87 kg, vp .implemented (part of) Van Jacobson's fast scanner design
+.br
+.br
+.restore
+.!
+.sect 1 3 Acknowledgements
+ This document was formatted with
+.program PROFF
+written by Ozan S. Yigit and Steven Tress, based on
+.program FORMAT
+in [Kern76], and various other formatters.
+The
+.program cpp
+program is from DECUS.
+Programs from FSF are everywhere.
+.!
+.!
+.need 6
+  For their time and skills, I am hopelessly indebted to:
+Shari Dugan, Stuart H. Ferguson, Fred Fish,
+Steve and Andere Jones, Ed Kilham, John Knezovich,
+Brad Lanam, Leslie and Dana Leong, Jim Mackraz,
+Pat Miller, Dana Myers, Tony Squier, and Dr. Donald V. Steward.
+.!
+.sp 2
+.!
+.save
+.center on
+.nofill
+.nojustify
+The author can be reached at these USENET addresses:
+.sp
+DOMAIN:  aleks@well.sf.ca.us
+USENET: {backbone}!uunet!seer.UUCP!rael!aleks
+SCHOOL:  brian@babbage.ecs.csus.edu
+.center off
+.br
+.restore
+.!
+.sp
+.st -13
+.save
+.lm +7
+.rm -2
+I have told the above story to different audiences.
+Programmers, as a rule, are delighted by it,
+and managers, invariably, get more and more annoyed as the story
+progresses; true mathematicians, however, fail to see the point.
+.!
+.br
+.nofill
+.rm +9
+.lm 44
+.sp
+Prof. Dr. E. W. Dijkstra
+from EWD594, "A Parable"
+.br
+.br
+.!
+.restore
+.br
+.endsect
+.br
+.!
+.! ---------------------
+.!
+.newsect System Overview
+.!
+The ${shname} system is a collection of programs and runtime libraries.
+Header files relating to the classes are also required for any
+compilation.
+This system extends the C language [Kern78]
+instead of creating a completely different language.
+.!
+.sect 1 1 Kind-of Object Oriented
+  Following the lead in [Cox86], ${shname} is an object oriented
+preprocessor for the "C" language.
+For the programmer, the system provides single inheritance.
+The root class is named
+.class Object [Gold89].
+This class is mandatory for any ${shname} application;
+all other classes are pulled in as required by your application.
+Allocated objects are of the single type "id",
+and any object reference may be assigned to any other object referring
+variable.
+The future reveals that typed object references will be introduced,
+and will co-exist with untyped object references.
+.!
+    Method selectors are bound dynamically at run-time.
+Any method may be sent to any object; successful understanding is
+another matter.
+Methods are generally public unless you don't mention them
+in the public interface file.
+Custom places an underscore (_) in front of private methods.
+Instance variables are hidden from the application, but not
+completely unreachable by it.
+.!
+.!
+.sect 1 2 Product Compatibility
+  There are a few differences between the ${lgname} - ${shname} system
+and Objective-C version 4 from StepStone, Inc.
+The preprocessor directive #import is not implemented.
+As long as ${shaname} uses an outboard preprocessor, this directive
+can't be implemented.
+Use #include instead; you'll get a few warnings, though.
+My base classes aren't as complete, either.
+Although I'm moving towards the verison classes, their implementation
+may be a little lacking.
+And remember, there is no graphical user interface.
+.!
+.!
+.sect 1 3 System Components
+   A running ${shname} application is the product of
+source files, interface definitions, and translation programs.
+The programs include an ${shname} to "C" source code translator,
+a class interface helper,
+and a pre-linker utility.
+The preprocessor,
+.program cpp
+is included for sites that
+don't have this program separate from the "C" compiler itself.
+Under Xenix, the preprocessor is part of the compiler's first pass,
+which does preliminary syntax checking.
+It will choke on the extended syntax.
+Your site need only contribute a K&R "C" compiler [Kern78].
+.! Prototyping and constant types are due for the second release.
+The interface definition file includes information about the
+class, its superclass, and method return types.
+.!
+.!
+.!
+   In addition to the translator there are a few support programs
+included in the ${product} package.
+A prelinker program arranges for the needed classes to be included
+from the ${shname} class library.
+Since the translator's scanner was built with
+.program flex,
+it's included, too.
+After changing two lines of
+.filename scan.l,
+the input is acceptable to UNIX
+.program lex.
+Programs enough to recompile the system are included also.
+.!
+.need 3
+   At present (April 1990), the system is remarkably independent of
+the actual machine it's running on.
+.! Calling the host system's object library maintance program from the
+.! .filename makefile
+.! is as specific as it gets.
+Calling vsprintf(), or something similar,
+is the height of weirdness for the runtime.
+Applications can be generated with 16-bit or 32-bit int's.
+The translator relies strictly on the standard "C" runtime library,
+not any Amiga or UNIX specific routines.
+The translator survives in 64K code and data segments,
+but not in a combined 64K segment for code
+.underline
+and
+data.
+.!
+.endsect
+.!
+.! ---------------------
+.!
+.newsect What the Translator Does
+.!
+The translator handles one class at a time.
+The definition of a class is split between
+the public interface definition header file and the
+private class implementation code file.
+(The totality of methods a class responds to includes those
+of its superclasses, also.)
+The public interface defines the class's instance variables and
+methods that it specifically implements.
+(See also C++ in [Stro86].)
+The implementation file holds source code to implement the
+methods, and it can include any private methods to
+assist the class's objects in carrying out their work.
+.!
+   Before compiling any class, information about the class's
+single superclass must be available.
+This superclass is used to link the class into the class ${heir}.
+Instance variables are collected by reading in the interface
+definition file for all the superclasses.
+.!
+  A implementation difficulty for ${oo} systems is translating the
+${mss} into a "universally unique code" for
+the particular collection of classes that are needed to form
+the application.
+The method choosen by Cox [Cox86] is for each phylum (grouping of classes)
+to maintain
+an array of codes representing the ${mss} unique to that
+phylum, ie, those not defined in its super-${phs}.
+(Phylum is a collection of related classes,
+such as Foundation, Collection, or Windowing.)
+Values from this array are read out and passed
+as the message selector code.
+At startup-time, each phylum's array is adjusted by a scalar representing
+the count of methods already defined and adjusted in the phylum
+before it.
+This has the advantage that each phylum
+can be built and compiled separatedly and without knowledge of
+other phylums.
+The cost is small at startup-time, and a single indirection during
+message invocation (array fetch at a fixed offset).
+.!
+   Once the program is ready to be linked, Cox's runtime
+substrate constructs a single list of classes.
+This list is used to preset all classes initially at startup-time,
+ie, [Sequence initialize].
+A single list of method selector names is also constructed..
+This list is used primarily for run-time error reporting
+(ie, "error: 'ByteArray' doesn't respond to [display:rop:]").
+These lists are built by the
+.program prelink
+, compiled,
+and passed to the system's linker along with the other module names.
+.!
+   For ${shname}, the basics of the above system have been implemented.
+The difference is that each object module includes a list of
+methods it references (phylums are not used).
+The
+.program prelink
+program builds a list of modules required for the application.
+When the runtime system initializes itself,
+it walks this list finding all the dependent classes.
+From this list, all the methods are given codes, and every class
+initialized.
+.!
+.!
+.sect 1 1 Language Extensions
+  To support the message expression, a grammar extension is created.
+Several "frills" (translator directives)
+have also been added for convience sakes.
+Translator directives are defined
+for access to the internal information
+of the translator.
+All files destined for the translator must somehow contained a
+.!  A non-break space would be great here!  *******
+.filename _#include
+.filename <objc/objc.h>
+directive.
+If you're defining a new class, this is taken care of for you already
+by the Object class interface file.
+If the file doesn't define any classes, then the directive
+"@includes()" must be placed after the file's list of include files
+(see
+.filename user.m
+in the directory
+.filename ooc/methods
+for details).
+.!
+   After
+.program cpp
+has processed the code, it's the translator's turn.
+First, all comments are stripped (again).
+If
+.program cpp
+doesn't strip them out, then ${shname} will.
+An additional comment form beginning with "//"
+and continuing until the end of the line is also recognized [Stro86].
+Right now there is no way to preserve comments, so
+.program lint
+isn't too effective here.
+(This may change with an integrated
+.program cpp
+preprocessor.)
+.!
+   Translator directives, beginning with "@",
+allow the programmer to access information in the classes'
+dataset without having to "hardwire" in such information.
+One directive is "@selector()" with takes a method selector
+and returns
+.! a function that returns the
+an implementation defined selector code (type `sel').
+If you need to get a selector from an arbitrary string,
+use the substrate function sel__getUid().
+The directive will promote to va-dcl methods (see below);
+the runtime function won't.
+The directive "@defs()" accepts a class name and returns the
+instance variable declaration.
+The returned text is suitable for inclusion in a structure definition
+(see below).
+.!
+.need 14
+.opencode
+#include <objc/substrate.h>
+
+//  This is a new comment!
+id  ignoreMe()
+{
+   struct { @defs(View) short xxx; }  cheater;
+   extern char   *users_method;
+
+   [obj perform:@selector(titleStr:) with:" Title "];
+   return sel_getUid( strcat( users_method, "vaDcl:" ) );
+}
+.endcode
+.!
+  For files that don't define any classes but use message passing,
+there should be a "@includes()" directive after the file's normal
+list of include files.
+.!
+.!
+   The message expression is the primary reason the translator was built.
+Messages begin with a left square bracket (_[)
+and close with a right square bracket (_]).
+Between the square brackets is the message target,
+and some combination of selectors and arguments expressions,
+seperated by spaces (except va-dcl, see below).
+The smallest message expression
+is a target and method selector like "new" or "hash".
+The method may also take arguments, which are separated from the
+selector by a colon (_:), ie "at:_ 1" and "put:_ target".
+This syntax is similar to a "code block" in Smalltalk.
+.!
+  Some messages allow a variable number of arguments to follow
+the fixed selectors.
+These arguments are unlabeled and are separated by commas (_,).
+The translator will automatically append "vaDcl:" to the method name
+internally, thus the last statement below invokes the message "with:vaDcl:".
+If a method name is unknown, another search with "vaDcl:" appended
+is tried.
+This way, "vaDcl:" methods may take a single parameter
+(after the opening name) and not require a trailing dummy parameter
+(see last statement in sample below).
+This is called auto-detection of "vaDcl:" type methods.
+.!
+.opencode 12
+#include <objc/Sequence.h>
+#include <objc/Array.h>
+#include <objc/PointXY.h>
+@includes
+
+//  Just a sample...
+void my_test()
+{
+   id   obj, targ, dest;
+   int  x_coord, y_coord;
+
+   targ = [Sequence new];      /* No arguments */
+   dest = [target find:nil];   /* One arg */
+   obj  = [[Array new:3] at:1 put:target];   /* Two args */
+   targ = [PointXY x: x_coord y: y_coord ];  /* Two args */
+   [targ setXY: 90 : 40 ];
+   dest = [Sequence with:2, target, nil];  /* Many va-dcl's */
+   targ = [self error: "It's OK" ];     /* 1 parm va-dcl */
+}
+.!
+.endcode
+.figure Application Using Objects
+.!
+.br
+The fourth line (reference to class
+.class PointXY_)
+invokes the factory method "x:y:".
+The statement after it invokes the method "setXY::".
+The second argument isn't a va-dcl method type, it's just unlabeled.
+Sometimes this style is handy, but usually it adds confusion.
+.!
+.!
+.sect 1 2 After Translation
+.!
+  A prelinker is used to build a list of classes
+that will be brought together to form the final application.
+A small
+.filename .c
+file is built, which must be compiled and added into
+the list of object modules for the appliction.
+This list tells the linker which classes to extract from
+the library.
+Any dependencies of the included classes are pulled in by their own
+external class references.
+It's also used by the substrate at startup-time to build
+the central list of method selector codes and class names.
+The list is searched depth-first to find classes that are used by
+classes that are used by the classes that the application requests.
+.!
+.!
+  Normally, this small file need only be rebuilt when the
+list of modules the user provides changes in some way,
+or a new class is added to the application.
+See the
+.filename makefile's
+for sample dependencies for rebuilding this file.
+.!
+.!
+.! ---------------------
+.!
+.endsect
+.newsect Translation
+.!
+Translation is accomplished in four phases.
+Source starts as
+.filename .m
+files (methods), are translated to
+.filename .c
+files, and then compiled to object files.
+The system linker, using the prelinker's output,
+coagulates the user and system classes creating the user's application.
+.!
+  The first two passes are driven by ${shname}, which calls
+.program cpp
+first.
+The translator then converts class definitions and methods
+into legal "C" code.
+The translator uses information in the @interface clauses
+to relate the external classes.
+The system's "C" compiler runs next.
+The prelinker creates a list of classes for use by the substrate.
+Finally the system's linker/loader pulls together object and library
+modules.
+.!
+.!
+   The ${shname} translator first uses
+.program cpp
+to process the input source file, stripping comments,
+inserting included files, and choosing conditional code.
+If the source code depends on the "C" compiler
+defining certain symbols relating to specific options, like
+.boldon
+__LARGE__DATA__MODEL,
+.bold off
+then these define's must be given explicitly to
+.program ${progname}
+to pass to
+.program cpp
+(see "Translator Gotchas!" below).
+The processed text is stored into a temporary file.
+.!
+   The translator reads this temporary file,
+translating it, and delivering a
+.filename .c
+output file.
+Headers for the methods and a dictionary describing the methods
+is built,
+and the file is ready for the "C" compiler.
+A little preprocessing is again needed
+since symbols are declared during translation.
+The translator will include
+.filename <objc/objc.h>
+a second time to clean up after itself.
+The include command is triggered either by a class @implementation
+clause or the @includes() directive.
+By including
+.filename <objc/objc.h>
+after the translator has run,
+the translator can be decoupled from the actual implementation,
+allowing cross-compiling simply by changing this include file.
+The "C" compiler takes over for conversion to object code.
+.!
+  Before the application can be linked, a list of needed classes
+must be constructed.
+The list is used to initialize all the classes
+when the application is executed.
+The
+.program prelink
+program scans the list of classes and files
+the user in contributing to the application.
+These filenames are combined with names from the "must init" file.
+.!
+.!
+.figopen 6 44
+                        ________
+                       /        \
+                      |\________/|
+                      |   user   |
+                      |  source  |
+                       \________/
+                           |
+    ________               V
+   /        \        +------------+
+  |\________/| <---- |   O.O.C.   | ----> +-------+
+  | i/f file | ----> | Translator | <---- |  cpp  |
+   \________/        +------------+       +-------+
+                           |
+                           V
+                     +------------+
+      .              |     C      |
+      :              |  compiler  |
+      |              +------------+
+  ____V____                |
+ /         \            ___V____             _________
+|\_________/|          /        \           /         \
+|   user    |         |\________/|         |\_________/|
+|  classes  |         |  object  |         | Substrate |
+ \_________/           \________/           \_________/
+      \                    |                    /
+       \                   V                   /
+        \            +------------+           /
+         `---------> | Pre-Linker |          /
+                     +------------+         /
+                     |  Linker &  | <------'
+                     | Sys Librs  |
+                     +------------+
+                           |
+                      _____V_____
+                     /           \
+                    |\___________/|
+                    | Application |
+                     \___________/
+.figclose
+.figure Data flow in ${shname}
+.!
+.!
+.sect 1 1 Translator Gotchas!
+.!
+   Discussed here are a few points to keep in mind when using the
+${lgname}.
+The warnings here are mostly the result of certain assumptions to
+simplify the translator a bit,
+and will probably change as the translator evolves.
+These idiosyncracies will probably return errors from the "C" compiler
+instead of compiling incorrect code.
+But if your application is amiss,
+you should first suspect the generated code.
+.!
+.! ____________________________  cpp
+.!
+  The first idiosyncracy concerns the use of
+.program cpp
+to first treat the code.  Since it doesn't know about "//" comments,
+the comment text has to obey certain rules;
+rules like matching quote marks.
+So for a line like: "// don't look now!",
+.program cpp
+will complain about "unterminated string" on the line
+.underline
+after
+the "//" comment.
+What happens is
+.program cpp
+is tripping over a single quote (_') in the comment line.
+There is no matching single quote on the line.
+If the error line is a comment, or just after a comment line,
+just ignore this error message.
+Also, since your host compiler didn't invoke
+.program cpp
+, there is no way symbols relating to the program's memory model can be set.
+These defines can passed
+using the -p or -d options of ${shname},
+or more permanetly set using environment variables.
+.!
+.! ____________________________  cpp
+.!
+.!
+  Among high-level programming languages, monadic operators that
+trail the expression are rare, except in "C" [Kern78].
+The usual handling cares should be applied to auto-increment
+and auto-decrement operators.
+Witness the famous:
+"a++ + ++b."
+Inserting a few parenthesis here will only make the code more
+understandable.
+If you forget the parenthesis, the post-inc and post-dec will
+associate right to left, in accordance with K&R [Kern78].
+This code sample points out a few concerns.
+.!
+.opencode 11
+- foo
+{
+   id   *there, cls = [super class];
+
+   there = (id *) IV(self);
+   while( *there )
+      [(*there++) free];
+
+   if( [self hash] > 5 )
+      cls = [self class];
+   (there-1)[1] = nil;         /* array store */
+}  /* - foo */
+.endcode
+.!
+
+Because the translator simply inspects the tokens as they appear,
+and not really following what they mean, it can get
+confused at times.
+How one token relates to its neighbors isn't inherit in the parsing.
+.!** Parsing if() and while() statments can cause this.
+.!** Most of the time, it shouldn't bother anything, but if
+.!** there are warnings, a set of curly braces (_{_})
+.!** might be needed after the if() or while().
+.!
+   The above line marked "array store" is an example of where a closing
+parenthesis (_)) would be next to an open square bracket (_[).
+The translator assumes this really is an array store
+(since the syntax is legal and correct).
+rather than going for the message expression.
+Note, if a function call were added to the beginning of the line,
+(ie, "foo(there)[1] = nil;")
+the square bracket (_[) might be mistaken as beginning a message.
+.!
+  In these cases, the translator doesn't treat the expression
+as a message expression.
+If the translator thought wrong, the "C" compiler should (hopefully)
+catch the message translation as illegal "C" syntax,
+and display an compiler error message.
+Remember, the translator is conservative in its decisions,
+and the highway to Hell is paved with BMW's.
+.!
+.!
+.endsect
+.! ----------------------
+.!
+.newsect The Reality of Runtime
+.!
+Before the user application can begin running,
+the system must initialize itself.
+Already the list of classes has been created.
+Each class will see the "initialize" message first,
+which will most likely be fielded by class
+.class Object
+as the default implementation (inheritance in action).
+The user's main() function name is been changed via a #define in 
+.filename <objc/objc.h>
+to app_main(), and exit() is changed to app_exit().
+This allows (almost) seamless operation
+with pre-existing source files, and requires nothing special from
+the run-time environment.
+.!
+.!
+.sect 1 1 Method Selector Codes
+  Before an application can run, all the method selector codes must
+be assigned unique codes.
+Instead of using string names, the dispatcher routine __msg()
+uses these codes to look up the method to run.
+Somehow the message "at:put:" has to be different from "perform:with:",
+and yet all occurances of "at:put:" must be the same.
+String equivalents of each message must be stored for run-time
+error messages (ie, "error: `ByteArray' doesn't respond to [titleStr:]").
+.!
+.!
+   The selector codes for each class are stored in array.
+Eventually the application starts up and initializes itself.
+As each class in the application is first discovered by the
+substrate startup code, its methods are assigned codes.
+The selector codes don't discriminate between factory or instance methods.
+The substrate holds a list of method string names and codes.
+This list can be consulted at run-time using the functions
+(defined in
+.filename <objc/substrate.h>
+):
+.!
+.opencode
+ /*  Convert a method string into SEL code:   */
+extern  SEL   sel_getUid PARMS(( CONST STR colon_name ));
+
+ /* convert an internal SEL ID into a string: */
+extern 	STR   sel_getName PARMS(( SEL sel_id ));
+.br
+.endcode
+.br
+.!
+.!
+.!
+.sect 1 2 Returned Values
+  Return values from the message invocation are a little sticky to
+deal with properly.
+The message expressions are translated to "C" functions calls of the form:
+.!
+.need 5
+.opencode
+   extern id  _msg( );
+{
+   /*  Was [array at:ndx put:store_obj]  */
+   _msg( array, /*at:put:*/_ocSAobject[4], ndx, store_obj );
+}
+.endcode
+.br
+.!
+Somehow the return value of the message must be coerced into
+the proper return type of that method (as stated in the class
+interface definition file).
+.!
+  Cox [Cox86] on page 86 points out a way to get
+around most of the difficulties with typecasting a return value.
+So instead of typecasting just the return value,
+he proposes changing the type of the identifier __msg()
+into an identifier that's a function returning the
+appropriate return type for the specific method being invoked.
+Although the syntax looks ugly, the translator and the compiler are
+the only ones that see it (but you can see it below).
+This funkiness allows returning of structures and complex data types.
+.!
+  This makes
+.program lint
+happy since the returned type matches the type of the variable
+the result is stored into.
+Many methods are used more for their side effects than their return values.
+But since __msg() always returns a value,
+and it's generally an "id" type,
+.program lint
+will complain that many results go unused.
+.!
+.!  FIX:  change return type into 'double'   ****
+NOTE: right now, don't return anything larger (bit-wise)
+than a `void *'.
+Since the return type of __msg() is `void *', and since the
+method return isn't directly from the method code back to the
+caller, part of the return value can get lost (truncated).
+.!  FIX:  change return type into 'double'   ****
+.!
+.need 8
+.opencode
+{
+   VECTOR    vect;
+
+   vect = (*((VECTOR (*)()) _msg))
+               ( mouse, /* point */ _ocSApointxy[2] );
+}
+.endcode
+.!
+.!
+   The handling of variable-count arguments to an object is taken
+care of for you by the translator.
+As the translator is evaluating each parameter in the selector area,
+it watches for a comma.  Seeing one, it switches to "va-dcl" mode.
+First the translator appends "vaDcl:" to the method selector it's
+building, then it simply passes along the remaining parameters to
+the output file.
+Because the translator doesn't come out of "va-dcl" mode until
+the message is complete (closing "_]" seen);
+there can be no named parameters afterwards.
+There is also an auto-detection of "vaDcl:" methods (described above).
+.!
+  The third statement below is another possibility for "vaDcl:" methods.
+It's of bad form and should really be split up into two functions.
+The second method gives an extreme example of
+what can be done with "vaDcl:" mode.
+.!
+.opencode 11
+.!
+void create_three()
+{
+   id   a, b, c;
+
+       /* Invoke the method with:vaDcl: */
+   a = [Array with:3, item1, item2, item3];        /* Good */
+       /* Invoke the method titleStr:vaDcl: */
+   b = [Menu titleStr:"X" with:2, "Save","Quit"];  /* OK.. */
+       /* Invoke the method with:vaDcl: */
+   c = [Datagram with:2, "joe", "al" msg:a];     /* ERROR! */
+}
+
+.need 10
+//	Not logical, Sir.  Your index is out of range:
+- boundsViolation: (register int) anOffset
+{
+   return( [self error: capacity > 0
+         ? "bounds violation: %d outside range [0..%d]",
+         : "zero capacity array", anOffset, capacity-1] );
+}
+.br
+.!
+.endcode
+.figure "va-dcl" method promotion
+.br
+.!
+.!
+.sect 1 3 Application Exit
+  Since many microcomputer "C" runtime libraries
+don't have _atexit() (yet),
+the include file redirects exit().
+This allows the substrate to cleanup.
+The substrate then calls the classes' "at exit" handler in FIFO order
+of how they were added.
+Currently, there is room for
+the number of classes in the application minus one handlers.
+Setting the global (BOOL) _msgTrace will print out some statistics
+from the message dispatcher.
+when the application exits.
+The include file
+.filename <objc/substrate.h>
+hold a definition for this variable.
+.!
+.!
+.endsect
+.!
+.! ---------------------
+.newsect Theory of Methods and Factories
+.!
+This section describes the run-time environment the objects exist within,
+and the "virtual reality" for the application.
+.!
+.figname cim +1
+.!
+.figopen 0 36
+.bold
+ Objects             Instance Base             Factory Base
+                                          ,_________________________,
+                                          |                         |
+               ,------------------------------------------------,   |
+               |                          |                     |   |
++--------+     V    +--------------+      V   +--------------+  |   |
+| isa   ----------> | isa         ----------> | isa         ------->|
++========+     ^    +--------------+      ^   +--------------+  |   |
+               |    | super     --> Nil   |   | super       ----+   |
+               |    | "Object"     |      |   | "_Object"    |      |
+               |    | size       4 |      |   | size      24 |      |
+               |    +--------------+      |   +--------------+      |
+               |                          |                         |
+               `----------------------,   `---------------------,   |
+                                      |                         |   |
++--------+          +--------------+  |       +--------------+  |   |
+| isa   ----------> | isa         ----------> | isa         ------->|
++========+     ^    +--------------+  |   ^   +--------------+  |   |
+|        |     |    | super       ----'   |   | super       ----'   |
++--------+     |    | "View"       |      |   | "_View"      |      |
+               |    | size      20 |      |   | size      24 |      |
+               |    +--------------+      |   +--------------+      |
+               |                          |                         |
+               `----------------------,   `---------------------,   |
+                                      |                         |   |
++--------+          +--------------+  |       +--------------+  |   |
+| isa   ----------> | isa         ----------> | isa         ------->|
+|        |          +--------------+  |       +--------------+  |
++--------+          | super       ----'       | super       ----'
+|        |          | "Fixture"    |          | "_Fixture"   |
++========+          | size      26 |          | size      24 | 
+|        |          +--------------+          +--------------+
++--------+
+.figclose
+.figure Classes in Memory
+.!
+.!
+.sect 1 1 Factories
+  Software factories create software objects.
+These objects carry pointers to structures that contain
+information about how much space
+the object occupies and which methods it responds to.
+In a factory method, "self" refers to the factory object.
+It is a actual parameter (along with "__cmd" which is the method selector)
+declared as part of the function definition.
+"self" can be reassigned to a new instance of itself and
+returned from a factory method, just as in [Cox86].
+However, this practice is discouraged by the author.
+Factory objects can never be free'd.
+.!
+.!
+.sect 1 2 Instances
+  Once created ([new] method),
+objects can be manipulated and assigned at will.
+The caller must track memory usage since there is
+no ${agc} nor referencing counting.
+This does place an extra burden on the programmer, but all of us
+learned Pascal in order to better discipline ourselves...
+.!
+  There is a facility to provide cleanup processing for classes.
+At any time, a method may declare an "at exit" handler.
+A function that takes no parameters and returns no specific value
+will be called when the application is finished, just before
+the message dispatcher is shutdown.
+If a class is responsible for managing a system resource,
+this routine might check that the resource was indeed allocated,
+and then return it back to the system.
+The strange code below sets up an "at exit" handler
+The first `if' statement in the method +initialize
+is passed the message to the superclass
+if the init'ing classs isn't
+.class Window.
+We can't reference 'self' here, since we're not
+.class Window;
+we're one of its decendent classes.
+.!
+.!
+.opencode 31
+.!
+#include "window.h"
+#include <objc/substrate.h>
+
+short            ndx_win_opens;      /* Track window opens */
+struct Window   *win_opens[ 10 ];    /* Stack of windows opened */
+
+//  Cleanup routine for Window class. Close any outstanding windows:
+static void free_win_list()
+{
+   int    j;
+
+   for( j=ndx_win_opens ; --j >= 0 ; ) {
+      if( win_opens[j] != NULL )
+         CloseWindow( win_opens[j] );
+   }
+}   /* free_win_list */
+
++ initialize
+{
+   /*  ONLY class Window may pass, others continue the search: */
+   if( self != &instWindow )
+      return [instWindow.clsSuper initialize] ;   /* cannot be 'self' */
+
+   if( !(self->isa->sysFlags & OC_SF_INIT_DONE) ) {
+      printf( "[Window init]\n" );
+      self->isa->sysFlags |= OC_SF_INIT_DONE;
+      _oc_atExit( free_win_list );    /* Catch errors */
+
+      /*  Allocate resources here.. */
+      ndx_win_opens = 0;
+   }
+   return( (id) self );
+}   /* + initialize */
+.!
+.endcode
+.figure Classs Initialization, and Cleanup Hook
+.!
+.!
+.sect 1 3 Methods
+   In each method function there is a variable called "self".
+It relates to
+the ${recr} of the message of the invocation statement that
+called it.
+If code in class
+.class Object
+is executing, "self" could be
+.class
+IdArray.
+The second variable the translator always creates is "__cmd",
+which is the method selector code for the current method.
+The types are "id" (for factories a pointer to struct __SHARED;
+for instance methods a pointer to struct __PRIVATE)
+and "SEL" (usually a 32-bit int), respectively.
+.!
+.figname figiv +1
+   The translator tracks references to your class's instance variables
+for you,
+so the "self->" qualifier for instance variables can be omitted.
+However, if you are referencing an object defined local to a method,
+its instance variables must be explicitly referenced
+(as you would expect, but see ${figiv}).
+Also, instance variables of any parent classes must be explicitly
+referenced with "self->" (but please restrain yourself).
+In the code sample below,
+we create a copy of ourselves, and then adjust some thresholds
+based on our "self" values.
+With these new settings,
+the actual work is performed by a locally held copy
+of ourselvses.
+The result obtained is stored for a later return.
+This temporary copy is then free'd and the
+result is returned (${figiv} below).
+.br
+.opencode 18
+.!
+- fastSend: msg
+{
+   id   newMe;                /* Temp settings holder */
+   id   result;               /* Result of fast send  */
+
+   newMe = [self copy];         /* A new of ourselves */
+   newMe->low_water = low_water - 1;     /* from self */
+   newMe->high_water = high_water + 1;   /* from self */
+   result = [newMe doIO: msg];
+   [newMe free];
+
+   return( result );
+}  /* - fastSend: */
+.!
+.endcode
+.br
+.figure Referencing Instance Variables
+.!
+.br
+   In the final statement in ${figiv},
+the temporary object if free'd.
+Basically, just remember to free a function's temporary
+objects when you're done with them.
+There are no automatic constructor or destructor invokations like in C++.
+The free method will zero out the object's "isa" pointer
+to catch some dangling pointer references.
+But, if that memory location is reused for another object,
+you won't win...
+.!
+.!
+.sect 1 4 Dispatching
+.!
+   Actions performed on objects are handled by a central method
+dispatcher.
+Objects are sent messages by creating message expressions
+that include method selectors.
+Messages can also be sent to "super" (see `new' example below).
+This is a ${pse}variable and is handled by the translator by invoking
+a different message dispatcher.
+For "super" messages,
+a pointer to the current executing class is passed as an additional
+parameter.
+Normally the tree climb starts above the calling method's class.
+For "super", it starts above the class that is currently executing
+the method code.
+(Cox has a technique wherein the "super" dispatcher accepts
+"self" as a pointer to the class where is code is.
+This pointer will be used to begin the search.
+It then peeks into
+its caller's stack frame to find its first parameter, which is "self".
+This "self" is used as the object identifcation.
+Very eechy stuff.)
+.!
+.figname figselect +1
+.!
+.opencode 33
+.!
+typedef struct _SHARED    *SHR;
+struct  _SHARED                /*  !! Abbreviated !!  */
+{
+   SHR         isa;            /* Who we belong to */
+   UWORD       flags;          /* System-private flags */
+   SHR         clsSuper;       /* Who we inheritent from */
+   char       *clsName;        /* Text name of class */
+   UWORD       clsSelectSize;  /* How many methods defined */
+   struct DICT *clsSelects;    /* Ptr to methods' table */
+} ;
+
+void * _msg( self, _cmd, args )
+   struct _SHARED  *self;
+   SEL      _cmd;
+   va_args  args;
+{
+   struct _SHARED  *class;
+   IMP             *func;
+
+   if( self == nil )        /* nil objects are inert */
+      return( nil );
+   if( self->isa == nil )
+      complain( "message sent to free'd object!" );
+
+   for( class=self->isa ; class != Nil ; class=class->clsSuper )
+   {
+      if( (func=dict_search(class->clsSelects, _cmd)) != NULL )
+         return( (*func)( self, _cmd, args, .. ) );
+   }
+   return [self doesNotRecognize:_cmd];     /* Error! */
+}  /* _msg */
+.!
+.endcode
+.figure Message Dispatcher
+.!
+
+The dispatcher, __msg(), uses the relations of ${cim} to
+find a dictionary of method selector codes
+and function (method) pointers (`IMP' pointer).
+It does this by first moving to "self->isa", which always yields a
+"struct __SHARED" pointer.
+Inside the shared class structure is
+a pointer to the selector-function dictionary.
+A sequential search looks for a matching selector.
+Each category of the class is searched.
+If no match selector is found, then the object's superclass is consulted
+by moving to "class->clsSuper", and continuing the search.
+The ${pse}code outlined in ${figselect} describes the basic functions.
+.!
+.!
+  Some performance and portabilities decisions have been
+applied to the actual dispatcher (although it's still written in "C"..).
+A cache of recently invoked methods helps speed the dictionary lookup.
+The cache is indexed by hashing together "class" and "__cmd".
+Which means that different load addresses will yield different hash values.
+And allocating objects in varying sequences will affect how
+long an entry survives in the cache.
+.!
+   In order to allow the dispatcher to be written entirely in "C",
+arguments are copied from the caller's stack frame
+to the ${recr} method's stack frame.
+Ideally, you'd want the dispatcher to be transparent and "jump through"
+into the ${recr}'s method code.
+In an actual implementation, the "jump through" code
+should be implemented in assembly
+since the application will gain the most
+from optimizing the inner loop.
+.!
+.!
+.endsect
+.! ---------------------
+.!
+.newsect Future Directions
+Discussed below are planned additions and future possibilites
+of ${product}.
+Most features are discussed as if they already exist; that's just
+the way they were typed in.
+Some are easily done, others will require reworking
+of the translator or run-time library.
+They're given here for today's programmers to plan ahead and
+accommodate future releases.
+.!
+.!
+.sect 1 1 Future: Syntax
+.!
+  The syntax recognized by the translator is mostly
+based on Objective-C version 4.
+The syntax to define classes and methods in [Cox86] is outdated.
+However, the classes and methods included in ${lgname}
+are very much version 2.
+Compatability with the present release would make ${product}
+much more attractive.
+The classes
+.class IdArray
+and
+.class ByteArray
+will most likely survive the updates, but the Collection group
+will be moved aside in favor a more generalized "list" notion.
+.!
+.!
+.sect 1 2 Future: Preprocessor
+.!
+  Another directive is "_@alias()" which assigns a method selector
+to call a another method.
+This aliasing is private to the class definition, as each method
+selector will have its own unique selector code.
+Aliasing can be used in some circumstances to save a little memory.
+The protocol defined in an abstract class may default one method
+to behave similar to another method, where subclass are free
+to re-define either method.
+The abstract class would alias the
+second method to the first method.
+Also, methods with multiple trailing arguments can be quickly
+produced, ie "perform:", "perform:with:" and "perform:with:with:".
+Here the method with most arguments would be defined, and the rest
+would simply alias to that method.
+In order for the processor to not crash when handling alias'ed
+methods, the stack layout must be very lax.
+Contrast this to machines that force static link frames,
+like the Prime 50 series and IBM 370 architectures.
+.!
+.need 12
+.opencode
+#import <objc/Object.h>
+
+_@implementation  Object ;
+
+- perform:(SEL)sel with:obj1 with:obj2
+{  ...
+}
+
+_@alias(perform:with:, perform:with:with:)
+_@alias(perform:,      perform:with:with:)
+.endcode
+.figure @alias Example
+.!
+.br
+.!
+  Also note the directive to include the header file "import",
+instead of "include".
+The current version of Objective-C uses this directive to
+specify that a file must be included at most once,
+all other attempts are quietly ignored.
+This is similar to the GNU
+.program cpp
+reading the "#pragma once <objc/Object.m>" directive.
+.!
+.!
+.sect 1 3 Future: Universal Name Binding
+.!
+   A goal of the ${lgname} system
+is to eventually have the classes partitioned
+into system provided and user provided.
+The operating system could then be a collection of resident classes
+the user's application links with, including some of their own classes,
+replacing any system classes seamlessly, as appropriate.
+All programs would share a common pool for ${mss}.
+Interprocess communication would be very straightforward since
+a method invocation could just be packaged like an RPC (Remote
+Process Call) call.
+Right now there is no way to know exactly how many parameters
+(or their byte widths) have been pushed on the stack.
+.!
+.!
+.sect 1 4 Future: Extensible Classes
+.!
+  Dynamically extending the list of known classes is being
+looked into.  This way a class could be paged in as needed, and
+then expunged from memory when the system felt the class didn't
+have any outstanding objects.
+Ideally, the system should manage this without
+.underline
+any
+management code in the user's application.
+When running on different configurations, different classes might be
+resident (ie, math coprocessor or software floating point).
+.!
+  And why not allow a class to extend itself dynamically?
+Perhaps a friend could pass on a few methods she has added
+to the
+.class Sequence
+class.
+While the computer is up and running, the user would indicate
+where the extension is stored.
+Then one of your friends applications could be run, and the system
+would automatically page in the class extension.
+Class categories in version 4 are along this line...
+.!
+.!
+.sect 1 5 Future: cpp replacement
+.!
+  Many nuisances could be eliminated if
+.program cpp
+were built-in to the translator.
+All comments could be sucessfully parsed,
+and error reporting could be improved by displaying the line as
+the user entered it.
+The translator might also run a little faster.
+However, it would grow by over 20K, maybe more (and load much slower).
+The replacement would be either from FSF or DECUS.
+Since few symbols are inherent in UNIX
+.program cpp,
+this is no great loss.
+.!
+.!
+.endsect
+.!
+.cl
+.source biblo.rinc
+.!
+.! EOJ
+.! ---------------------------------------------------
+.!    End of Document -- Dump the Table of Contents
+.!
+.nofill
+.he ///%/
+.pg 1
+.pagenumber roman
+.fo //-- # --//
+.!
+.center on
+.bold
+Table of Contents
+.sp 2
+${product} - (${vers}) - ${lgname}
+.br
+As of ${date}
+.sp
+.figcount
+.br
+.center off
+.sp 2
+.printcont
+.outend

@@ -1,0 +1,271 @@
+.!	OOC Reference manual:
+.!		This file, and the document produced from it, are
+.!		copyright(c) 1989, 1990 by Brian Witt.
+.!
+.!
+.!	1-sept-89	bjw 	Removed from main 'ooc.ri' file.
+.!	18-apr-90	bjw 	Described toFirst and first.
+.!	25-may-90	bjw 	Uses common style file.
+.!
+.include man-oct.rinc
+.!
+.! --------------------------------
+.!	listum  --  prepare for metho list
+.define listum
+.br
+.save
+.lm 5
+.rm +1
+.fill
+.nojustify
+.en
+.!
+.! --------------------------------
+.!   Include some real neat stuff:
+.!
+.!  These are used by PROFF.rinc
+.define boldon
+.bold on
+.en
+.define underon
+.underline on
+.en
+.!
+.include sys:usr/include/PROFF.rinc
+.!
+.! --------------------------------
+.!
+.newsect Method Selector Definitions
+Below are listed the methods in the ${shname} system.
+There abstract functionallity and return types are detailed.
+Each class is free to interpret them within some leway;
+after all this is an ${oo} system with data-hiding!
+
+  The name in square brackets (_[,_]) after the method protype
+is the category where the method is first defined.
+Generally speaking, any method in this category of classes
+or inheriting from a class in this category can respond sucessfully
+to this message.
+
+.!
+.sect 1 1 Factory Methods
+These methods are known by factory objects.
+.!
+.listum
+.!
+.odentry initialize [Foundation]
+Perform any presetting for this class.
+Returing nil will cause the application to abort.
+Called before user's application begins to run.
+Classes
+with complex instance variable declarations that can't be encoded
+during translation may change their text encoding.
+.sp
+A handler for cleanup may be installed by calling __oc__atExit().
+The single parameter is a function that will be called
+in LIFO (stack) order when the application exits.
+.!
+.odentry new [Foundation]
+Allocate and initialize a new instance of the ${recr} class.
+In contrast to [Cox86], in a factory method, it's illegal to
+assign the result to the variable `self', as that refers to
+the class object, and not the instance object!
+.opencode
++ new
+{
+   id newObj;
+
+   /*  Never assign to "self" in a factory!  */
+   newObj = [super new];
+   newObj->capacity = 0;
+   return( newObj );
+}
+.endcode
+.!
+.odentry (int)ndxVarSize [Foundation]
+Reply the count of bytes each indexed variable occupies. For non-indexing
+class, the default from Object will return 0.
+Effectively returns:  sizeof( [self ndxVarType] ).
+.!
+.odentry (STR)ndxVarType [Foundation]
+Reply a string encoding that describes the instance variables that
+are index-able.  For instance,
+.class ByteArray,
+returns "c", char type.
+.!
+.odentry poseAs:(classId) [Foundation]
+Perform surgery and change the class of the ${recr} to a new class.
+(Still under construction.)
+.!
+.odentry with:(int)nArgs vaDcl:(id)argList [Foundation]
+Create a "sized" object, capable of holding 'nArgs' things.
+Of course, the class is free is adjust to account for memory management,
+and additional memory could be used by a class's superclass.
+The "vaDcl:" selector is inserted automatically by the translator
+when it sees a comma inside a message expression.
+.!
+.restore
+.!
+.! ---------------------
+.!
+
+.sect 1 2 Instance Methods
+These methods are known by instance objects.
+.listum
+.!
+.odentry add:item [Array and Collection]
+Store 'item' at the next available slot.
+If there is a notion of a cursor in self, then 'item' will be after
+the cursored slot.
+Array's generally store in the first unused (nil) slot.
+.!
+.odentry at:(int)index_ put:(id)anObject [Foundation]
+Store an object into the indexing storage ${recr} object.
+.!
+.odentry (int) count [Array and Collection]
+Return the count of usable objects contained within the object.
+For Array types, 'nil' pointers are not counted.
+(Was named 'size'.)
+.!
+.odentry error:(STR)fmtSTR vaDcl:stuff [Foundation]
+Display an error message about self.
+Feeds 'stuff' to an sprintf() call.
+Aborts the program and never returns.
+.!
+.odentry find:otherObj [Array and Collection]
+Returns a member that is "==" to 'otherObj'.
+Returns nil if there is no match.
+.!
+.odentry findMatching:otherObj [Array and Collection]
+Returns a member that is isEqual: to 'otherObj'.
+Returns nil if there is no match.
+.!
+.odentry findSTR:(STR)aString [Array and Collection]
+Returns a member that is isEqual: to 'aString'.
+Returns nil if there is no match.
+.!
+.odentry first [Sequence]
+Sets the objects cursor to be the first element.
+Returns the first element within the list.
+This is how sequencing starts.
+Performing [list next] returns the second element.
+.!
+.odentry free [Foundation]
+Releases memory used by object and returns nil.
+The object is no longer usable, and any references the appliation
+holds must be forgotten.
+Because there is no reference counting,
+free'ing an object that has an infrastructure (like
+.class Set)
+will create unreachable objects.
+.!
+.odentry freeContents [Foundation]
+Walks through internal contents and frees any major sub-objects.
+The internal infrastructure is invisible to the application.
+Added an object after freeContents will cause the object to
+rebuild its infrastructure.
+.!
+.odentry hash [Foundation]
+Return an integer representing a the ${recr} in hashed form.
+The same hash value is returned for all objects that are YES
+for "isEqual:".
+Ie, [obj1 hash] == [obj2 hash], iff [obj1 isSame:obj2] == YES.
+Implemented in
+.class Object,
+so everything hash a hash value.
+Re-implemented in classes like
+.class ByteArray.
+.!
+.odentry last [Collection]
+Moves a cursor to the last element stored and returns that element.
+.!
+.odentry toFirst [Collection]
+Set a cursor inside the object to point at the first element.
+Returns 'self', not the first object in the list.
+Performing [list next] returns the first element.
+.!
+.odentry toLast [Collection]
+Set a cursor inside the object to point just past the last object.
+Returns 'self', not the last object in the list.
+Performing [list prev] returns the last element.
+.!
+.restore
+
+.endsect
+.!
+.! ---------------------
+.!
+.newsect Class Heirarchy
+.!
+  Listed here are the categories and which classes they contain.
+Each category has a superclass listed after it, except "Foundation"
+which is the base for all other classes.
+Class structuring is a tradeoff between time and space.
+For instance, time has been gained by not subclassing the
+.class ByteArray
+off of
+.class Array,
+but rather copying the superclass's implementation code into
+.class ByteArray
+and making it a subclass of
+.class Object.
+This saves one level of dictionary searching in __msg(),
+and for a these central classes, the redundancy may be worth it.
+.!
+.opencode
+.bold
+Foundation:
+   Object
+      Array
+      ByteArray
+      IdArray
+.sp
+.bold
+Collection (Object):
+   Collection
+      Set
+      Sequence
+      Queue
+      OrderedCollection
+.sp
+.bold
+Windowing (Object):
+   View
+      Fixture
+         ArrowFixture
+         ElevatorFixture
+         StretchFixture
+      NullView
+      MenuBar
+         PullDownMenu
+            TextMenu
+      StdSystemView
+.endcode
+.br
+.endsect
+.!
+.! ---------------------
+.!	EOJ**
+.! ---------------------------------------------------
+.!    End of Document -- Dump the Table of Contents
+.!
+.nofill
+.he ///%/
+.pg 1
+.pagenumber roman
+.fo //-- # --//
+.!
+.center on
+.bold
+Table of Contents
+.sp 2
+${product}  (${vers})  ${shname}
+.br
+As of ${date}
+.sp
+.figcount
+.br
+.center off
+.sp 2
+.printcont
+.outend

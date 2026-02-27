@@ -1,0 +1,11 @@
+include:
+========
+
+This directory contains two subdirectories: 'objc' for the foundation
+classes, and 'apps' for applications that user's create.  Feel free
+to add your own.  These directories contain the @interface .h files.
+Under UN*X systems, the Amiga header files should be stored here.
+The 'mustinit.ooc' file is used by the prelinker, and the path here
+is compiled into 'prelink' (source file src/xlator/pln.c).
+
+--- brian witt, 18-April-90

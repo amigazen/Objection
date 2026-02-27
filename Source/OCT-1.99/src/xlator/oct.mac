@@ -1,0 +1,12 @@
+bs gerr  ; 4S; ds
+bs gwarn ; 4S; ds
+bs trim_parents_ob ; 3T ; p cp ; ps *cp
+bs whole_msg_body ; db *curr_name ; 3T
+bs yyparse ; 3S
+bs function_body ; 3S
+bs haveFunctYet ; 2s
+bs exprFuncParm ; s
+bs asTypeString ; 2s
+bs lu_classdef ; s
+g
+

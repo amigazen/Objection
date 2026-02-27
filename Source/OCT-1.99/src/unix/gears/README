@@ -1,0 +1,96 @@
+README
+
+This is the closest we'll come to release notes with this
+distribution, so read carefully.  I'll use this space to
+document some standard conventions I follow.  Please, do
+not take this to be Stepstone's official style guide.  This
+is just one person's attempt to pass along knowledge on one
+way of doing things that you might find helpful.
+
+This software builds one version of the interlocked wheel
+simulation described in the article "Pictorial Design
+Notation for Software-ICs" from the July/August '90 issue
+of JOOP.  Since there was a significant amount of time
+between the work being done and the paper being published,
+the source as it appears in this distribution is slightly
+different than the outlines in the article.  In particular,
+I've opted to (a) rely on the plotting facilities available in
+Sun OS4.n, and (b) distribute source that better reflects 
+how I would implement a code generator for the diagrams in
+the article.
+
+To use the demo application on a Sun character display:
+
+  simDemo 100 50 | plot -Tcrt
+
+The following are a set of general comments on the code 
+contained in the distribution:
+
+1. Interface files are created from completed implementation
+   files.  Therefor, the interface files will seem rather
+   bland.  In a commercial release situation, this would be
+   unacceptable.
+
+2. Andy's Rule of "#imports" - Import the interface for any
+   class that's directly referenced in the implementation
+   file.  This means redundant references to the same file.
+   That's OK, since the import preprocessor command will
+   only include a file once per compilation.  It's my own
+   preference to over-document to decrease the amount of
+   information the programmer has to remember while looking
+   at a class.
+
+3. Always include the superclass and instance variables in
+   the implementation file.  While not strictly required 
+   (it is required in the class's interface), it helps (see
+   #2 above).
+
+4. While the statement "self = [self new]" is seen in the
+   original source code published in JOOP, it really should
+   be avoided.  The "+create" method in BBObject.m shows a
+   better way of setting up new instances of classes.
+
+5. The comments in the code will refer to producers and
+   consumers of components.  The producer is the party that
+   is responsible for the design, development, test, and
+   packaging of the reusable component.  The consumer is
+   the party that uses the component as is.
+
+6. Classes that need access to the interface for Object will
+   import the interface for BBObject.  BBObject uses the 
+   poseAs mechanism to add behavior to the predefined Object
+   class.  [For NeXT users: I'm not sure how well poseAs is
+   supported in NeXT's version of the Objective-C compiler.
+   You might have to convert BBObject from a separate class
+   that uses posing, to a category of class Object.]
+
+7. The two instance methods, "circumference:" and "offset:" 
+   in the GearModel class have been merged into one method,
+   called "circumference:offset:".
+
+8. The 'initialize' method in the clock class sets the
+   period instance var to zero.  Although this is redundant
+   (instance vars are automatically set to zero when
+   allocated), it helps to document all assumptions.
+
+9. Several of the classes (Clock, GearModel, etc.) have
+   dummy methods defined.  These methods provide the type
+   information the Objective-C compiler needs to translate
+   the parameters and return type for the output messages
+   sent by these components.  
+
+10. Small error in paper.  Figure 3.3 in the paper should 
+    show "radius:" as "circumference:offset:".
+
+I hope this code helps.  Please remember that this is being 
+sent as unsupported.  That doesn't mean I don't want to start
+discussions on alternative ways of implementing classes, it
+means I'm not very interested in helping to port the code to
+other platforms.  I look forward to any comments you might
+have.
+
+Andy N.
+---
+Andy Novobilski     | The Stepstone Corp.  | Object-Oriented Programming:
+andyn@stepstone.com | 75 Glen Rd.          | TV Network scheduling based on 
+(203)426-1875       | Sandy Hook, CT 06482 | the number of insulted viewers.

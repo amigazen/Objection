@@ -1,0 +1,182 @@
+############################
+#	:bk=0
+#	
+#	Makefile for class files in the foundation.
+#		32 BIT INT, LARGE CODE & DATA	32 BIT INT, LARGE CODE & DATA
+#		make  --  produce classes and substrate.
+#		make clean  -- delete all intermediary files.
+#		make lib    -- produce classes and substrate libraries.
+#
+
+# -------------------------------------
+
+CC = cc
+LN = ln
+LFLAGS = -g
+LIBS = src:tree.o
+
+TEMPDIR = t:
+OOCINC = ooc:include/
+OOCBIN = sys:bins/
+OOCLIB = LIB:
+
+#	Some actual include files:
+TREEINC = sys:usr/include/tree.h
+RELEASE = $(OOCINC)objc/release.h
+
+# -------------------------------------
+
+CLASSLIB = $(OOCLIB)ocbasel32.lib
+SUBSLIB  = $(OOCLIB)ocsubsl32.lib
+HEADERS  = $(OOCINC)objc/objc.h
+OOC = oct
+OCFLAG = -w2
+#
+
+QUES = Point.o List.o EList.o ENode.o
+CQUES = Point.c List.c EList.c ENode.c
+MQUES = Point.m List.m EList.m ENode.m
+
+COLS = Collection.o Sequence.o Set.o OrdCltn.o
+CCOLS = Collection.c Sequence.c Set.c OrdCltn.c
+MCOLS = Collection.m Sequence.m Set.m OrdCltn.m
+
+OBJS = Object.o Array.o IdArray.o ByteArray.o
+COBJS = Object.c Array.c IdArray.c ByteArray.c
+MOBJS = Object.m Array.m IdArray.m ByteArray.m
+
+#	Substrate functions written in "C":
+#	The order here is important 'SUBS' !
+SUBS = subs.o subio.o submem.o subbind.o submsg.o
+CSUBS = subio.c user.c
+MSUBS = subio.m user.m
+
+
+#  All named methods:
+ALL_METHODS = $(MOBJS) $(MCOLS) $(MQUES) $(MSUBS)
+
+#	All modules in class library:
+ALL_LIB_OBJ = $(QUES) $(COLS) $(OBJS)
+
+# STATS = -DSTAT_SWITCH
+STATS  =
+CFLAGS = -n +CDL
+LFLAGS = -g
+CLIB   = -lcl32
+
+
+# ----------------------------------
+#	Rules from the Roundtable:
+#
+.m.c :
+	$(OOC) $(OCFLAG) $*.m
+
+
+# ----------------------------------
+#	The beginning has order:
+#
+all :	main32
+
+lib :	$(CLASSLIB) $(SUBSLIB)
+
+clean :
+	-delete >nil: quiet $(CLASSLIB) $(SUBSLIB)
+	-delete >nil: quiet main32
+	-delete >nil: #?.bak #?.sym #?.lst
+	-delete >nil: #?.o
+	-delete >nil: quiet $(COBJS)
+	-delete >nil: quiet $(CCOLS)
+	-delete >nil: quiet $(CQUES)
+	-delete >nil: quiet $(CSUBS)
+	-delete >nil: quiet user.o
+
+
+# ----------------------------------
+#	Create the foundation library:
+#	The Object library is ordered, the substrate library is
+#	already ordered correctly.
+#
+$(CLASSLIB) :	$(ALL_LIB_OBJ) clsObj.ord
+	-type osize.o
+	lb $(CLASSLIB) -f clsObj.ord
+	echo >osize.o "32 bit ints"
+
+clsObj.ord :
+	ls >t:uu $(ALL_LIB_OBJ)
+	ord -v t:uu clsObj.ord
+
+$(SUBSLIB) :	$(SUBS)
+	-type osize.o
+	lb $(SUBSLIB) $(SUBS)
+	echo >osize.o "32 bit ints"
+
+subs :	$(ALL_LIB_OBJ) $(SUBS)
+
+
+# ----------------------------------
+#	The workers of reality:
+#
+main32 :	$(SUBS) $(ALL_LIB_OBJ) user.o ww.o
+	$(LN) $(LFLAGS) -o main32 $(SUBS) user.o ww.o $(ALL_LIB_OBJ) $(CLIB)
+	echo >osize.o "32 bit ints"
+
+ww.o :	ww.c
+	$(CC) $(CFLAGS) ww.c
+
+ww.c :
+	prelink ww.c $(ALL_METHODS)
+
+subs.o :	$(HEADERS) $(OOCINC)objc/substrate.h
+	$(CC) $(CFLAGS) +x5 $(STATS) $*.c
+
+submem.o : $(OOCINC)objc/substrate.h
+	$(CC) $(CFLAGS) +x5 $(STATS) $*.c
+
+#	submsg - "+m" enable stack overflow check
+submsg.o :	$(HEADERS) $(OOCINC)objc/substrate.h
+	$(CC) $(CFLAGS) +x5 +m $(STATS) $*.c
+
+subbind.o : $(HEADERS) $(OOCINC)objc/substrate.h
+	$(CC) $(CFLAGS) +x5 $(STATS) $*.c
+
+subio.o :	subio.c
+	$(CC) $(CFLAGS) +x5 $(STATS) $*.c
+
+subio.c :	subio.m	$(HEADERS)
+
+user.o :	user.c
+user.c :	user.m
+
+
+
+# ----------------------------------
+#	Statement of Relations for Class Files:
+#
+
+Array.o :	Array.c
+ByteArray.o :	ByteArray.c
+Collection.o :	Collection.c
+IdArray.o : 	IdArray.c
+Object.o : 	Object.c
+OrdCltn.o :	OrdCltn.c
+Point.o :	Point.c
+List.o :	List.c
+Sequence.o :	Sequence.c
+Set.o : 	Set.c
+
+EList.o :	EList.c
+ENode.o :	ENode.c
+
+
+# ----------------------------------
+#	Super Dependencies:
+#
+
+Object.c : 	Object.m $(HEADERS) $(OOCINC)objc/substrate.h \
+			$(OOCINC)objc/release.h
+
+ByteArray.c :	ByteArray.m  $(OOCINC)objc/substrate.h
+OrdCltn.c : 	OrdCltn.m $(OOCINC)objc/substrate.h
+Array.c :	Array.m $(OOCINC)objc/substrate.h
+Set.c	:	Set.m $(OOCINC)objc/substrate.h
+

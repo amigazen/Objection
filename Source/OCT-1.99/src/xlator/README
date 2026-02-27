@@ -1,0 +1,15 @@
+src/xlator:
+===========
+
+This directory contains the source to the Objective-C translator.
+It includes a lex scanner, which can be passed to FSF's flex, or
+the UN*X lex program.  There are a few dependencies of these files
+on the objc include files, specifically the include files:
+        objc/objc.h        objc/release.h
+
+You should modify the 'makefile' to store the executables in your
+/bin directory.  The compiler can be built using 16-bit int's or
+32-bit int's, it doesn't matter.  The compiler failed when compiled
+for a combined 64K code and seg area (small model) under '286 Xenix.
+
+--- brian witt, 18-April-90

@@ -1,0 +1,15 @@
+These files have been changed:
+From ooc/s/cpp-src.zoo:
+	cpp.h
+	cpp6.c
+	cpp2.c
+	Makefile
+	tags
+	cppdef.h
+	README
+
+Modified in development:
+	cpp3.c
+
+--- brian witt
+    (15-Oct-90)

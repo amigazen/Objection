@@ -1,0 +1,241 @@
+############################
+#	:bk=0
+#	
+#	Makefile for class files in the foundation.
+#		make  --  produce classes and substrate.
+#		make clean  -- delete all intermediary files.
+#		make lib    -- produce classes and substrate libraries.
+#					when adding new classes, delete clsCtln.ord.
+#		make tex	-- create .tex document (process with LaTeX).
+#
+#	Libraries are stored in OOCLIB, currently "LIB:".
+#
+# -------------------------------------
+
+## vvvvvvvvvvvvvvvvvvv  User Servicable Parts Follow  vvvvvvvvvvvvvvvvvv */
+
+#A # ---- AMIGA  -------------------------------------
+#A 
+#A CC = cc
+#A LN = ln
+#A LEX = flex
+#A LFLAGS = -g
+#A LIBS = -locbase -locsubs
+#A DELETE = delete quiet
+#A DISPLAY = type
+#A CLONE  = copy clone
+#A RENAME = rename
+#A CLIB   = -lc
+#A 
+#A TMPDIR = t:
+#A OOCINC = ooc:include/
+#A OOCBIN = Haven:bins/
+#A OOCLIB = ooc:include/
+#A 
+#A # -------------------------------------
+#A 
+#A #	Some actual include files:
+#A TREEINC = dh4:usr/include/tree.h
+#A RELEASE = $(OOCINC)objc/release.h
+#A TEMP = $(TMPDIR)cpp-temp.c
+#A 
+#A #	The programs we create:
+#A OCT = oct
+#A PLN = prelink
+#A OCT_CPP = oct-cpp
+#A 
+#A CLASSLIB = $(OOCLIB)ocCltn.lib
+#A 
+#A # STATS = -DSTAT_SWITCH
+#A STATS  =
+#A CFLAGS = $(MODEL) -n -DNO_PROTOTYPE
+#A CF_STACK +m
+#A 
+
+
+# ---- UNIX  -------------------------------------
+
+.SUFFIXES: .o .c .h .m
+
+CC  = cc -c
+LN  = cc
+LEX = lex
+# MODEL = -g
+MODEL = 
+LIBS  = -locbase -locsubs
+DELETE = rm -f
+DISPLAY = cat
+CLONE  = cp
+RENAME = mv
+CLIB   = 
+
+TMPDIR = /usr/tmp/
+OOCINC = $(HOME)/myoct/include/
+OOCBIN = $(HOME)/bin/
+OOCLIB = $(HOME)/myoct/lib/
+
+LFLAGS = $(MODEL) -L $(OOCLIB)
+
+# -------------------------------------
+
+#	Some actual include files:
+TREEINC = $(OOCINC)tree.h
+RELEASE = $(OOCINC)objc/release.h
+TEMP = $(TMPDIR)cpp-temp.c
+
+#	The programs we create:
+OCT = oct
+PLN = prelink
+
+CLASSLIB = $(OOCLIB)libocCltn.a
+
+# STATS = -DSTAT_SWITCH
+STATS  =
+CFLAGS = $(MODEL) -DNO_PROTOTYPE -I ../usr/include -I $(OOCINC)
+CF_STACK =
+
+##
+## ^^^^^^^^^^^^^^^^  No User Servicable Parts Beyound  ^^^^^^^^^^^^^^^^^ */
+##
+
+# -------------------------------------
+
+
+HEADERS  = $(OOCINC)objc/objc.h
+OCFLAG = -w2
+#
+
+#	Store the .tex output somewhere:
+TEXFILE = all.tex
+
+OBJSIZE = osize.o
+
+COLS = Collection.o Sequence.o Set.o OrdCltn.o
+CCOLS = Collection.c Sequence.c Set.c OrdCltn.c
+MCOLS = Collection.m Sequence.m Set.m OrdCltn.m
+
+
+#  All named methods:
+ALL_LIB_METHODS = $(MCOLS)
+ALL_METHODS = $(ALL_LIB_METHODS)
+
+#	All modules in class library:
+ALL_LIB_OBJ = $(COLS)
+
+# STATS = -DSTAT_SWITCH
+STATS  =
+
+
+# ----------------------------------
+#	Rules fro the Roundtable:
+#
+.m.c :
+	$(OCT) $(OCFLAG) $*.m
+
+
+# ----------------------------------
+#	The beginning has order:
+#
+all :	main16
+
+zoo :	lib zoofile
+
+
+lib:	$(CLASSLIB)
+
+#A tex :	$(TEXFILE)
+
+clean :
+	-$(DELETE) $(CLASSLIB)
+	-$(DELETE) main16
+	-$(DELETE) $(CCOLS) user.c
+	-$(DELETE) *.tex *.o *.bak *.sym *.lst
+
+
+# ----------------------------------
+#	Create the foundation library:
+#	The Object library is ordered, the substrate library is
+#	already ordered correctly.
+#
+$(CLASSLIB) :	$(ALL_LIB_OBJ) clsCtln.ord
+	-$(DISPLAY) $(OBJSIZE)
+	ar -cr $(CLASSLIB) `cat clsCtln.ord`
+	echo >$(OBJSIZE) "16 bit ints"
+
+clsCtln.ord :	Makefile
+	lorder $(ALL_LIB_OBJ) | tsort >clsCtln.ord
+
+subs :	$(ALL_LIB_OBJ)
+
+
+# ----------------------------------
+#	The workers of reality:
+#
+main16 :	$(ALL_LIB_OBJ) user.o ww.o
+	$(LN) $(LFLAGS) -o main16 user.o ww.o $(ALL_LIB_OBJ) $(LIBS) $(CLIB)
+	echo >$(OBJSIZE) "16 bit ints"
+
+ww.o :	ww.c
+	$(CC) $(CFLAGS) ww.c
+
+ww.c :	Makefile
+	prelink ww.c $(ALL_METHODS) user.m
+
+user.o :	user.c
+user.c :	user.m
+
+
+# ----------------------------------
+#	Statement of Relations for Class Files:
+#
+Array.o :	Array.c
+Collection.o :	Collection.c
+IdArray.o : 	IdArray.c
+Object.o : 	Object.c
+OrdCltn.o :	OrdCltn.c
+List.o :	List.c
+Sequence.o :	Sequence.c
+Set.o : 	Set.c
+
+EList.o :	EList.c
+ENode.o :	ENode.c
+
+
+# ----------------------------------
+#	Super Dependencies:
+#
+OrdCltn.c : 	OrdCltn.m $(OOCINC)objc/objc-runtime.h
+Array.c :	Array.m $(OOCINC)objc/objc-runtime.h
+Set.c	:	Set.m $(OOCINC)objc/objc-runtime.h
+
+Object.c : 	Object.m $(HEADERS) $(OOCINC)objc/release.h \
+			 $(OOCINC)objc/substrate.h
+
+
+# ----------------------------------
+#	Zoo file package:
+#
+#A zoofile :
+#A	copy Makefile to mk-amiga
+#A	zoo -add ram:M *.m sub*.c mk-amiga
+#A	cd /include/objc
+#A	zoo -add ram:IO *.h
+#A	cd /apps
+#A	zoo -add ram:IA *.h
+#A	cd sys:include
+#A	zoo -add ram:IE exec/types.h exec/nodes.h exec/lists.h
+#A	cd ram:
+#A	zoo -add ram:I IO.zoo IA.zoo IE.zoo
+#A	delete I(O|A|E).zoo
+#A	cd ooc:methods
+#A	@delete mk-amiga
+
+
+# ----------------------------------
+#	TeX document:
+#
+#A $(TEXFILE) :
+#A	/makedoc/makedoc -C classfile -o $(TEXFILE) $(ALL_LIB_METHODS)
+#A	@echo "Type  TeX $(TEXFILE)  to format this stuff! (use LaTeX)"
+#A
+

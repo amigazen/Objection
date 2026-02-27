@@ -1,0 +1,58 @@
+MACHINE:  Amiga 1000, 68000, 7.8MHz clock. fast mem, no background programs.
+
+Iterations = 40000.
+
+
+TEST #1 = Messages to class AClass.
+  "AClass" --> _Object .
+  Beginning 40000 iterations..  ...done with test #1.
+  --  Test #1 took 00:00:32.00.  --
+
+TEST #4 = Messages to class DClass.
+  "DClass" --> _CClass --> _BClass --> _AClass --> _Object .
+  Beginning 40000 iterations..  ...done with test #4.
+  --  Test #4 took 00:00:32.00.  --
+
+done.
+Bucket   Hit  Rplc         Class Name, Method
+  10:      2     1            _Object, str
+  12:      2     1            _Object, superClass
+  27:      1     1            _DClass, initialize
+  37:      1     1            _DClass, new
+  97:      1     1             AClass, name
+ 134:      1     1             AClass, str
+ 135:  40000     1             AClass, count
+ 136:      1     1             AClass, superClass
+ 137:      1     1             AClass, free
+ 140:      1     1            _CClass, name
+ 159:      1     1            _AClass, name
+ 166:      2     1            _CClass, initialize
+ 177:      1     1            _CClass, str
+ 179:      1     1            _CClass, superClass
+ 185:      2     1            _AClass, initialize
+ 190:      1     1             DClass, name
+ 191:      1     1            _BClass, name
+ 195:      1     1            _AClass, new
+ 196:      1     1            _AClass, str
+ 198:      1     1            _AClass, superClass
+ 217:      2     1            _BClass, initialize
+ 224:      2     1            _Object, name
+ 227:      1     1             DClass, str
+ 228:  40001     2             DClass, count
+ 229:      1     1             DClass, superClass
+ 230:      2     2             DClass, free
+ 250:      2     1            _Object, initialize
+Bucket   Hit  Rplc         Class Name, Method
+Message: Performed=80034, Super=0, Climbs=27.
+Cache:   Used=27, Miss=29, Hits=80021, Collide=2; Hit Ratio=99.9%.
+Supers:  Climbs=51, Avg Climbs=1.88; Max Msg Depth=4.
+
+
+-------
+
+The first cache buldge at bucket 135 is for the first test.
+The second buldge at #228 is test #4.  The extra hit is probably
+from another (previous) method hashing there as well.
+
+(bjw, 23-nov-91)
+

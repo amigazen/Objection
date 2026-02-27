@@ -1,0 +1,368 @@
+From csusac!ucdavis!ucbvax!tut.cis.ohio-state.edu!pacific.mps.ohio-state.edu!zaphod.mps.ohio-state.edu!swrinde!cs.utexas.edu!uunet!mcsun!ukc!pyrltd!tetrauk!rick Mon Sep 24 19:40:59 PDT 1990
+
+In article <411@eiffel.UUCP> kimr@eiffel.UUCP (Kim Rochat) writes:
+>In article <0yw10qr@Unify.Com>, dbrus.Unify.Com.brian@unify.uucp (Brian Meyerpeter ) writes:
+>> I have a question that has been bugging me for a long time.  
+>> 
+>> Why does Eiffel try to be a typed language? 
+>> 
+>> In an ideally object-oriented language shouldn't you be able to assign
+>> a class of any type to another class of any type as long as the 
+>> client that is assigning them knows their interface and does not 
+>> abuse it?
+>
+>The last comment is the reason Eiffel is typed.  Because of typing, the
+>compiler can verify that class interfaces (i.e., types) are properly used, 
+>and a type error cannot occur at run time.  In contrast, dynamically 
+>typed languages get type errors at run time instead of compile time.
+
+A fundamental confusion here is the distinction (or lack of it) between types
+and classes.  Classification is really all about taxonomy, and being able to
+describe something by saying "this is like X except ...".  This is a very good
+method for defining a software module (i.e. a class), and the basis of code
+re-use in OOPLs.
+
+A type on the other hand is a definition of an interface.  It says what an
+object is prepared to do for a client.  For dynamic binding to work reliably,
+it is important that an object is never asked to do something it doesn't
+support, therefore the issue of type conformance is important.  If this
+conformance can be checked and guaranteed early, the predictable reliability of
+the system is improved.
+
+A class and a type don't have to be the same thing, but given the state of the
+art in compilers it is a useful pragmatic to treat them as the same.  I.e. the
+inheritance tree is used as the basis for determining type conformance.  For a
+compiler to analyse type conformance purely based on interface definitions
+independent of inheritance is clearly a non-trivial issue.  I'm not an expert
+on compilers so I shall not attempt to comment further.
+
+A view of the future evolution of Eiffel's type system is described in two
+papers by Bertrand Meyer, re-posted in comp.lang.eiffel last July.  They
+anticipate support for a notion of partial conformance, still based on class
+inheritance but both less restrictive and more reliable (that's the way I read
+it - perhaps someone would correct me if I've got it wrong?).
+
+
+Along similar lines, I am working on a client/server architecture using OO
+principles (which is the obvious way to treat it), and the problems of
+encapsulation and conformance are being dealt with by having the client
+interrogate the server to get a definition of its interface.  The client then
+knows what it can or cannot do, and can make dynamic decisions as to how to
+use the server;  it avoids the run-time problem of trying to "send a message"
+and getting it bounced.
+
+In my case the domain is clearly defined and the interface definition is
+tightly structured, but is this approach applicable in a more general form in
+an OOPL?
+
+-- 
+Rick Jones			The definition of atomic:
+Tetra Ltd.				from the Greek meaning "indivisible"
+Maidenhead, Berks, UK		So what is:
+rick@tetrauk.uucp			an atomic explosion?
+
+
+From: johnson@m.cs.uiuc.edu
+Newsgroups: comp.object
+Subject: Re: Types vs. Classes
+Message-ID: <77500058@m.cs.uiuc.edu>
+Date: 28 Sep 90 03:14:00 GMT
+References: <60700001@inmet>
+Lines: 46
+Nf-ID: #R:inmet:60700001:m.cs.uiuc.edu:77500058:000:2365
+Nf-From: m.cs.uiuc.edu!johnson    Sep 27 22:14:00 1990
+
+
+This is a continuation of the discussion of the difference between
+types and classes in an object-oriented language.
+
+First, let me talk about the difference between specification and
+implementation.  A class definition contains a little of both,
+since an important part of the specification of an object is the
+set of operations that can be performed on it.  Most statically-typed
+object-oriented languages equate them, e.g. C++, Eiffel, Trellis/Owl.
+In these language, a subclass inherits both the implementation and
+the specification of its superclasses.
+
+In general, there can be many implementations of a specification
+and a particular implementation can match many specifications.
+Moreover, a slight change to a particular implementation can completely
+change the specification.  Thus, it seems to me that it is better to
+separate specifications and implementations, and not to try to have
+a single language construct that is used to describe both.
+
+Assuming that you buy my argument, which of "type" and "class" should
+be used to refer to implemenation and specification?  This is my
+interpretation of the original question.
+
+What do we mean when we say that a language is statically typed?
+I could say that this means that programs are type-checked at
+compile-time, not run-time, but this just begs the question, because
+what does type-checking mean?  What are we checking when we check
+types?  Are we checking implementations or specifications?
+
+It seems clear to me that we are checking specifications.  If I
+type-check a Smalltalk expression (x + y) then it means that the
+value of x is an object that understands the + message and that
+the type of the argument of the method that is invoked contains
+the type of y.  I think that the preceeding sentence HAS to use
+the word "type", and that using "class" instead would be very
+counterintuitive.  Thus, it is clear (to me) that "type" means
+specification and that "class" means implementation.
+
+This fits very nicely with the intuition of the Smalltalk
+community.  Everybody knows what I mean when I say that I
+want to type-check Smalltalk.  Some like the idea, some don't
+like it, but everybody knows that I am requiring the values of
+variables to have certain properties, and that I have to write
+down those properties, i.e. specifications.
+
+Ralph Johnson -- University of Illinois at Urbana-Champaign
+
+From: render@cs.uiuc.edu (Hal Render)
+Newsgroups: comp.object
+Subject: Re: Do we really need types in OOPL's?
+Message-ID: <1990Oct9.190813.23402@ux1.cso.uiuc.edu>
+Date: 9 Oct 90 19:08:13 GMT
+References: <0yw10qr@Unify.Com> <60700003@inmet> <1426@media01.UUCP>
+Sender: news@ux1.cso.uiuc.edu (News)
+Organization: U. of Illinois, Dept. of Computer Science, Systems Research Group
+Lines: 201
+
+In article <1426@media01.UUCP> pkr@media01.UUCP (Peter Kriens) writes:
+>> 1. Typing is preferred by people who never enjoyed a typeless
+>>   language.
+>
+>Most people I have met who enjoyed the joys of a "fast" Smalltalk system
+>seem to have a hard time going back to an environment like C(++). And
+>if you like at the amount of information you have to type in for a
+>C(++) program and Smalltalk, this is quite understandable. When I write
+>in C, I always feel like explaining to my 2 year old daughter what I 
+>would like here to do. If you look at a C program, it is 80 percent
+>telling the compiler the types, the templates, the keywords 
+>and 20% defining a function. 
+
+Conversely, a substantial percentage of my method definitions in Smalltalk 
+are often checks to verify the class of the objects to which I am sending
+messages.  These things are much more concisely done in a typed language
+by constraining variables and parameters to only hold objects of a certain
+type.
+
+>> 2. A typed language gives you the freedom to make more errors, 
+>>   of which only some are catched by the compiler.
+>
+>When you like at a C program it seems that number of errors you
+>are allowed to make are a magnit4;1Hude bigger. For example if I have
+>two structures A and B that do maintain something (information hiding, even
+>in C), than if I have two procedures pA and pB that are supposed to
+>do the work from the structures, I get a crash if I call pA(B) or
+>pB(A). So it is nice to have a compiler that checks this for me. In
+>Smalltalk, the run time mechanism makes the choice and this particualar
+>error could not occur. I agree that in some case it would be nice to have
+>some "capability checking", but it is undoubtedly true that there are
+>a lot more errors to make in C than in Smalltalk.
+
+This is misleading at best.  In Smalltalk you can also "get a crash" if
+you send the wrong message to the wrong kind of object, it is just that
+you actually have to run the program to see if the message is indeed
+wrong.  Worse, in Smalltalk the object could understand the message but 
+still not handle it correctly because it was intended for a different kind
+of object.  I can send an add: message to both a set and to an ordered
+collection, but if I only want to send it to an ordered collection,
+I either have to verify that only an ordered collection can be assigned
+to the variable I am using as the target reference or I have to query
+the target object with kindOf: to validate it's class.  It is simpler
+in such cases to be able to statically declare that only objects
+of a particular kind can be assigned to a certain variable and let the
+compiler do the checking for me.
+
+By the way, you can make just as many errors in Smalltalk as in C, it's
+just that C will tell you about more of them at compile-time.
+ 
+>> 3. A strict typed compiler does not allow you to skip a thorough
+>>   test.
+>
+>A lot of people say that static typing is necessary because a test will not
+>get to all the places in the code. If that is true, can you really have
+>confidence in the code? When I was writing in Pascal, a VERY strict typed
+>checked language, I never was able to have a faultless program the first
+>time it ran without compilation errors. So it seems that testing is
+>still necessary, even with static type checking. And if it is still
+>necessary, I would prefer an environment which told me where he went
+>beserk, instead of a crash because of an overwritten pointer or
+>something like that.
+
+Static typing does allow the compiler to test some things at compile-time,
+but there are many errors can only be checked at run-time.   The problem 
+with languages that do not support static typing is that *all* error-checking 
+must be done at run-time.  This is the reason (I think) that languages
+such as Smalltalk have superior symbolic debuggers--they're absolutely
+necessary to make the language usable.  Good symbolic debuggers are also
+necessary for statically-typed languages, because of the kinds of problems
+that compilers cannot check.  Unfortunately, good symbolic debuggers for C, 
+Pascal and similar seem to be few and far except on PCs.
+
+>> 4. The result of an error in a typed language is usually
+>>   disastrous
+>
+>It seems that errors in static typed languages are much more disastrous
+>than errors in dynamic typed language. When I was writing in C and
+>PL/M the errors I got were usually a machine that died on you. And then
+>after a night debugging you found the pointer that went astray or the
+>misinterpretation of that routine. In a dynamic language the error
+>shows up with a smoking gun in its hands.
+
+Again, this is because it is absolutely necessary for a dynamically-typed
+language not to fail completely.  It would be almost impossible to 
+debug a Smalltalk program from a core file with an assembly-level debugger 
+because of all the virtual machine mechanisms between a user program and 
+the target machine.  You can usually, however, debug a statically-typed 
+program from a core file because there is a much more direct mapping between 
+a user program and the machine.  Because such programs are easier to debug 
+with low-level debuggers, it is often the case that compiler writers put 
+only a bare minimum of debugger support in the compiled images they generate.
+This makes the compiled images smaller and faster, which is one of the 
+benefits that such statically-typed languages usually have to over 
+dynamically-typed languages.  
+
+Thus, you are trading load-image size and speed for debugging support.
+This is why dynamically-typed languages are better for prototypes
+while statically-typed langauges are better for production code.
+
+>> 5. A typed language forces you the write and maintain the same functionality
+>>    multiple times.
+>
+>A great example of this is the select funtion in smalltalk. If I have
+>a collection I can call it to make a subselection according to a certain
+>criteria. One method works for all collection, while the collections
+>can contain any kind of object. Well lets compare that to the Booch
+>classes where he needs a float set, a float orderedcollection, an integer
+>sortedcollection etc. And then for each class you need to write
+>that select function.
+
+Again, this is not quite true.  If a language has INHERITANCE, you can often
+define a method once and have it propagated to many different subclasses of 
+object.  However, if some of the objects change the structure of their
+instances, you may have to redefine the method.  Try subclassing any of
+the Smalltalk collection classes and adding instance variables.  You'll
+find that some of the copy methods will have to be redefined so that the
+instance variable values get copied as well.
+
+Admittedly, the type construction mechanisms for most statically-typed
+languages are crude, lacking support for inheritance, genericity or 
+polymorphism.  But dynamically-typed languages do not solve all the
+problems associates with type construction.
+
+>> 6. A typed program makes your runtime a little faster but your
+>>   development a lot longer.
+>
+>There is no dout about the fact that typed languages are faster. They
+>can bypass a lot of checking and indexing in runtime. And even though
+>vendors claim that a message send is only 25% slower than a procedure
+>call, this doesn't mean that the difference is is only 25%. In C many
+>statements are executed inline, in Smalltalk, everything is a message
+>send. This results in a considerable overhead. But how I have seen
+>so many times programmers spending much more time developing code than
+>that code will ever save in the field, that I wonder where the priority
+>should be. And because most programs usually only have a small critical
+>section, I think optimising that section and writing the remainder in
+>a better language is very much preferrable.
+
+Often the difference between a successful program and an unsuccessful program 
+is speed of execution.  If I have to wait 6 more months for a fast version of 
+a program, I'll usually do it.  There are still people who use micro-emacs,
+Jove, and other versions of emacs instead of Gnu-emacs because Gnu-emacs
+is slower.  It doesn't matter to them that Gnu-emacs is more powerful, for
+some people the loss in performance is too much of a draback.
+
+>> 7. With a typed language language the development cycle time is
+>>    exponantially proportional with the project size and a dynamic
+>>    language it is almost independent from project size.
+>
+>In a static typed language, the compiler needs to know "everything"
+>of all the classes. For example in C++, the compiler needs to
+>know the size of the instance variables to create stack space, and
+>for virtual binding it needs to know all the superclasses. This results
+>in an explosion of include files. Because there are so many include
+>files, the changes of a change in any of those files becomes greater,
+>a change enforces a recompile of all dependent modules. A normal
+>development cycle is normally linear dependent on project size, but
+>this close coupling of modules makes it exponential.
+
+This is a fact of life, not a drawback of statically-typed languages.
+If the programmer and the compiler figure out all the details of the 
+type structure of a program before execution, then the program doesn't 
+have to do it dynamically.  This means more work for the programmer but 
+less for the program.  Thus development takes longer but the resulting program
+will run faster.  
+
+If the type structure of a program changes, then you still have to do 
+the work to re-validate it, but who or what does this work depends on 
+the language and the change control tools available.  It is just as
+much hassle to change a class definition in Smalltalk as it is to change
+a type definition in C, it's just that Smalltalk has better tools to 
+help you find all references to the class.  Still, from what I've heard
+some of the statically-typed OO languages (like Objective C and Eiffel)
+also have good change-control tools, so Smalltalk may have some competition.
+
+By the way, do you have any references to back up your claims of the
+comparative development times?  If not, you shouldn't state such
+things so freely because they may not actually be true.
+
+>When I write these lines I always try to think how my grandchilderen
+>in 2045 will look back to these days. I think they will have
+>the same feeling as we have now looking back at the first days
+>of automobiles and televisions. Things which seem funny to us now
+>were taken very serious then. But I think that they will have a much
+>more efficient way of telling the computer what to do than C.
+
+I've written several thousand lines of C and several thousand lines
+of Smalltalk.  Each has its place, altough I don't think anyone
+who had the option to program in one or the other would choose C
+unless performance is a factor.   Part of this is due to the great 
+Smalltalk environment (the browser, debugger, and change manager in 
+particular) and part of it is due to the Smalltalk language itself.
+OO languages are easier to use because of modularity, inheritance, 
+large class libraries and other things.  I think the programming 
+languages that people will use in the future will be ones that combine 
+OO features and strong support environments with efficiency of execution.
+What these languages will look like is anybody's guess, and I'll leave that 
+to the various language proponents to debate.
+
+hal.
+
+From: ajs@prg.ox.ac.uk (Adolfo Socorro)
+Newsgroups: comp.lang.eiffel
+Subject: Signature compatibility rules
+Message-ID: <752@culhua.prg.ox.ac.uk>
+Date: 23 Oct 90 09:09:58 GMT
+Sender: news@prg.ox.ac.uk
+Reply-To: ajs@prg.ox.ac.uk (Adolfo Socorro)
+Organization: Oxford University Computing Laboratory, UK
+Lines: 24
+
+In article <668@caliban.mrcu> Tony Clark remarks that the rules in Eiffel
+concerning the redefinition of signatures make the type system unsafe. I
+agree with this. The rule he proposes is called ``contra-variance'' by
+some, and implemented in a few languages, like Trellis/Owl (articles in
+various OOPSLAs). Contra-variance, unfortunately, limits expressiveness.
+Note, however, that preconditions in Eiffel are required to observe this
+``reverse'' behaviour. (Why, then, wasn't contra-variance adopted in Eiffel?)
+
+I guess the choice of one rule of signature compatibility over the other
+depends on whether you want absolute type security (required for the
+implementation of so-called ``safety-critical systems''), or flexibility in
+defining a class hierarchy.
+
+A MUST article by Peter Wegner and Stanley Zdonik called ``Inheritance as an
+Incremental Modification Mechanism'' (ECOOP 87), explores the different kinds
+of redefinition possible with inheritance and their impact on the type-safety
+of systems. They argue at one point that it is the ``subset relation rather
+than the subtype relation that corresponds to the classical is-a relation'',
+and that the fact that an A is always a B is in many contexts more important
+than the fact that certain operations on As are inappropriate when performed
+on Bs. Substitutability implies indistinguishability and is often
+unreasonable.
+
+Adolfo Socorro 
+

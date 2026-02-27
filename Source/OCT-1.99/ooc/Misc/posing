@@ -1,0 +1,78 @@
+From csusac!nextnet.ccs.csus.edu!wittbj Sun, 15 Dec 91 10:42:39 PST
+Received: by rael.UUCP (V1.08/Amiga)
+	id AA00000; Sun, 15 Dec 91 10:42:39 PST
+Received: from csus.ccs.csus.edu by csusac.ecs.csus.edu (5.61/1.34)
+	id AA19958; Tue, 26 Nov 91 11:33:15 -0800
+Received: from nextnet.ccs.csus.edu (cube05.ccs.csus.edu) by csus.edu with SMTP id AA17389
+  (5.65c/IDA-1.4.4 for <csusac!rael!aleks>); Tue, 26 Nov 1991 11:29:15 -0800
+Date: Tue, 26 Nov 91 11:21:51 PST
+Message-Id: <9111261921.AA14572@nextnet.ccs.csus.edu>
+From: csusac!nextnet.ccs.csus.edu!wittbj (brian witt)
+To: rael!aleks
+Subject: objc idea
+
+Path: csus.edu!decwrl!elroy.jpl.nasa.gov!swrinde!cs.utexas.edu!utgpu!cunews!bertrand!greg
+From: greg@organia.sce.carleton.ca (Greg Franks)
+Newsgroups: comp.lang.objective-c
+Subject: Re: have you overridden -doesNotRecognize: ?
+Message-ID: <GREG.91Nov18113313@organia.sce.carleton.ca>
+Date: 18 Nov 91 16:33:13 GMT
+References: <1991Nov17.173504.470@tti.uucp>
+Sender: news@cunews.carleton.ca
+Organization: /home/organia/greg/.organization
+Lines: 52
+In-Reply-To: dennisg@tti.UUCP's message of 17 Nov 91 17: 35:04 GMT
+
+In article <1991Nov17.173504.470@tti.uucp> dennisg@tti.UUCP (Dennis P. Glatting) writes:
+
+   My question is:  how much value is -doesNotRecognize:?
+
+   Have you ever used it for something other than the default behavior from class  
+   Object?  If you have then please post an example.
+
+   It seems to me that -doesNotRecognize: has little value.  If a object doesn't  
+   respond to a method then how is it going to gracefully recover?  Could  
+   -doesNotRecognize: predict the usage of a object such that it could recover?
+   -- 
+    ...!uunet!tti!dennisg | Threaded Technologies, Inc.
+	 dennisg@tti.UUCP | Loveland, Ohio
+
+
+-doesNotRecognize:xxx is handy for "proxy" objects.  Proxy objects are
+used to re-route messages.  For example, class "Foo" objects exist on
+a separate machine and can only be reached through inter-machine
+messages (eg: UDP/IP).  You program has class "Bar" objects that
+accept all messages acceptable to class Foo objects.  A message sent
+to a Bar object is converted into an IP datagram, forwarded to the
+remote machine, and munged by the appropriate Foo object.
+
+The -doesNotRecognize method makes the trick of forwarding messages
+from one object to another simple because the proxy class (in this
+case "Bar") does not have to implement any of the methods of the
+target class ("Foo").  The Bar class overrides -doesNotRecognize.  The
+implementation of this method takes the selector and its arguments,
+and calls then calls the appropriate instance of the foo object.
+
+eg:
+
+-doesNotRecognize:aSel with:arg
+{
+	return [remoteObject perform:aSel with:arg];
+}
+
+
+			**** UNFORTUNATELY ****
+
+One cannot use this trick in Objective-C because -doesNotRecognize
+does not pass the arguments to the method orginally called, unlike
+smalltalk.  There probably exists a paper or two on this someplace,
+but I do not have a reference or two handy.  
+
+Hope this helps!
+
+--
+Greg Franks, (613) 788-5726               | "The reason that God was able to
+Systems Engineering, Carleton University, | create the world in seven days is
+Ottawa, Ontario, Canada  K1S 5B6.         | that he didn't have to worry about 
+greg@sce.carleton.ca  ...!cunews!sce!greg | the installed base" -- Enzo Torresi
+

@@ -1,0 +1,10 @@
+:samples/view:
+==============
+
+This directory contains an incomplete attempt at object-oriented
+windowing.  It does provide many examples of pushing the translator
+and substrate to their limits.  Use the source code for whatever...
+It does do something right now, I think.
+
+--- brian witt, 19-April-90
+

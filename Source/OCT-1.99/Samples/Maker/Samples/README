@@ -1,0 +1,10 @@
+samples/Maker:
+==============
+
+This directory contains two example classes.  The first is from the
+Objective-C book by Dr. Brad Cox, chapter 6.  The dependency graph
+example can read a file, or generate a sample internally.  The other
+example is a cute "hello world" program that uses a class that has
+one method in it, strReverse.  These are good places to start from.
+
+--- brian witt, 18-April-90
