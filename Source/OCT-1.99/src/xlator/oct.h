@@ -47,6 +47,14 @@
 
 /*  "GRAMMAR" is defined for the lexer and the grammar files only.
 */
+/* Standard headers first so every TU gets prototypes (SAS/C Warning 100). */
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <ctype.h>
+
 #ifndef  GRAMMAR
 
 /*  Our standard header usually in a /usr/local/include place.. */
@@ -54,15 +62,34 @@
 
 #endif
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <ctype.h>
-
 #include <objc/private/config.h>
 
+#ifndef DEBUG
+#define DEBUG 1
+#endif
+
+/* Debug trace: define DEBUG=1 when building (e.g. DEFINE DEBUG=1). All output
+ * goes to stdout so it is visible when stdout is redirected or buffered.
+ */
+#if defined(DEBUG) && DEBUG
+# include <stdarg.h>
+/* Full prototypes for strict compilers (e.g. SAS/C) that warn on K&R declarations. */
+int fprintf(FILE *stream, const char *format, ...);
+int vfprintf(FILE *stream, const char *format, va_list arg);
+int fflush(FILE *stream);
+static void _oct_dbg(const char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	fprintf(stdout, "[OCT] ");
+	vfprintf(stdout, fmt, ap);
+	va_end(ap);
+	fflush(stdout);
+}
+# define DBG(x) do { _oct_dbg x; } while(0)
+#else
+# define DBG(x) ((void)0)
+#endif
 
 /*  Some nice string handling:  */
 #ifndef EOS
@@ -142,8 +169,8 @@
 # define  PARMS(x)   ()
 #endif
 
-#if __STDC__
-# define  CONST  /* const */
+#if defined(__STDC__) && __STDC__
+# define  CONST  const
 #else
 # define  CONST
 #endif
@@ -237,22 +264,21 @@ enum key_lex_text
 
 #endif
 
-extern char 	*strstr PARMS(( char *, char *	));   /* ANSI C */
-extern char   	*strchr PARMS(( char *, int  	));
+/* strstr/strchr from <string.h> (included at top); do not redeclare. */
 
 
 /* ---------------------------------------------------------------- */
 
 
 /*  Our dynamic string library:  */
-extern unsigned char   lastchr PARMS(( char * ));
+extern unsigned char   lastchr PARMS(( CONST char * ));
 extern char	    *strremove  PARMS(( char *, char ));
 
 extern char 	*newstring  PARMS(( CONST char *fix ));
-extern char	    *newstrcat  PARMS(( char *old, char *add  ));
-extern char 	*newstrins  PARMS(( char *fixed, char *dynamic  ));
+extern char	    *newstrcat  PARMS(( char *old, CONST char *add  ));
+extern char 	*newstrins  PARMS(( CONST char *fixed, char *dynamic  ));
 extern char 	*newstrjoin PARMS(( CONST char *front, CONST char *rear  ));
-extern char 	*newstr1chr PARMS(( const char *front, char lastch ));
+extern char 	*newstr1chr PARMS(( char *front, char lastch ));
 
 extern void	    addMethod PARMS((  char order, char *ret_type, char *name ));
 extern void	    dump_m_header PARMS((  struct mynode * 	));
@@ -261,26 +287,36 @@ extern struct mynode  *parse_structure PARMS(( int souoe ));
 
 /*  Scanner communiction routines:  */
 extern void     hash_line PARMS(( int      	));
-extern char	    *lex_text PARMS(( enum key_lex_text , ... ));
+extern char    *lex_text PARMS(( enum key_lex_text , ... ));
 
 extern struct mynode	*methSearch PARMS(( char *colonName, int order ));
 extern void	     addTypeName PARMS(( char * yyext 	));
 extern char	    *asCRef_selector PARMS(( char *colon_name ));
-extern char 	*asFunc_selector PARMS(( char *colon_name ));
+extern char 	*asFunc_selector PARMS(( CONST char *colon_name ));
 extern char  	*str_name_method PARMS(( CONST struct mynode * ));
 extern void  	 enter_type PARMS(( CONST char *, CONST char *));
 
 extern int       lu_instvar PARMS(( CONST char *target ));
 extern char     *lu_classdef PARMS(( char *class_name ));
+extern char     *publicClassVarSTR(char *class_name);
 
 
 #ifndef GRAMMAR
 extern FILE	    *must_open PARMS(( char *base, char	*mode, char *ext  ));
-extern char	    *mk_base_name PARMS(( char *fname ));
+extern char	    *mk_base_name PARMS(( CONST char *fname ));
 
 extern struct mynode   *mk_mynode PARMS(( CONST char *, CONST char * ));
 extern void           done_mynode PARMS(( struct mynode * ));
 
+extern void init_types(void);
+extern void init_parser(void);
+extern void pre_ops(FILE *fp, int flag);
+extern int yyparse(void);
+extern void dump_dict(void);
+extern void post_ops(void);
+extern void cleanup(int rc);
+extern void cpp_infile(char *prog_name, char *prog_args, char *infname, char *outfname);
+extern char *strlower(char *s);
 
 /*  These are generally known already to the grammar: */
 extern int      yydebug;

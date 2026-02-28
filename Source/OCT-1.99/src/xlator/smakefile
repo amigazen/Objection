@@ -1,0 +1,83 @@
+#
+# SAS/C smakefile for OCT xlator. Builds oct (translator) and prelink.
+# Run from the xlator directory: smake
+# Uses SCOPTIONS in this directory (CODE=FAR DATA=FAR). Include path
+# is ../../include for objc headers (config, release, octhead, etc.).
+# For debug tracing (printf to stderr at key points), use:
+#   opts = NOLINK INCLUDEDIR=$(inc) DEFINE DEBUG=1
+#
+
+inc = //include
+# Amiga build: MCH_AMIGA selects exec/lib list ops, Amiga DOS in file.c, etc.
+# usr-inc has stdio.h, stdlib.h, string.h with ANSI prototypes for SAS/C (Warning 100).
+opts = NOLINK INCLUDEDIR=$(inc) DEFINE MCH_AMIGA=1
+ldlibs = lib:sc.lib lib:amiga.lib
+
+# Object files for oct (translator)
+oct_objs = gram0.o main.o file.o strs.o symbol.o select.o gram.o expr.o mdef.o\
+ class.o error.o hate.o info.o mystrs.o scan.o tree.o
+
+# Object files for prelink
+pln_objs = pln.o mystrs.o
+
+all: oct prelink
+
+oct: $(oct_objs)
+	slink FROM sc:lib/c.o + $(oct_objs) TO oct LIB $(ldlibs)
+
+prelink: $(pln_objs)
+	slink FROM sc:lib/c.o + $(pln_objs) TO prelink LIB $(ldlibs)
+
+gram0.o: gram0.c oct.h //include/objc/private/config.h
+	sc $(opts) gram0.c
+
+main.o: main.c oct.h error.h //include/objc/release.h //include/objc/objc.h //include/octhead.h
+	sc $(opts) main.c
+
+class.o: class.c oct.h gram.h error.h //include/objc/objc.h
+	sc $(opts) class.c
+
+error.o: error.c oct.h error.h
+	sc $(opts) error.c
+
+expr.o: expr.c oct.h error.h gram.h
+	sc $(opts) expr.c
+
+file.o: file.c oct.h
+	sc $(opts) file.c
+
+gram.o: gram.c oct.h gram.h error.h
+	sc $(opts) gram.c
+
+hate.o: hate.c oct.h gram.h error.h
+	sc $(opts) hate.c
+
+info.o: info.c oct.h error.h
+	sc $(opts) info.c
+
+mdef.o: mdef.c oct.h gram.h error.h
+	sc $(opts) mdef.c
+
+mystrs.o: mystrs.c oct.h
+	sc $(opts) mystrs.c
+
+pln.o: pln.c oct.h //include/objc/release.h //include/octhead.h
+	sc $(opts) pln.c
+
+scan.o: scan.c flexskeldef.h oct.h //include/objc/private/config.h
+	sc $(opts) scan.c
+
+select.o: select.c oct.h error.h
+	sc $(opts) select.c
+
+strs.o: strs.c oct.h
+	sc $(opts) strs.c
+
+symbol.o: symbol.c oct.h gram.h //include/objc/objc-class.h error.h
+	sc $(opts) symbol.c
+
+tree.o: tree.c //include/tree.h //include/octhead.h
+	sc $(opts) tree.c
+
+clean:
+	-delete \#?.o oct prelink quiet

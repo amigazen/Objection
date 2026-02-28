@@ -129,7 +129,7 @@ del_nodes( tree, model_node )
 
 	while( (np=(struct mynode *)searchTree(tree,name)) != NULL )
 	{
-		Remove( np );
+		Remove( (struct Node *)np );
 
 		/*  Inherit the sequence number if it has already been assigned: */
 		if( np->sequence != 0 )
@@ -141,7 +141,7 @@ del_nodes( tree, model_node )
 			if( np->sequence != index )
 			{
 				error_string = "(del_nodes) bad sequence value" ;
-				gerr( ERROR_ABORT, GERR_INTERNAL, NULL );
+				gerr( ERROR_ABORT, GERR_INTERNAL, NULL, 0L );
 				/*NOTREACHED*/
 			}
 		}	/* if dup node has sequence value */
@@ -256,7 +256,7 @@ dump_m_header( np )
 		if( (front=strchr(pv,' ')) == NULL )
 		{
 			error_string = "(dump_m_header) type/var count mismatch" ;
-			gerr( ERROR_ABORT, GERR_INTERNAL, NULL );
+			gerr( ERROR_ABORT, GERR_INTERNAL, NULL, 0L );
 			/*NOTREACHED*/
 		}
 

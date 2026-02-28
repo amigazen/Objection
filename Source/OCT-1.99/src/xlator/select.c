@@ -120,7 +120,7 @@ push_context()
 
     if( (cp=(CONTEXT *) MALLOC( sizeof(*cp) )) == NULL )
     {
-        gerr( ERROR_ABORT, GERR_NO_CORE, NULL );
+        gerr( ERROR_ABORT, GERR_NO_CORE, NULL, 0L );
         /*NOTREACHED*/
     }
 
@@ -189,7 +189,7 @@ pop_context()
     if( rootc == NULL )
     {
         error_string = "pop_context" ;
-        gerr( ERROR_ABORT, GERR_INTERNAL, NULL );
+        gerr( ERROR_ABORT, GERR_INTERNAL, NULL, 0L );
                 /*NOTREACHED*/
     }
 
@@ -472,7 +472,7 @@ m_call( starts )
 #if SW_ASSERT
         default :
                 error_string = "m_call, bad state" ;
-                gerr( ERROR_ABORT, GERR_INTERNAL, NULL );
+                gerr( ERROR_ABORT, GERR_INTERNAL, NULL, 0L );
                 /*NOTREACHED*/
 #endif
 

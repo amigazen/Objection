@@ -69,8 +69,8 @@ enum GW_CODES
 
 /* ----------------------  Externally, Yours  ------------------------ */
 
-extern void 	gerr PARMS(( /* int , enum GERR_CODES, PFI, ULONG */ ));
-extern void 	gwarn PARMS(( enum GW_CODES ));
+extern void gerr(int level, enum GERR_CODES ecode, PFI rec_fptr, ULONG rec_parm);
+extern void gwarn(enum GW_CODES ecode);
 
 extern int  	trip_hline;			/* Scanner should output #line */
                      /*  =1 , right now,  =-1, after {} block ends */

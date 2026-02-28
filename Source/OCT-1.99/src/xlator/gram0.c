@@ -51,12 +51,12 @@ unsigned char 	tokenkey[ _LAST_TOKEN_SYMBOL ];
 
 /* ----------------------  Startup and Go Code  ---------------------- */
 
-    void
-init_parser( )
+void
+init_parser(void)
 {
-
-    /*  General init stuff: */
-    m_order = 0;
+	DBG(("init_parser: entry\n"));
+	/*  General init stuff: */
+	m_order = 0;
 
 
     /*  if 'DONE' is < 0 then don't store!!!! */
@@ -153,20 +153,22 @@ init_parser( )
 
     tokenkey[ T_DUMMY ] = TKEY_OC_SPECIAL;
 
+	DBG(("init_parser: done\n"));
 }	/* init_parser */
 
 
-
-    void
-init_types( )
+void
+init_types(void)
 {
-                               /*  [nodeName] -->  [def],      [tag]    */
-   symtab  = (void *)newTree();	 /* "USHORT" --> "unsigned short"         */
+	DBG(("init_types: entry\n"));
+	/*  [nodeName] -->  [def],      [tag]    */
+	symtab  = (void *)newTree();	 /* "USHORT" --> "unsigned short"         */
    ivar_tree = (void *)newTree();  /* "Point" --> "id xval, yval;","id id" */
    class_tree = (void *)newTree();  /* "Point" --> "Object"                */
    method_tree = (void *)newTree();  /* "at:"   --> "(id)(int)", "offset"  */
 
-   NewList( & category_list );      /* "Node"  --> "doobie"; --> "test"   */
-   NewList( & alias_list );         /* "atChar:" --> "at:"               */
+	NewList( & category_list );      /* "Node"  --> "doobie"; --> "test"   */
+	NewList( & alias_list );         /* "atChar:" --> "at:"               */
+	DBG(("init_types: done\n"));
 }	/* init_types */
 

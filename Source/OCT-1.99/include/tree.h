@@ -32,11 +32,14 @@ typedef struct
 } TREE ;
 
 
-/*  The public interface:  */
-extern TREE     	*newTree( /* */ );
-extern void     	addTree( /* void *root, struct Node *node */ );
-extern struct Node	*searchTree( /* void *root, char *name */ );
-extern struct Node	*enumTree( /* void *root, int *index */ );
+/*  The public interface (ANSI prototypes for SAS/C). */
+#ifndef MCH_AMIGA
+extern void NewList(struct MinList *list);
+#endif
+extern TREE *newTree(void);
+extern void addTree(TREE *root, struct Node *node);
+extern struct Node *searchTree(TREE *root, char *name);
+extern struct Node *enumTree(TREE *root, int *index);
 
 #endif
 

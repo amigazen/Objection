@@ -346,7 +346,7 @@ parse_structure( souoe )
         if( again == 0 )
         {
            error_string = curr_name;     /* thanx to Ramsey 12-apr-91 */
-           gerr( 0, GERR_NOT_TYPENAME, NULL );
+           gerr( 0, GERR_NOT_TYPENAME, NULL, 0L );
            get_tok();     /* Pretend it's an undefined typedef name */
         }
 
@@ -747,7 +747,7 @@ yyparse( )
 
         	case OPEN_INTERFACE :
                     	if( in_state & IS_INCLUDES )
-                    	    gerr( ERROR_RESYNC, GERR_CLASS_LATE, NULL );
+                    	    gerr( ERROR_RESYNC, GERR_CLASS_LATE, NULL, 0L );
 
                     	in_state |= IS_SEEN_IF;
                     	in_context |= IC_INTERFACE;

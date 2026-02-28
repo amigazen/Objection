@@ -22,6 +22,7 @@
 //   	14-dec-90 	bjw 	Uses <octhead.h> to list/node defines.
 */
 
+#include <stddef.h>
 #include <octhead.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,20 +42,18 @@
 /*  These functions are included for non-Amiga machines: */
 #ifndef MCH_AMIGA
 
-	void
-NewList( list )
-	register struct MinList 	*list;
+void
+NewList(struct MinList *list)
 {
 	list->mlh_Head     = (struct MinNode *) & (list->mlh_Tail);
 	list->mlh_Tail     = NULL;
 	list->mlh_TailPred = (struct MinNode *) & (list->mlh_Head);
 }   /* NewList */
 
-	void
-Remove( node )
-	register struct Node 	*node;
+void
+Remove(struct Node *node)
 {
-	register struct Node	*n2;
+	struct Node	*n2;
 
 	n2   = node->ln_Succ;		/* Get successor */
 	node = node->ln_Pred;		/* Get predecessor */
@@ -63,12 +62,10 @@ Remove( node )
 }   /* Remove */
 
 
-	void
-AddHead( list, node )
-	struct MinList 	 	*list;
-	register struct Node 	*node;
+void
+AddHead(struct MinList *list, struct Node *node)
 {
-	register struct Node 	*n2;
+	struct Node 	*n2;
 
 	n2 = (struct Node *) list->mlh_Head;
 	list->mlh_Head = (struct MinNode *) node;	/* Connect others to us */
@@ -79,12 +76,10 @@ AddHead( list, node )
 }   /* AddHead */
 
 
-	void
-AddTail( list, node )
-	struct MinList 	*list;
-	register struct Node 	*node;
+void
+AddTail(struct MinList *list, struct Node *node)
 {
-	register struct Node 	*n2;
+	struct Node 	*n2;
 
 	n2 = (struct Node *) list->mlh_TailPred;
 	list->mlh_TailPred = (struct MinNode *) node;	/* Connect others to us */
@@ -97,12 +92,10 @@ AddTail( list, node )
 
 
 
-	struct Node *
-FindName( list, name )
-	struct MinList 	*list;
-	register char	*name;
+struct Node *
+FindName(struct MinList *list, char *name)
 {
-	register struct Node 	*np;
+	struct Node 	*np;
 
 	for( np=(struct Node *)list->mlh_Head ; np->ln_Succ != NULL ; np=np->ln_Succ )
 	{
@@ -118,9 +111,8 @@ FindName( list, name )
 /* --------------------  Private Code Workings  ---------------------- */
 
 
-	unsigned
-hashTree( name )
-	char	*name;
+unsigned
+hashTree(char *name)
 {
 	unsigned	h;
 
@@ -142,47 +134,55 @@ hashTree( name )
 /* ----------------------  Public Code Works  ------------------------ */
 
 
-	void
-addTree( tp, node )
-	TREE	*tp;
-	struct Node  *node;
+void
+addTree(TREE *tp, struct Node *node)
 {
+#ifdef MCH_AMIGA
+	AddTail( (struct List *)&tp->b[ hashTree(node->ln_Name) ], node );
+#else
 	AddTail( & tp->b[ hashTree(node->ln_Name) ], node );
+#endif
 }
 
 
-	struct Node *
-searchTree( tp, name )
-	TREE	*tp;
-	char	*name;
+struct Node *
+searchTree(TREE *tp, char *name)
 {
+#ifdef MCH_AMIGA
+	return( FindName( (struct List *)&tp->b[ hashTree(name) ], name ) );
+#else
 	return( FindName( & tp->b[ hashTree(name) ], name ) );
+#endif
 }
 
 
-	TREE *
-newTree( )
+TREE *
+newTree(void)
 {
-	register TREE	*tp;
+	TREE	*tp;
 	short	j;
 
 	if( (tp=(TREE *)malloc(sizeof(TREE))) != NULL )
 	{
 		for( j=0 ; j < MX_BUCKETS ; ++j )
+		{
+#ifdef MCH_AMIGA
+			NewList( (struct List *)&tp->b[j] );
+#else
 			NewList( & tp->b[j] );
+#endif
+		}
 	}
 	return( tp );
 }   /* newTree */
 
 
 /*   enumTree  --  Sequentially access all nodes in the hash tree in
-//				   uncertain order.  Works correctly even if the
-//				   returned node is free'd by the caller.
-*/
-	struct Node *
-enumTree( root, index )
-	TREE	*root;
-	int		*index;			/* Use -1 to init enumeration */
+ *                uncertain order.  Works correctly even if the
+ *                returned node is free'd by the caller.
+ */
+struct Node *
+enumTree(TREE *root, int *index)
 {
 	static int	header = MX_BUCKETS;
 	static struct Node	*next = NULL;

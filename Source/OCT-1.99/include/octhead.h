@@ -134,13 +134,22 @@ struct MinList {
 #define NT_SEMAPHORE 14L
 #define NT_SIGNALSEM 15L
 
-/*  Node function from Amiga Exec:  */
-extern void   		NewList( /* struct List * */ );
-extern void	        Remove( /* struct List * */ );
-extern void 		AddHead ( /* struct List *, struct Node *  */ );
-extern void  		AddTail ( /* struct List *, struct Node *  */ );
-extern struct Node     *RemTail ( /* struct List *  		*/ );
-extern struct Node     *FindName ( /* struct List *, char * */ );
+/*  Node functions (Amiga: from exec; non-Amiga: from tree.c).  */
+#ifdef MCH_AMIGA
+extern void NewList(struct List *list);
+extern void Remove(struct Node *node);
+extern void AddHead(struct List *list, struct Node *node);
+extern void AddTail(struct List *list, struct Node *node);
+extern struct Node *RemTail(struct List *list);
+extern struct Node *FindName(struct List *list, char *name);
+#else
+extern void NewList(struct MinList *list);
+extern void Remove(struct Node *node);
+extern void AddHead(struct MinList *list, struct Node *node);
+extern void AddTail(struct MinList *list, struct Node *node);
+extern struct Node *RemTail(struct MinList *list);
+extern struct Node *FindName(struct MinList *list, char *name);
+#endif
 
 
 #endif

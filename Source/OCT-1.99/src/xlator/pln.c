@@ -56,6 +56,7 @@ static char copyright[]={" (c) copyright Brian Witt, 1989,1990,1991. ALL RIGHTS 
 
 #define  DEBUG  0
 
+#define NULL 0
 
 #define  VERSION  "(OCT prelink 1.07B)"
 
@@ -93,9 +94,8 @@ static char 	cmt_close[ ] =	{ ' ', '*', '/' , 0 } ;
 
 #if SW_NEED_STRDUP
 
-	char	*
-strdup( str )
-	char	*str;
+char *
+strdup(const char *str)
 {
 	char	*new;
 
@@ -113,13 +113,12 @@ strdup( str )
 
 
 /*   mk_node  --  Create a node for our list that has an attached name.
-//			If we fail, them we abort.  String ptr copied, not duplicated.
-*/
-	struct Node *
-mk_node( name )
-	char	*name;			/* String name that's already saved */
+ *                If we fail, we abort.  String ptr copied, not duplicated.
+ */
+struct Node *
+mk_node(char *name)
 {
-	register struct Node 	*np;
+	struct Node 	*np;
 
 	if( (np=(struct Node *)malloc( sizeof(struct Node) )) == NULL )
 	{
@@ -139,17 +138,12 @@ mk_node( name )
 
 
 /*   mk_base_name  --  Extract the base filename.  Strip any path spec,
-//					   and remove the file extension.  Assumes there is
-//					   a filename to extract.  Otherwise returns a nil
-//					   string if nothing to extract.
-//		Returns:  string of basename, caller owns string.
-*/
-	char *
-mk_base_name( path )
-	char	*path;
+ *                     and remove the file extension.  Returns basename; caller owns string.
+ */
+char *
+mk_base_name(char *path)
 {
-	register char	*base, *p;
-	register unsigned	c;
+	char	*base, *p;
 
 	/*  Move down and remove path prefix: */
 	base = path;
@@ -177,11 +171,10 @@ mk_base_name( path )
 
 
 /*   must_list  --  Reads in 'must init' module list.  Appends to current
-//					list of modules.  If file not found, a message is
-//					printed.
-*/
-	void
-must_list()
+ *                  list of modules.  If file not found, a message is printed.
+ */
+void
+must_list(void)
 {
 	static char 	buff[ SIZ_BUFFER ];
 	FILE	*fp;
@@ -214,16 +207,14 @@ must_list()
 /* ----------------------  Public Code Works  ------------------------ */
 
 
-/*   mk_table  --  Create the two extern class tables in the output file,
-//				'data_file'.  First list is extern definitions, second is
-//				the array that the runtime binding will use.  We extern
-//				them as characters; they really are class structures.
-//		Because of the laziness, this file requires no header files!
-*/
-	void
-mk_table()
+/*   mk_table  --  Create the two extern class tables in the output file.
+ *                 First list is extern definitions, second is the array
+ *                 that the runtime binding will use.
+ */
+void
+mk_table(void)
 {
-	register struct Node 	*np;
+	struct Node 	*np;
 	short 	isFirst;
 
 	fprintf( data_file, "%sCreated by %s for class initialization%s\n\n",
@@ -253,11 +244,10 @@ mk_table()
 
 
 
-	void
-usage( rc )
-	int 	rc;
+void
+usage(int rc)
 {
-	register FILE	*uf = stdout;
+	FILE	*uf = stdout;
 
 	fprintf( uf, "%s", RELEASE );
 	fprintf( uf, "usage: prelink <outCfile> <inMfile>..\n" );
@@ -271,10 +261,8 @@ usage( rc )
 }	/* usage */
 
 
-	void
-parse_cmd( argc, argv )
-	int 	argc;
-	char	*argv[ ];
+void
+parse_cmd(int argc, char *argv[])
 {
 	char	*name;
 	int 	j;
@@ -305,10 +293,8 @@ parse_cmd( argc, argv )
 
 
 
-    void
-main( argc, argv )
-	int 	argc;
-	char	*argv[ ];
+int
+main(int argc, char *argv[])
 {
 
 	puts( VERSION );
@@ -321,6 +307,7 @@ main( argc, argv )
 
 	fclose( data_file );
 
-    exit( 0 );
+	exit( 0 );
+	return 0;  /* not reached */
 }	/* main */
 

@@ -67,7 +67,7 @@ must_match( who, tok )
     if( curr_tok != tok )
     {
         error_string = curr_name;
-        gerr( ERROR_RESYNC, GERR_MISMATCH, er_msg );
+        gerr( ERROR_RESYNC, GERR_MISMATCH, er_msg, 0L );
 #if SW_ASSERT
         printf(" %s: hoping for %c, paren_deep=%d\n", who,tok,paren_deep);
 #endif
@@ -342,7 +342,7 @@ primary( tok )
                     printf( "(primary) default taking typecast\n" );
 
                     if( gram_typecast() != RC_OK )
-                    	gerr( ERROR_RESYNC, GERR_EXPRESSION, er_msg );
+                    	gerr( ERROR_RESYNC, GERR_EXPRESSION, er_msg, 0L );
                 } else
 #endif
                 if( monadic( tok ) || dyadic( tok ) )
@@ -355,7 +355,7 @@ primary( tok )
                     /*  a msg expr, ie "[newSTR: argv[1]]".
                     */
                     error_string = curr_name;
-                    gerr( ERROR_RESYNC, GERR_EXPRESSION, er_msg );
+                    gerr( ERROR_RESYNC, GERR_EXPRESSION, er_msg, 0L );
                 }
                 break ;
 
@@ -410,7 +410,7 @@ expr( tok )
         tok = get_tok();
     }   /* while not EOF */
     
-    gerr( ERROR_RESYNC, GERR_SHORT_MESSAGE, er_msg );
+    gerr( ERROR_RESYNC, GERR_SHORT_MESSAGE, er_msg, 0L );
 }   /* expr */
 
 
@@ -459,7 +459,7 @@ m_arg_list2( depth )
     } else
     if( curr_tok == IDENTIFIER )
     {
-        gerr( ERROR_RESYNC, GERR_EXPRESSION, er_msg );
+        gerr( ERROR_RESYNC, GERR_EXPRESSION, er_msg, 0L );
     }
 
 }   /* m_arg_list2 */
@@ -512,7 +512,7 @@ whole_msg_body( )
         case IDENTIFIER :
                     m_call( MSM_METHOD );
                     if( get_tok() != ']' )    	/* Eat ']' */
-                    	gerr( ERROR_RESYNC, GERR_LONG_MESSAGE, er_msg );
+                    	gerr( ERROR_RESYNC, GERR_LONG_MESSAGE, er_msg, 0L );
 
                     break ;
         default :
@@ -523,7 +523,7 @@ whole_msg_body( )
         case DONE :
         case ']'  :
         case ','  :
-                    gerr( ERROR_RESYNC, GERR_SHORT_MESSAGE, er_msg );
+                    gerr( ERROR_RESYNC, GERR_SHORT_MESSAGE, er_msg, 0L );
                     break ;
 
     }   /* switch */
@@ -587,7 +587,7 @@ function_body()
         {
         	if( gram_typecast() != RC_OK )
         	{
-                gerr( ERROR_RESYNC, GERR_EXPRESSION, NULL );
+                gerr( ERROR_RESYNC, GERR_EXPRESSION, NULL, 0L );
                 unget_tok();	/* Parse again what typecast() choked on */
         	}
         	tok = curr_tok;

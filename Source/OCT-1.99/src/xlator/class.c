@@ -132,7 +132,7 @@ grab_class_vars()
 	if( all_classVars == NULL )
 	{
 		error_string = "(grab_class_vars) can't find class def" ;
-		gerr( ERROR_ABORT, GERR_INTERNAL, NULL );
+		gerr( ERROR_ABORT, GERR_INTERNAL, NULL, 0L );
 		/*NOTREACHED*/
 	}
 

@@ -81,6 +81,15 @@ static char  copyright_2[]={" Inquires to: brian@babbage.ecs.csus.edu " };
 #include <tree.h>
 #include <objc/release.h>
 
+#ifdef MCH_AMIGA
+/* write/unlink prototypes when unistd.h not used */
+extern int write(int fd, const void *buf, unsigned n);
+extern int unlink(const char *path);
+#endif
+#ifndef MCH_AMIGA
+#include <unistd.h>
+#endif
+
 
 #ifndef __DATE__
 # define __DATE__	"19 Sep 93"
@@ -110,6 +119,13 @@ static char  	only_cpp = FALSE;		/* TRUE for -E flag */
 
 static FILE     *phasefp;               /* "Phase n" messages.. */
 
+/* Forward declarations (ANSI C). */
+static void usage(int rc);
+static void pcl_needfile(int optchr);
+static int parse_opts(int argc, char *argv[]);
+static int parse_cmdline(int argc, char *argv[]);
+static void aim_input(char *filename);
+
 
 /* ----------------------  Private Support Code  ----------------------- */
 
@@ -118,11 +134,10 @@ static FILE     *phasefp;               /* "Phase n" messages.. */
  *              just a simple line of help is printed.  Otherwise a
  *              little instructional information is displayed.
  */
-	LOCAL void
-usage( rc )
-	int   rc;
+static void
+usage(int rc)
 {
-   register FILE   *f = stdout;
+   FILE   *f = stdout;
    static char   *trypaths[] = { EV_TEMPDIR, NULL } ;
    int      i;
 
@@ -130,6 +145,9 @@ usage( rc )
    	fputs( RELEASE, f );
 
    fprintf( f,
+ "?usage: OCT [-Ehln][-i dir][-o file][-p opts][-w#][-z{adkpt}] Mfile\n");
+   /* Also to stderr so it appears when stdout is not connected (e.g. Amiga Workbench). */
+   fprintf( stderr,
  "?usage: OCT [-Ehln][-i dir][-o file][-p opts][-w#][-z{adkpt}] Mfile\n");
 
    if( rc < 0 )
@@ -147,11 +165,11 @@ usage( rc )
    fputs("  -v       --  Display version information only.\n", f );
 fputs("  -w#      --  Set warning level: 0/1/2 --> silent/normal/noisy.\n",
    			f );
-   fputs("  -Wall    --  Display all warnings (like -W3).\n");
+   fputs("  -Wall    --  Display all warnings (like -W3).\n", f );
    fputs("  -za      --  Don't invoke 'cpp' on source file (accept).\n", f );
    fputs("  -zd      --  Output obnoxious internal debugging.\n", f );
-fprintf(f,"  -zk      --  Keep (don't delete) output of 'cpp' in %s.\n",
-   			my_maketemp() );
+/* Avoid my_maketemp() here; it can block on Amiga (getenv/mktemp). Use env name. */
+   fprintf(f,"  -zk      --  Keep (don't delete) output of 'cpp' in " EV_TEMPDIR " (or current dir).\n");
    fputs("  -zp      --  Send translated source to stdout (piping).\n",f);
    fputs("  -zt      --  Trace grammar's progress.\n", f );
 
@@ -162,14 +180,15 @@ fprintf(f,"  -zk      --  Keep (don't delete) output of 'cpp' in %s.\n",
    fprintf(f, " %9s --  Option string for translator.\n", EV_OPTS );
    fprintf(f, " %9s --  Addtional include directories.\n", EV_INCLUDE );
 
+   fflush( stdout );
+   fflush( stderr );
    exit( rc );
    /*NOTREACHED*/
 }	/* usage */
 
 
-	LOCAL void
-pcl_needfile( optchr )
-	char	optchr;
+static void
+pcl_needfile(int optchr)
 {
 
 	printf( "?%s: -%c requires filename.\ntype \"%s -h\" for help\n",
@@ -183,9 +202,8 @@ pcl_needfile( optchr )
 /*   addInclude  --  Another directory to have 'cpp' search inside.
  *                   String them all together.
 */
-    void
-addInclude( include_fname )
-	char	*include_fname;
+void
+addInclude(char *include_fname)
 {
 	char	*junk;
 
@@ -203,16 +221,14 @@ addInclude( include_fname )
  *                   Var 'letter' hold un-case converted for UNIX freaks.
  *   Side Affects:  Sets many flag variables.
  */
-    LOCAL int
-parse_opts( argc, argv )
-    int      argc;
-    char    *argv[];
+static int
+parse_opts(int argc, char *argv[])
 {
 #define  THE_PARM(cp)   (((cp)[1] == EOS) ? ap=argv[++index] : ++(cp) )
 
     extern int  yydebug;
-    register char	*cp;
-	register char   *ap;
+    char	*cp;
+	char   *ap;
 	char    letter;
 	char    *thisArg;
     int 	index = 1;
@@ -361,25 +377,23 @@ parse_opts( argc, argv )
  *                      the command line is examined.
  *      Returns:  offset of possible file in argv[].
  */
-    LOCAL int
-parse_cmdline( argc, argv )
-    int   argc;
-    char	*argv[];
+static int
+parse_cmdline(int argc, char *argv[])
 {
     extern char   **tokenizer  PARMS(( CONST char  *plainStr ));
-    extern char    *inspectEnv PARMS(( char *, char * ));
-    extern char   **parse_env  PARMS(( CONST char *, CONST char * ));
     extern int    yydebug;
 
-    register char	**user_argv;
-    register char 	*cp;
+    char	**user_argv;
+    char 	*cp;
     int     ap;
+
+    DBG(("parse_cmdline: argc=%d\n", argc));
 
     /*  Help can be obtained with no args, or first arg containing a '?'.
     //  Ie, "oct -?" will print usage.
     */
 
-    if( argc < 2 || strchr( argv[1], '?' ) )
+    if( strchr( argv[1], '?' ) )
     {
 	    usage( 1 );
 	    /*NOTREACHED*/
@@ -400,8 +414,8 @@ parse_cmdline( argc, argv )
     /* -------------------------------- */
     /*  Read include directories, then  */
     /*  general args for 'cpp':         */
-
-    user_argv = tokenizer( getenv( EV_INCLUDE ) );
+    cp = getenv( EV_INCLUDE );
+    user_argv = tokenizer( cp != NULL ? cp : "" );
     if( user_argv[1] != NULL )
     {
 	    cp = user_argv[0];     	/* Whole text (dynamic) string */
@@ -425,14 +439,14 @@ parse_cmdline( argc, argv )
     /* -------------------------------------- */
     /*  Parse options stored in environment:  */
     /*  then parse options from command line. */
-
-    user_argv = tokenizer( getenv( EV_OPTS ) );
+    cp = getenv( EV_OPTS );
+    user_argv = tokenizer( cp != NULL ? cp : "" );
     if( user_argv[1] != NULL )
     {
 	    cp = user_argv[0];     	/* Whole text (dynamic) string */
 	    user_argv[0] = argv[0]; 	/* Program name for error reporting */
 	    for( ap=1 ; user_argv[ap] != NULL ; ++ap )
-		    ;;
+		    (void)0;  /* count args for parse_opts */
 	    parse_opts( ap, user_argv );
 
 	    MFREE( cp );
@@ -448,7 +462,7 @@ parse_cmdline( argc, argv )
 
 
     /* --------------------------------- */
-    if( warn_level > WARN_NORMAL || verbose_flag )
+    if( phasefp != NULL && (warn_level > WARN_NORMAL || verbose_flag) )
 	    fputs( "Phase 1\n", phasefp );
 
     /*  Arrange for conforming flag combinations: */
@@ -473,15 +487,14 @@ parse_cmdline( argc, argv )
  *                  the preprocessor will be run from here.
  *	Side Effects:  sets global 'from_fname', 'yyin'.
  */
-	LOCAL void
-aim_input( filename  )
-	char	*filename;
+static void
+aim_input(char *filename)
 {
     extern char   *file_indir PARMS (( char *path, CONST char *name ));
 
-    register char 	*cp;
-    register int     ap;
+    char 	*cp;
 
+    DBG(("aim_input: filename=%s\n", filename ? filename : "(null)"));
     cp = filename;
     if( (yyin=fopen(cp, "r" )) != NULL )
     {
@@ -501,8 +514,11 @@ aim_input( filename  )
         /* --------------------------- */
         /*  Pre-process the input file */
         if( ! only_cpp )
+        {
+        	DBG(("aim_input: calling my_maketemp\n"));
         	temp_name = my_maketemp();
-
+        }
+        DBG(("aim_input: calling cpp_infile\n"));
         cpp_infile( CPP_PNAME, preproc_opts, from_fname, temp_name );
         if( only_cpp )
         	return ;
@@ -553,9 +569,8 @@ aim_input( filename  )
  *                If no errors, then return code is changed to 0.
  *	Returns: never.
  */
-	void
-cleanup( rc )
-	int   rc;
+void
+cleanup(int rc)
 {
 
     /*  Cleanup a little bit after ourselves: */
@@ -610,46 +625,66 @@ cleanup( rc )
 /* -------------------------------------------------------------------- */
 
 
-    int
-main( argc, argv )
-    int   argc;
-    char  *argv[];
+int
+main(int argc, char *argv[])
 {
     extern int 	  yyparse();
     extern char   	* sel_array ;			/* Selector array */
     int   rc;
 
+    /* Earliest possible output: confirm we reached main (no stdio, no globals). */
+    (void) write( 2, "[OCT] main entered\n", 18 );
+
+    /* No-args case first so we never touch init or stdio state; output and exit. */
+    if( argc < 2 )
+    {
+	    fputs( "OCT: no input file. Use 'oct -h' for usage.\n", stderr );
+	    fflush( stderr );
+	    usage( 1 );
+	    /*NOTREACHED*/
+    }
+
     fprintf( stderr, "(%s, %s)\n%s\n", version, __DATE__, copyright );
+    fflush( stderr );
+    DBG(("main: start argc=%d argv[0]=%s\n", argc, argv[0] ? argv[0] : "(null)"));
 
     /* ----------------------- */
-    /*  Init some reality:     */
+    /*  Init some reality (phasefp must be set before parse_cmdline uses it). */
     ProgName = argv[0] ;
-    init_types( );
-    init_parser( );
+    phasefp = stdout;
+    preproc_opts = NULL;
     td_nest = 0;
     in_context = 0;
     className  = "" ;
     error_string = "" ;
     category_name = "" ;
     superclassName = "" ;
-    preproc_opts = NULL;
-	phasefp = stdout;
+    DBG(("main: calling init_types\n"));
+    init_types( );
+    DBG(("main: calling init_parser\n"));
+    init_parser( );
 
     /* ----------------------------- */
+    DBG(("main: calling parse_cmdline\n"));
     rc = parse_cmdline( argc, argv );
+    DBG(("main: parse_cmdline returned rc=%d argv[rc]=%s\n", rc, argv[rc] ? argv[rc] : "(null)"));
     aim_input( argv[ rc ] );
+    DBG(("main: aim_input done\n"));
     if( only_cpp )
         cleanup( 0 );
 
+    DBG(("main: calling pre_ops\n"));
     pre_ops( yyout, 0 );
 
     /* ----------------------------- */
-    if( warn_level > WARN_NORMAL || verbose_flag )
+    if( phasefp != NULL && (warn_level > WARN_NORMAL || verbose_flag) )
         fputs( "Phase 2\n", phasefp );
 
     /* There may be text after the @end directive.  Read until EOF: */
+    DBG(("main: entering yyparse loop\n"));
     while( (rc = yyparse()) == RC_OK )
         ;;
+    DBG(("main: yyparse loop done rc=%d\n", rc));
 
     fflush( stdout );
     fflush( stderr );
@@ -657,13 +692,13 @@ main( argc, argv )
         cleanup( RC_ERROR );
 
     /* ----------------------------- */
-    if( warn_level > WARN_NORMAL || verbose_flag )
+    if( phasefp != NULL && (warn_level > WARN_NORMAL || verbose_flag) )
         fputs( "Phase 3\n", phasefp );
 
     if( sel_array == NULL )
     {
         /*  For some reason 'cpp' didn't complete: */
-        gerr( ERROR_ABORT, GERR_SUDDEN_EOF, NULL );
+        gerr( ERROR_ABORT, GERR_SUDDEN_EOF, NULL, 0L );
         /*NOTREACHED*/
     }
     if( className[ 0 ] == EOS )
@@ -675,6 +710,7 @@ main( argc, argv )
             gwarn( GW_NO_INCLUDES );
     } 
 
+    DBG(("main: calling dump_dict, post_ops, cleanup\n"));
     dump_dict( );
     post_ops( );
 
@@ -687,8 +723,8 @@ main( argc, argv )
 #ifdef MCH_AMIGA
 /*   abort  --  For some reason, Manx 3.6A doesn't have abort().
  */
-   void
-abort()
+void
+abort(void)
 {
      write( 2, "Abort\n", 6 );
      exit(255);

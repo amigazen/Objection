@@ -107,11 +107,11 @@ static char      err_fmt[ ] = {	 "**** %s(%u) %s %d: %s %s\n"  } ;
 /* -------------------------  Error Recovery  ------------------------ */
 
 
-/*   er_semi  --  Error Recover: Find next semicolon, preceed from there.
-//				  Returns 0 if OK, else non-zero to abort.
-*/
-	int
-er_semi()
+/*   er_semi  --  Error recover: find next semicolon, proceed from there.
+ *                Returns 0 if OK, else non-zero to abort.
+ */
+int
+er_semi(void)
 {
 
 	while( curr_tok != ';' &&
@@ -129,11 +129,11 @@ er_semi()
 
 
 
-/*   er_msg  --  Error Recover: Find end of message expr, preceed from there.
-//				 Returns 0 if OK, else non-zero to abort.
-*/
-	int
-er_msg()
+/*   er_msg  --  Error recover: find end of message expr, proceed from there.
+ *               Returns 0 if OK, else non-zero to abort.
+ */
+int
+er_msg(void)
 {
 	short	save_nest = td_nest;
 
@@ -148,10 +148,10 @@ er_msg()
 
 
 /*   er_curly  --  Eat a curly-brace block.  Stops when scanner pops out
-//					out of all blocks, or when nesting un-nested.
-*/
-	int
-er_curly()
+ *                of all blocks, or when nesting un-nested.
+ */
+int
+er_curly(void)
 {
 
 	while( curr_tok != CH_RCURLY && curr_tok != ';' && td_nest > 0 )
@@ -164,9 +164,9 @@ er_curly()
 }
 
 
-/*   er_end  --  Eats tokens until "@end" encoutnered.
-*/
-er_end()
+/*   er_end  --  Eats tokens until "@end" encountered. */
+int
+er_end(void)
 {
 
 	if( warn_level > WARN_NORMAL )
@@ -195,20 +195,11 @@ er_end()
 
 
 /*   gerr  --  Handle the big errors.  Use level=ERROR_ABORT to kill oneself.
- *
- *   level :         0 = print msg, return to caller.
- *         ERROR_ABORT = print msg, call cleanup(10).
- *        ERROR_RESYNC = print msg, request #line real soon.
- *
- *   rec_fptr :   NULL = no resync/recover routine.
- *              ! NULL = a funct that returns 0 if OK, !=0 to Abort.
+ *   level: 0 = print msg, return; ERROR_ABORT = print msg, cleanup(10).
+ *   rec_fptr: NULL = no resync; else function that returns 0 if OK, !=0 to abort.
  */
-	void
-gerr( level, ecode, rec_fptr, rec_parm )
-	int 		level;
-	enum GERR_CODES 	ecode;
-	PFI 		rec_fptr;
-	ULONG		rec_parm;
+void
+gerr(int level, enum GERR_CODES ecode, PFI rec_fptr, ULONG rec_parm)
 {
 	static char 	*level_str[] = { "Error", "Fatal" };
     int          is_fatal = 0;
@@ -237,9 +228,8 @@ gerr( level, ecode, rec_fptr, rec_parm )
 }	/* gerr */
 
 
-	void
-gwarn( ecode )
-	enum GW_CODES 	ecode;
+void
+gwarn(enum GW_CODES ecode)
 {
 
 	if( ecode >= GERR__LAST )

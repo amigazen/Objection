@@ -82,7 +82,7 @@ must_token( who, tok )
 			printf( "error: (%s) wanted \"%c\", but found \"%s\"\n",
 						who, tok, curr_name );
 
-		gerr( ERROR_RESYNC, GERR_SYNTAX, er_curly, NULL );
+		gerr( ERROR_RESYNC, GERR_SYNTAX, er_curly, 0L );
 		rc = RC_ERROR;
 	}
 
@@ -185,7 +185,7 @@ dcl_method2( ret_type, method1 )
 			case CH_OPEN_PAREN :
 						if( state != ST_COLON )
 						{
-							gerr( ERROR_RESYNC, GERR_MISSING_VAR, er_curly );
+							gerr( ERROR_RESYNC, GERR_MISSING_VAR, er_curly, 0L );
 							return( NULL );
 						}
 
@@ -223,7 +223,7 @@ dcl_method2( ret_type, method1 )
 	} /* while forever.. */
 
  DM_ERR :
-	gerr( ERROR_RESYNC, GERR_SYNTAX, er_curly );
+	gerr( ERROR_RESYNC, GERR_SYNTAX, er_curly, 0L );
 	return( NULL );
 }	/* dcl_method2 */
 
@@ -317,14 +317,14 @@ rd_method_dcl( flags )
 			case OPEN_INSTANCE_METHOD :
 						np = dcl_method( );
 						np->flags = flags;
-						addTree( method_tree, np );
+						addTree( method_tree, (struct Node *)np );
 						break ;
 
 			case ';' :
 						break ;
 
 			case DONE :
-						gerr( ERROR_ABORT, GERR_SUDDEN_EOF, NULL );
+						gerr( ERROR_ABORT, GERR_SUDDEN_EOF, NULL, 0L );
 						/*NOTREACHED*/
 
 			default :
@@ -397,7 +397,7 @@ def_method()
 		}
 	}	/* if previouusly unknown method */
 
-	addTree( method_tree, methodExtrnDecl );
+	addTree( method_tree, (struct Node *)methodExtrnDecl );
 
     methodExtrnDecl->lineDefined = lineat;
 	methodExtrnDecl->flags |= DF_IMP;
@@ -425,7 +425,7 @@ see_public()
 	if( !(in_context & IC_INTERFACE) )
 	{
 		error_string = "@public" ;
-		gerr( ERROR_RESYNC, GERR_DIRECTIVE_CONTEXT, er_semi, NULL );
+		gerr( ERROR_RESYNC, GERR_DIRECTIVE_CONTEXT, er_semi, 0L );
 	}	/* if @public out of context */
 
 	in_state |= IS_SEEN_PUBLIC ;
@@ -447,7 +447,7 @@ do_td_defs( class_name )
 	if( (defs=lu_classdef( class_name )) == NULL )
 	{
 		error_string = class_name;
-		gerr( ERROR_RESYNC, GERR_BAD_DEFS, er_semi, NULL );
+		gerr( ERROR_RESYNC, GERR_BAD_DEFS, er_semi, 0L );
 	} else
 	{
 		fputs( defs, yyout );
@@ -462,8 +462,8 @@ do_td_defs( class_name )
 
 /*   do_protocol  --  Handle protocol method defintions, @protocol.
 */
-	int
-do_protocol()
+int
+do_protocol(void)
 {
 
 	in_state |= IS_SEEN_IF ;
@@ -478,16 +478,16 @@ do_protocol()
 
 
 	/*  Digest methods this class declares:
-	//  Basically they're external references without having to specify
-	//	a class the methods belong to.  Creates protocol without clutter.
-	*/
+	 *  Basically they're external references without having to specify
+	 *  a class the methods belong to.  Creates protocol without clutter.
+	 */
 	if( rd_method_dcl( DF_DECLARED | DF_PROTOCOL ) != RC_OK )
 	{
-		gerr( ERROR_RESYNC, GERR_METHOD_DECLARE, er_end, NULL );
+		gerr( ERROR_RESYNC, GERR_METHOD_DECLARE, er_end, 0L );
 	}
 
 	in_state &= ~IS_SEEN_IF ;
-
+	return RC_OK;
 }	/* do_protocol */
 
 
@@ -547,14 +547,14 @@ do_imp()
 
 	if( className[0] != EOS )
 	{
-		gerr( ERROR_ABORT, GERR_DUP_CLASS, NULL );
+		gerr( ERROR_ABORT, GERR_DUP_CLASS, NULL, 0L );
 				/*NOTREACHED*/
 	}
 
 	/*  Class Name: */
 	if( get_tok() != IDENTIFIER )
 	{
-		gerr( ERROR_ABORT, GERR_DEF_METHOD, NULL );
+		gerr( ERROR_ABORT, GERR_DEF_METHOD, NULL, 0L );
 				/*NOTREACHED*/
 	}
 
@@ -565,7 +565,7 @@ do_imp()
 	thisClass = (struct mynode *) searchTree( class_tree, curr_name );
 	if( thisClass == NULL )
 	{
-		gerr( ERROR_ABORT, GERR_NO_INTERFACE, NULL );
+		gerr( ERROR_ABORT, GERR_NO_INTERFACE, NULL, 0L );
 				/*NOTREACHED*/
 	}
 
@@ -663,7 +663,7 @@ do_if( )
 
 	if( get_tok() != IDENTIFIER )
 	{
-		gerr( ERROR_ABORT, GERR_SYNTAX, NULL );
+		gerr( ERROR_ABORT, GERR_SYNTAX, NULL, 0L );
 		/*NOTREACHED*/
 	}
 
@@ -684,7 +684,7 @@ do_if( )
 			get_tok();			/* ..and whatever is next */
 			if( curr_tok == ':' || curr_tok == CH_LCURLY )
 			{
-				gerr( ERROR_RESYNC, GERR_CATEGORY_SYNTAX, er_end );
+				gerr( ERROR_RESYNC, GERR_CATEGORY_SYNTAX, er_end, 0L );
 				goto  IF_ABORT;
 			}
 			break ;
@@ -692,7 +692,7 @@ do_if( )
 		case ':' :
 			if( get_tok() != IDENTIFIER )
 			{
-				gerr( ERROR_ABORT, GERR_SYNTAX, NULL );
+				gerr( ERROR_ABORT, GERR_SYNTAX, NULL, 0L );
 				/*NOTREACHED*/
 			}
 			super = newstring( curr_name );
@@ -703,7 +703,7 @@ do_if( )
 			break ;
 
 		default :
-			gerr( ERROR_RESYNC, GERR_SYNTAX, er_end );
+			gerr( ERROR_RESYNC, GERR_SYNTAX, er_end, 0L );
 			goto  IF_ABORT;
 
 	}	/* switch on token after interface class name */
@@ -735,7 +735,7 @@ do_if( )
 		/*  Remember class<-->superclass relation:  */
 		np = mk_mynode( class, super );
 		np->flags = DF_DECLARED;
-		addTree( class_tree, np );
+		addTree( class_tree, (struct Node *)np );
 		if( super != NULL )
 			MFREE( super );
 	}
@@ -760,7 +760,7 @@ do_if( )
 
 		if( curr_tok != CH_RCURLY )
 		{
-			gerr( ERROR_RESYNC, GERR_SYNTAX, er_curly );
+			gerr( ERROR_RESYNC, GERR_SYNTAX, er_curly, 0L );
 			rc = RC_ERROR;
 		}	/* if not end of instance structure */
         else
@@ -782,7 +782,7 @@ do_if( )
 	/*  Digest methods this class declares: */
 	if( rc != RC_OK || rd_method_dcl( DF_DECLARED ) != RC_OK )
 	{
-		gerr( ERROR_RESYNC, GERR_METHOD_DECLARE, er_end );
+		gerr( ERROR_RESYNC, GERR_METHOD_DECLARE, er_end, 0L );
 	}
 
 	return( rc );

@@ -42,7 +42,9 @@
  *    30-may-91     bjw     Moved string functs to common file.
  */
 
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "oct.h"
 
 
@@ -113,31 +115,28 @@ myfree( p, file )
 /*   lastchr  --  Return the last most non-space character.  If string all
  *                spaces or empty, returns 0.
  */
-	unsigned char
-lastchr( str )
-    CONST char	*str;
+unsigned char
+lastchr(const char *str)
 {
-    register char	*p;
+	const char	*p;
 
-    if( str != NULL )
-        for( p=str+strlen(str) ; --p >= str ; )
+	if( str != NULL )
+		for( p=str+strlen(str) ; --p >= str ; )
             if( !isspace(*p) )
                 return( (unsigned char) *p );
 
-    return 0;
+	return 0;
 }	/* lastchr */
 
 
 
 /*   strremove  --  Extract all occurances of a character from the string.
- *                  String is changed (shorted) in-place.
+ *                  String is changed (shortened) in-place.
  */
-	char *
-strremove( str, outch )
-    char	*str;
-    char	outch;			/* Remove this char */
+char *
+strremove(char *str, char outch)
 {
-    register char	*t;
+	char	*t;
 
  top:
     for( t=str; *t != EOS ; ++t )
@@ -165,55 +164,47 @@ strremove( str, outch )
  *                 that space.  A one space separator is included if the
  *                 types of characters that might be joined require the
  *                 separation.  Usually identifiers and cmd line options
- *        are separated.  Always returns successfully.  Either (or both)
- *        pointers may be NULL.
+ *                 are separated.  Always returns successfully.  Either (or both)
+ *                 pointers may be NULL.
  */
-	static char *
-str_glue( first, last )
-    CONST char    *first;
-    CONST char    *last;
+static char *
+str_glue(const char *first, const char *last)
 {
-    register char	*new;
-    int 	len;
+	char	*new;
+	int 	len;
 
     if( first == NULL )
 	    first = "" ;
     if( last == NULL )
 	    last = "" ;
 
-    len = strlen(first) + strlen(last) + 4;
-    if( (new = MALLOC( len )) == NULL )
+	len = (int)(strlen(first) + strlen(last) + 4);
+	if( (new = (char *)malloc( (size_t)len )) == NULL )
+	{
+		fprintf( stderr, "%s", msg_no_core );
+		abort();
+	}
+	strcpy( new, first );
+	if( (len = (int)strlen(first)) > 0 )
     {
-    	write( 2, msg_no_core, LEN_NO_CORE );
-    	abort();
-    }
-
-    strcpy( new, first );
-    if( (len=strlen(first)) > 0 )
-    {
-        if( (isalnum(first[len-1]) || isalnum(last[0]) || last[0] == '_' ) ||
-            (last[0] == '-' || last[0] == '+') )
-        {
-            strcat( new, " " );
-        }
-    }
-    strcat( new, last );
-
-    return( new );
+		if( (isalnum((unsigned char)first[len-1]) || isalnum((unsigned char)last[0]) || last[0] == '_') ||
+		    (last[0] == '-' || last[0] == '+') )
+			strcat( new, " " );
+	}
+	strcat( new, last );
+	return new;
 }	/* str_glue */
 
 
-/*   newstrjoin  --  Concat to static strings into one dynamically
+/*   newstrjoin  --  Concat two static strings into one dynamically
  *                   alloc'ed string.  No separators between strings.
  *                   We can accept two NULL ptrs.
  */
-	char *
-newstrjoin( front, back )
-	CONST char	*front;
-	CONST char	*back;
+char *
+newstrjoin(const char *front, const char *back)
 {
-    char	*new;
-    int   len;
+	char	*new;
+	int   len;
 
     /*  Society for the prevention of "references thru NULL ptrs"  */
     if( front == NULL )
@@ -221,26 +212,27 @@ newstrjoin( front, back )
     if( back == NULL )
 	    back = "" ;
 
-    if( (new=malloc( strlen(front) + strlen(back) + 4)) == NULL )
-    {
-    	write( 2, msg_no_core, LEN_NO_CORE );
-    	abort();
-    }
-    strcpy( new, front );
-    strcat( new, back );
-
-    return( new );
+	len = (int)(strlen(front) + strlen(back) + 4);
+	if( (new = (char *)malloc( (size_t)len )) == NULL )
+	{
+		fprintf( stderr, "%s", msg_no_core );
+		abort();
+	}
+	strcpy( new, front );
+	strcat( new, back );
+	return new;
 }	/* newstrjoin */
 
 
-/*   newstring  --  Functionally like strdup(), but can handle NULL ptrs.
- *                  Allocates a few extra bytes, too!
+/*   newstring  --  Like strdup(); handles NULL by returning allocated "".
+ *                  C90 has no strdup(), so we keep this wrapper.
  */
-    char *
-newstring( tocopy )
-    CONST char   *tocopy;
+char *
+newstring(const char *tocopy)
 {
-    return( newstrjoin( NULL, tocopy ) );
+	if( tocopy == NULL )
+		tocopy = "";
+	return newstrjoin( "", tocopy );
 }   /* newstring */
 
 
@@ -248,36 +240,32 @@ newstring( tocopy )
 /*   newstr1chr  --  Join STR + CHR.  Nothing passed in is free'd.
  *                   OK if front == NULL.
  */
-    char *
-newstr1chr( front, lastchr )
-    char   *front;
-    char    lastchr;      /* append this char afterwards */
+char *
+newstr1chr(char *front, char lastch)
 {
-    char    mybuff[2];
+	char    mybuff[2];
 
-    mybuff[0] = lastchr;
-    mybuff[1] = 0;
-    if( front == NULL )
-    {
-        front = newstring( mybuff );
-    } else
-    {
-        strcat( front, mybuff );     /* Use that extra allocated byte */
-    }
-    return front;
+	mybuff[0] = lastch;
+	mybuff[1] = 0;
+	if( front == NULL )
+	{
+		front = newstring( mybuff );
+	} else
+	{
+		strcat( front, mybuff );     /* Use that extra allocated byte */
+	}
+	return front;
 }   /* newstr1chr */
 
 
 /*   newstrcat  --  Given a (possibly) existing string, append another
  *                  string to it.  The 'old' string is result of calling
  *                  this function previously.  We can accept two NULL ptrs.
-*/
-	char *
-newstrcat( old, fixed )
-	char		*old;    	/* Will be free'd */
-	CONST char	*fixed;
+ */
+char *
+newstrcat(char *old, const char *fixed)
 {
-    char	*new;
+	char	*new;
 
     new = str_glue( old, fixed );
     if( old != NULL )
@@ -286,12 +274,10 @@ newstrcat( old, fixed )
 }	/* newstrcat */
 
 
-    char *
-newstrins( fixed, old )
-    CONST char	*fixed;	    	/* String constant to prepend */
-    char    	*old;	    	/* Dynamic string; will be free'd */
+char *
+newstrins(const char *fixed, char *old)
 {
-    char	*new;
+	char	*new;
 
     new = str_glue( fixed, old );
     if( old != NULL )
@@ -303,25 +289,23 @@ newstrins( fixed, old )
 /* --------------------------------------------------------------------- */
 
 
-/*   tokenizer  --  Accept an plain old string.  We separate it into
-//		   tokens stored in argv[] style.  The array and string
-//                  returned are owned by the caller.
-//	    argv[0] == whole string,
-//	    argv[1] == first token,
-//	    argv[2] == second token, ...
-//	    argv[n] == NULL (terminator).
-*/
-    char **
-tokenizer( plainStr )
-    CONST char      *plainStr;
+/*   tokenizer  --  Accept a plain old string.  We separate it into
+ *                  tokens stored in argv[] style.  The array and string
+ *                  returned are owned by the caller.
+ *                  argv[0] == whole string, argv[1] == first token, ...
+ *                  argv[n] == NULL (terminator).
+ */
+char **
+tokenizer(const char *plainStr)
 {
-    register char	**argv;  		/* Working array pointer */
-    register char	*p;
-    register int 	tokenCnt;
-    char	**the_place;    		/* Array returned to caller */
-    char	*the_string;
+	char	**argv;  		/* Working array pointer */
+	char	*p;
+	int 	tokenCnt;
+	char	**the_place;    		/* Array returned to caller */
+	char	*the_string;
 
-    the_string = newstring( plainStr );
+	DBG(("tokenizer: plainStr=%s\n", plainStr ? plainStr : "(null)"));
+	the_string = newstring( plainStr );
     for( tokenCnt=3, p=the_string ; *p != EOS ; ++p )
     {
     	if( IS_EV_SEP(*p) )

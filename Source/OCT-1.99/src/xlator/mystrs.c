@@ -27,46 +27,41 @@
 #if SW_NEED_STRSTR
 
 /*   strstr  --  Locate a string within a larger string.  Returns pointer
-//				 to first occurance, or NULL if 'target' string is not
-//				 found within 'buff'.  This routine is fully public domain.
-*/
-	char *
-strstr( buff, target )
-	CONST char	*buff;      		/* Search here */
-	CONST char	*target;      		/* For this whole string */
-{ 
-	register char	*p, *t;
-	register int 	first;		/* Save sign extension time */
+ *               to first occurrence, or NULL if 'target' is not found in 'buff'.
+ */
+char *
+strstr(const char *buff, const char *target)
+{
+	char	*p;
+	const char	*t;
+	int 	first;
 	int 	len_t;
 
-    if( buff != NULL && target != NULL )
-    {
-        t = target;
-        first = t[0];
-        len_t = strlen( t );
-
-        for( p=buff ; (p=strchr(p, first)) != NULL ; ++p )
-        {
-        	if( strncmp( p, t, len_t ) == 0 )
-        		return( p );
-        }
-    }
-	return NULL;		/* string not found */
+	if( buff != NULL && target != NULL )
+	{
+		t = target;
+		first = (unsigned char)t[0];
+		len_t = strlen( t );
+		p = (char *)buff;
+		for( ; (p = strchr(p, first)) != NULL ; ++p )
+		{
+			if( strncmp( p, t, len_t ) == 0 )
+				return p;
+		}
+	}
+	return NULL;
 }	/* strstr */
 
 #endif
 
 
-#if SW_NEED_STRLOWER
-
 /*   strlower  --  Convert a string, in place, into lower case.
  *                 Returns ptr to converted string.  Handles NULL string.
-*/
-	char *
-strlower( str )
-	char	*str;
+ */
+char *
+strlower(char *str)
 {
-	register char	*s;
+	char	*s;
 
     if( str != NULL )
     {
@@ -76,8 +71,6 @@ strlower( str )
 	return( str );
 }	/* strlower */
 
-#endif
-
 
 
 /* ------------------------  ANSI ctype Support  ---------------------- */
@@ -85,25 +78,19 @@ strlower( str )
 
 #if  SW_NEED_2LOW_2UP
 
-/*   tolower  --  Provide side-affect free ASCII tolower function that does
- *                tolower('5') == '5'.
- */
-    char
-tolower( ch )
-    int   ch;
+/*   tolower  --  Provide side-effect free ASCII tolower; tolower('5') == '5'. */
+char
+tolower(int ch)
 {
-    return isupper(ch) ? (ch + ('a' - 'A' + 1)) : ch ;
+	return (char)(isupper(ch) ? (ch + ('a' - 'A' + 1)) : ch);
 }   /* tolower */
 
 
-/*   toupper  --  Provide side-affect free ASCII toupper function that does
- *                toupper('5') == '5'.
- */
-    char
-toupper( ch )
-    int   ch;
+/*   toupper  --  Provide side-effect free ASCII toupper; toupper('5') == '5'. */
+char
+toupper(int ch)
 {
-    return islower(ch) ? (ch - ('a' - 'A' + 1)) : ch ;
+	return (char)(islower(ch) ? (ch - ('a' - 'A' + 1)) : ch);
 }   /* toupper */
 
 #endif

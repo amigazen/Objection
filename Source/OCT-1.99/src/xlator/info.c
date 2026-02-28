@@ -267,7 +267,7 @@ oo_code( colon_name )
     {
         sprintf( buff, "unknown method: %s.", colon_name );
         error_string = buff;
-        gerr( ERROR_ABORT, GERR_INTERNAL, NULL );
+        gerr( ERROR_ABORT, GERR_INTERNAL, NULL, 0L );
         /*NOTREACHED*/
     }
     if( np->sequence == 0 )
@@ -421,7 +421,7 @@ add_generic( colon_name )
     np = mk_mynode( colon_name, "(id)" );
     np->flags = DF_GENERIC;
     np->order = lineat;
-    addTree( method_tree, np );
+    addTree( method_tree, (struct Node *)np );
 
 }	/* add_generic */
 

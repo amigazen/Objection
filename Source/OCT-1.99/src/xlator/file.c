@@ -53,11 +53,18 @@
 #define  SW_WATCH  0
 #define  SW_DEBUG  0
 
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "oct.h"
 #include <fcntl.h>
 
 #ifdef MCH_AMIGA
+/* Ensure TEXT is defined before dos.h; required for FileInfoBlock etc. (SAS/C). */
+# include <exec/types.h>
+# ifndef TEXT
+#  define TEXT  char
+# endif
 # include <libraries/dos.h>
 #endif
 #ifdef UNIX
@@ -76,9 +83,8 @@
 #if SW_NEED_ISUDIR
 
 /*   isudir  --  Return true if 'path' is directory path specifier. */
-	int
-isudir( path )
-	CONST char	*path;
+int
+isudir(const char *path)
 {
 	struct stat	stbuf;
 	int  	rc = FALSE;
@@ -98,19 +104,19 @@ isudir( path )
 /*   isudir  --  Return true if 'path' is directory path specifier.
  *               This version is AmigaDOS specific.
  */
-	int
-isudir( path )
-	CONST char	*path;
+int
+isudir(const char *path)
 {
 	extern long 	Lock PARMS(( char *, long ));
+	extern long 	UnLock PARMS(( long ));
 	extern long 	Examine PARMS(( long, void *));
 
 	struct FileInfoBlock   *fib;
-	long	dlock = NULL;
+	long	dlock = (long)NULL;
 	int  	rc = FALSE;
 
 	fib = (struct FileInfoBlock *)malloc( sizeof( struct FileInfoBlock ) );
-	if( (dlock=Lock( path, ACCESS_READ )) != NULL )
+	if( (dlock=Lock( (char *)path, ACCESS_READ )) != NULL )
 	{
 	    fib->fib_DirEntryType = 0;  /* Set default in case Examine() fails */
 		Examine( dlock, fib );
@@ -126,11 +132,10 @@ isudir( path )
 
 
 /*   system  --  Run a program, wait for completion.  Returns 0 if OK.
-//               Returns -1 if failure of some sort.
-*/
-	int
-system( cmdline )
-	CONST char	*cmdline;
+ *               Returns -1 if failure of some sort.
+ */
+int
+system(const char *cmdline)
 {
 	extern long 	Output PARMS(( void ));
 	extern long 	Execute PARMS(( char *, long, long ));
@@ -138,7 +143,7 @@ system( cmdline )
 	int  	ret = 0;    			/* Assume things worked */
 
 	/* Execute() returns 0 if error */
-	if( Execute( cmdline, (long)0, Output() ) == 0 )
+	if( Execute( (char *)cmdline, (long)0, Output() ) == 0 )
 		ret = -1;
 
 	return( ret );
@@ -151,14 +156,12 @@ system( cmdline )
 
 
 /*   inspectEnv  --  If an EV is set, return its value, otherwise return
-//                   the default string.  CALLER OWNS STRING.
-*/
-    char *
-inspectEnv( envVar, defaultStr )
-	char	*envVar;    	/* Environment variable name */
-	char	*defaultStr;	/* Accept if EV unset */
+ *                   the default string.  CALLER OWNS STRING.
+ */
+char *
+inspectEnv(char *envVar, char *defaultStr)
 {
-    char	*str;
+	char	*str;
 
 	if( (str=getenv(envVar)) == NULL )
 		str = defaultStr;
@@ -171,15 +174,14 @@ inspectEnv( envVar, defaultStr )
 
 
 /*   joinDirFname  --  Returns a dynamic string consisting of the pathname,
-//                     a separator (applied if needed), and the filename.
-//                     Concentrates slash conventions in one place!
-//          RETURNS:   Caller owns string.  Can't use global buffer.
-*/
-    char *
-joinDirFname( dirname, filname )
-    CONST char	*dirname, *filname;
+ *                     a separator (applied if needed), and the filename.
+ *                     Concentrates slash conventions in one place!
+ *          RETURNS:   Caller owns string.  Can't use global buffer.
+ */
+char *
+joinDirFname(const char *dirname, const char *filname)
 {
-    char	*whole;     	/* complete filespec.. */
+	char	*whole;     	/* complete filespec.. */
 	char	c;
 	char	*glue = ""; 	/* How dirname and filname are joined */
 	int 	len;
@@ -243,16 +245,13 @@ joinDirFname( dirname, filname )
 
 
 /*   file_indir  --  Returns a complete filespec (name and dir parts) as
-//				     a dynamic string.  Take 'path' which is either a
-//				     path or a filespec.  First goal is to find a
-//			directory.  If the string isn't a dir, then return it as
-//			a filename.  Otherwise, append a dir separator, concat the
-//			filename, and return that.
-*/
-	char	*
-file_indir( path, fname )
-	char	*path;			/* Path, either directory name or filename */
-	char	*fname;			/* Use this filename is path==directory */
+ *                   a dynamic string.  Take 'path' which is either a
+ *                   path or a filespec.  First goal is to find a directory.
+ *                   If the string isn't a dir, return it as filename.
+ *                   Otherwise append dir separator, concat filename, return.
+ */
+char *
+file_indir(char *path, const char *fname)
 {
 	char	*filespec = NULL;
 
@@ -287,16 +286,13 @@ file_indir( path, fname )
 
 
 /*   must_open  --  Using the user provided base filename, try to open it.
- * 			        If not found, append a type extension and try again.
- * 			        The opened filename is stored in buff[].  Always
- * 			returns with open file pointer.  The extension must include
- *          the period, ie ".c" string.
-*/
-	FILE *
-must_open( fname, mode, type )
-	char	*fname;				/* User provided filename */
-	char	*mode;				/* fopen() open mode */
-	char	*type;				/* Desired extention */
+ *                  If not found, append a type extension and try again.
+ *                  The opened filename is stored in buff[].  Always returns
+ *                  with open file pointer.  The extension must include the
+ *                  period, ie ".c" string.
+ */
+FILE *
+must_open(char *fname, char *mode, char *type)
 {
 	FILE	*fp;
 	char	*s;
@@ -331,11 +327,11 @@ must_open( fname, mode, type )
  *                    The filename is returned always, and has a trailing
  *                    directory separator attached to it.  If there is
  *                    no environment variable to select a temp dir, then
- *         use nothing, which should put the file in the current directory.
+ *                    use nothing, which should put the file in the current directory.
  *  NOTE:  The EV_TEMPDIR is a string list.  We try each one in order.
  */
-	char *
-my_maketemp()
+char *
+my_maketemp(void)
 {
 	extern char 	*mktemp PARMS(( char * ));
 
@@ -343,11 +339,12 @@ my_maketemp()
 	char	*tpath, *tdir = NULL;			/* Temp Dir */
 	int     i;
 
-    for( i=0 ; tempvars[i] != NULL ; ++i )
+	DBG(("my_maketemp: entry\n"));
+	for( i=0 ; tempvars[i] != NULL ; ++i )
 	{
 		if( (tdir=getenv(tempvars[i])) != NULL )
 			break ; 		/* Found a specifier */
-    }
+	}
 
 	if( tdir == NULL )    	/* Still didn't get any.. :-( */
 	{
@@ -371,6 +368,7 @@ my_maketemp()
 	}
 
 	tpath = joinDirFname( tdir, "ot-XXXXX" );      /* Splice */
+	DBG(("my_maketemp: mktemp %s\n", tpath));
 	tdir = newstring( mktemp( tpath ) );
 	if( strlen(tdir) == 0 )
     {
@@ -379,7 +377,7 @@ my_maketemp()
 		exit(20);
     }
 	MFREE( tpath );
-
+	DBG(("my_maketemp: return %s\n", tdir));
 	return( tdir );
 }   /* my_maketemp */
 
@@ -390,19 +388,15 @@ my_maketemp()
 /*    cpp_infile  --  Run the "C" Pre-processor on an input file.  The
  *                    environment variable INCLUDE is examined.  The
  *                    directories are used as options to "cpp".  Any
- *          options should be passed in 'proc_args'.  If there are any
- *          troubles, we abort through exit().
+ *                    options should be passed in 'proc_args'.  If there are any
+ *                    troubles, we abort through exit().
  */
-	void
-cpp_infile( prog_name, prog_args, infname, outfname )
-	char	*prog_name; 			/* File to exec() */
-	char	*prog_args; 			/* Args to pass file (can be NULL) */
-	char	*infname, *outfname;
+void
+cpp_infile(char *prog_name, char *prog_args, char *infname, char *outfname)
 {
-	extern int    system();
-
 	char	*cmdline;				/* Cmd Line to exec */
 
+	DBG(("cpp_infile: %s ... %s -> %s\n", prog_name ? prog_name : "(null)", infname ? infname : "(null)", outfname ? outfname : "(null)"));
 	cmdline = newstrjoin( prog_name, prog_args );
     cmdline = newstr1chr( cmdline, ' ' );
 
@@ -431,19 +425,18 @@ cpp_infile( prog_name, prog_args, infname, outfname )
 
 
 /*   mk_base_name  --  Extract the base filename.  Strip any path spec,
-//			   and remove the file extension.  Assumes there is
-//			   a filename to extract.  Otherwise returns a nil
-//			   string if nothing to extract.
-//		Returns:  caller owns string.
-*/
-	char *
-mk_base_name( path )
-	CONST char	*path;
+ *                     and remove the file extension.  Assumes there is
+ *                     a filename to extract.  Otherwise returns a nil
+ *                     string if nothing to extract.
+ *   Returns:  caller owns string.
+ */
+char *
+mk_base_name(const char *path)
 {
-	register char	*base, *p;
+	char	*base, *p;
 
 	/*  Move down and remove path prefix: */
-	base = path;
+	base = (char *)(void *)path;
 #ifdef MCH_AMIGA
 	if( (p=strchr(base,':')) != NULL )
 		base = p+1;
@@ -481,14 +474,12 @@ mk_base_name( path )
 /*   mygetenv  --  Check shared library and filesystem based environment
  *                 variables for a requested value.  Checks for info
  *                 tooltypes before any global environments.  Returns ptr
- *          to staic string storage (save yourself before calling a
- *          second time).  Returns NULL if nothing found.
+ *                 to static string storage (save yourself before calling a
+ *                 second time).  Returns NULL if nothing found.
  */
-    char *
-mygetenv( envstr )
-    CONST char   *envstr;
+char *
+mygetenv(const char *envstr)
 {
-	extern struct WBStartup  *WBenchMsg;	/* Iconic launch.. */
 	static char   envbuff[ 200 ];
 	int 	len, fd;
 	char	*value = NULL;

@@ -42,13 +42,23 @@
 #define  SW_WATCH  0
 #define  SW_DEBUG  0
 
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
 #include "oct.h"
 #include <tree.h>
 #include "gram.h"
 #include "error.h"
 
 #include <objc/objc-class.h>
+
+#ifdef MCH_AMIGA
+extern int write(int fd, const void *buf, unsigned n);
+#endif
+#ifndef MCH_AMIGA
+#include <unistd.h>
+#endif
 
 
 /* --------------------  Our Private Variables  ---------------------- */
@@ -69,18 +79,18 @@ enter_type( tname, equiv )
 {
     struct mynode  *typedefNode;
 
-    if( searchTree(symtab, tname) == (struct Node *)NULL )
+    if( searchTree(symtab, (char *)tname) == (struct Node *)NULL )
     {
     	typedefNode = mk_mynode( tname, equiv );
     	addTree( symtab, &typedefNode->node );
     } else
     {
-        error_string = tname;
+        error_string = (char *)tname;
         gwarn( GW_DUP_TYPEDEF );
 #if SW_ASSERT
         if( yydebug )
         {
-            typedefNode = (struct mynode *) searchTree(symtab,tname);
+            typedefNode = (struct mynode *) searchTree(symtab, (char *)tname);
             printf( "dup %s - %s vs %s\n", tname, equiv, typedefNode->def );
         }
 #endif
@@ -427,7 +437,7 @@ lu_instvar( target )
 
     }	/* if first time thru.. */
 
-    if( varstring != NULL && (p=strstr( varstring, target )) != NULL )
+    if( varstring != NULL && (p=(char *)strstr( varstring, target )) != NULL )
     {
         /*  If this is a word (spaces at begin and end), then accept: */
     	if( isspace(p[-1]) &&
@@ -455,12 +465,12 @@ lu_instvar( target )
  *   => LT_ADD concat an additional string, eatum=0(FRONT), 1(REAR).
  *   => LT_QCAPTURE returns current capture string, NULL if no save.
  */
-    char * 
-lex_text( code, eatum, plus )
-    enum key_lex_text   code;    	/* See codes for actions */
-    UCHAR	eatum; 	    	/* When terminating, eat this char! */
-    char	*plus;        	/* Additional string. */
+char *
+lex_text(enum key_lex_text code, ...)
 {
+    va_list ap;
+    UCHAR eatum = 0;
+    char *plus = NULL;
     extern short  save_text;
     extern char   *texts;
 
@@ -468,6 +478,15 @@ lex_text( code, eatum, plus )
     register char	*ret = NULL;
     char   adds[ 2 ];
     int 	pos;
+
+    va_start(ap, code);
+    if (code != LT_QCAPTURE && code != LT_START)
+    {
+	eatum = (UCHAR)va_arg(ap, int);
+	if (code == LT_ADD)
+	    plus = va_arg(ap, char *);
+    }
+    va_end(ap);
 
     switch( code )
     {
@@ -582,11 +601,10 @@ lex_text( code, eatum, plus )
 //            	    values are saved here, so both strings can be from
 //            	    static buffers.  If no memory, this routine aborts.
 */
-    struct mynode *
-mk_mynode( name, value )
-    char	*name, *value;
+struct mynode *
+mk_mynode(const char *name, const char *value)
 {
-    register struct mynode  *newNodePtr;
+	struct mynode  *newNodePtr;
 
     if( (newNodePtr=(struct mynode *)MALLOC(sizeof(struct mynode))) == NULL )
     {
