@@ -160,6 +160,7 @@ enum TOKEN_SYMBOLS {
 		OPEN_INTERFACE,
 		OPEN_IMPLEMENTATION, 	/* @implementation  class definition */
 		OPEN_PROTOCOL,			/* @protocol  class specification */
+		OPEN_CLASS,				/* @class  forward declaration */
 		CLOSE_END ,
 
 		OPEN_FACTORY_METHOD ,

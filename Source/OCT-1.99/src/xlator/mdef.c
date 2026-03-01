@@ -57,6 +57,8 @@
 char          * sel_array ;     	/* Selector array */
 
 extern struct List 	category_list;		/* handles class categories */
+extern struct List 	protocol_req_list;
+extern struct List 	class_impl_list;
 
 
 /* --------------------  Our Private Variables  ---------------------- */
@@ -318,6 +320,8 @@ rd_method_dcl( flags )
 						np = dcl_method( );
 						np->flags = flags;
 						addTree( method_tree, (struct Node *)np );
+						if ( (flags & DF_PROTOCOL) && current_protocol_name != NULL )
+							AddTail( & protocol_req_list, & mk_mynode( current_protocol_name, np->node.ln_Name )->node );
 						break ;
 
 			case ';' :
@@ -398,6 +402,7 @@ def_method()
 	}	/* if previouusly unknown method */
 
 	addTree( method_tree, (struct Node *)methodExtrnDecl );
+	AddTail( & class_impl_list, & mk_mynode( className, methodExtrnDecl->node.ln_Name )->node );
 
     methodExtrnDecl->lineDefined = lineat;
 	methodExtrnDecl->flags |= DF_IMP;
@@ -416,10 +421,10 @@ def_method()
 
 
 /*   see_public  --  The scanner saw "@public".  Check for context, and
- *                   if OK, set some flags.
+ *                   if OK, set some flags.  Clear @protected/@private.
  */
 	void
-see_public()
+see_public(void)
 {
 
 	if( !(in_context & IC_INTERFACE) )
@@ -428,9 +433,46 @@ see_public()
 		gerr( ERROR_RESYNC, GERR_DIRECTIVE_CONTEXT, er_semi, 0L );
 	}	/* if @public out of context */
 
+	in_state &= ~(IS_SEEN_PROTECTED | IS_SEEN_PRIVATE);
 	in_state |= IS_SEEN_PUBLIC ;
 
 }	/* see_public */
+
+
+/*   see_protected  --  The scanner saw "@protected".  Same context as @public.
+ */
+	void
+see_protected(void)
+{
+
+	if( !(in_context & IC_INTERFACE) )
+	{
+		error_string = "@protected" ;
+		gerr( ERROR_RESYNC, GERR_DIRECTIVE_CONTEXT, er_semi, 0L );
+	}
+
+	in_state &= ~(IS_SEEN_PUBLIC | IS_SEEN_PRIVATE);
+	in_state |= IS_SEEN_PROTECTED ;
+
+}	/* see_protected */
+
+
+/*   see_private  --  The scanner saw "@private".  Same context as @public.
+ */
+	void
+see_private(void)
+{
+
+	if( !(in_context & IC_INTERFACE) )
+	{
+		error_string = "@private" ;
+		gerr( ERROR_RESYNC, GERR_DIRECTIVE_CONTEXT, er_semi, 0L );
+	}
+
+	in_state &= ~(IS_SEEN_PUBLIC | IS_SEEN_PROTECTED);
+	in_state |= IS_SEEN_PRIVATE ;
+
+}	/* see_private */
 
 
 
@@ -460,6 +502,47 @@ do_td_defs( class_name )
 
 /* ----------------------  Main and Drivers  ------------------------- */
 
+/*   do_class_forward  --  Parse @class Name1, Name2, ... ;
+ *  Adds each name to class_tree with empty super (forward decl) so type
+ *  lookup recognizes the class before @interface.  No code output.
+ */
+int
+do_class_forward(void)
+{
+	struct mynode *np;
+	char *name;
+
+	if ( get_tok() != IDENTIFIER )
+	{
+		gerr( ERROR_ABORT, GERR_SYNTAX, NULL, 0L );
+		return RC_ERROR;
+	}
+	for ( ; ; )
+	{
+		if ( curr_tok != IDENTIFIER )
+		{
+			gerr( ERROR_RESYNC, GERR_SYNTAX, er_semi, 0L );
+			return RC_ERROR;
+		}
+		name = newstring( curr_name );
+		if ( searchTree( class_tree, name ) == NULL )
+		{
+			np = mk_mynode( name, "" );
+			np->flags = DF_DECLARED;
+			addTree( class_tree, (struct Node *)np );
+		}
+		MFREE( name );
+		get_tok();
+		if ( curr_tok != ',' )
+			break;
+		get_tok();  /* next identifier after comma */
+	}
+	if ( curr_tok != ';' )
+		gerr( ERROR_RESYNC, GERR_SYNTAX, er_semi, 0L );
+	return RC_OK;
+}
+
+
 /*   do_protocol  --  Handle protocol method defintions, @protocol.
 */
 int
@@ -467,7 +550,15 @@ do_protocol(void)
 {
 
 	in_state |= IS_SEEN_IF ;
-	/* Skip class name and such: */
+	if ( current_protocol_name != NULL )
+	{
+		MFREE( current_protocol_name );
+		current_protocol_name = NULL;
+	}
+	get_tok();
+	if ( curr_tok == IDENTIFIER )
+		current_protocol_name = newstring( curr_name );
+	/* Skip to first method: */
 	while( curr_tok != DONE &&
 		   curr_tok != CLOSE_END &&
 		   curr_tok != OPEN_FACTORY_METHOD &&
@@ -477,7 +568,7 @@ do_protocol(void)
 	}
 
 
-	/*  Digest methods this class declares:
+	/*  Digest methods this protocol declares:
 	 *  Basically they're external references without having to specify
 	 *  a class the methods belong to.  Creates protocol without clutter.
 	 */
@@ -486,6 +577,11 @@ do_protocol(void)
 		gerr( ERROR_RESYNC, GERR_METHOD_DECLARE, er_end, 0L );
 	}
 
+	if ( current_protocol_name != NULL )
+	{
+		MFREE( current_protocol_name );
+		current_protocol_name = NULL;
+	}
 	in_state &= ~IS_SEEN_IF ;
 	return RC_OK;
 }	/* do_protocol */
@@ -657,6 +753,7 @@ do_if( )
 	struct mynode	*np;
 	char	*class;
 	char	*super = NULL;
+	char	*protocol_list = NULL;
 	char	*type_str = NULL;
 	short 	found_category = FALSE;
 	int   rc = RC_OK;				/* Any error value */
@@ -708,37 +805,80 @@ do_if( )
 
 	}	/* switch on token after interface class name */
 
+	/*  Optional protocol adoption: < Protocol1, Protocol2, ... > */
+	if ( curr_tok == '<' )
+	{
+		char	*comma = "";
 
-	/*  If duplicate interface encountered, we can display warning: */
-	if( searchTree( class_tree, class ) != NULL )
+		get_tok();
+		while ( curr_tok == IDENTIFIER )
+		{
+			if ( protocol_list == NULL )
+				protocol_list = newstring( curr_name );
+			else
+			{
+				protocol_list = newstrcat( protocol_list, comma );
+				protocol_list = newstrcat( protocol_list, curr_name );
+			}
+			comma = ",";
+			get_tok();
+			if ( curr_tok != ',' )
+				break;
+			get_tok();
+		}
+		if ( curr_tok != '>' )
+			gerr( ERROR_RESYNC, GERR_SYNTAX, er_end, 0L );
+		else
+			get_tok();
+	}
+
+	/*  If duplicate interface encountered, or forward decl to replace: */
+	np = (struct mynode *)searchTree( class_tree, class );
+	if( np != NULL )
 	{
 		struct mynode	*newClass;
 
 		if( ! found_category )
 		{
-			if( verbose_flag )
-				printf( "Duplicate interface for %s..", class );
-			er_end();
+			/* Forward decl has empty super (def); replace with full class. */
+			if( np->def != NULL && np->def[0] == '\0' )
+			{
+				Remove( (struct Node *)np );
+				done_mynode( np );
+				np = NULL;  /* fall through to add full class */
+			}
+			else
+			{
+				if( verbose_flag )
+					printf( "Duplicate interface for %s..", class );
+				er_end();
 	IF_ABORT :
-			MFREE( class );
-			return( RC_OK );
+				if ( protocol_list != NULL )
+					MFREE( protocol_list );
+				MFREE( class );
+				return( RC_OK );
+			}
 		}
-
-		/*  Remember all category's we reference: */
-		newClass = mk_mynode( class, category_name );
-		newClass->flags = DF_DECLARED;
-		AddTail( & category_list, & newClass->node );
-
+		else
+		{
+			/*  Remember all category's we reference: */
+			newClass = mk_mynode( class, category_name );
+			newClass->flags = DF_DECLARED;
+			AddTail( & category_list, & newClass->node );
+		}
 	}	/* if duplicate class name */
-	else
+	if( np == NULL && ! found_category )
 	{
-		/*  Remember class<-->superclass relation:  */
+		/*  Remember class<-->superclass relation (or was forward):  */
 		np = mk_mynode( class, super );
 		np->flags = DF_DECLARED;
+		np->protocols = protocol_list;  /* adopted protocols or NULL */
 		addTree( class_tree, (struct Node *)np );
 		if( super != NULL )
 			MFREE( super );
 	}
+	else if ( protocol_list != NULL )
+		MFREE( protocol_list );  /* duplicate/category: not attached to node */
     super = NULL;      /* This var available */
 
 	/*  By now we must be at either:
@@ -787,4 +927,67 @@ do_if( )
 
 	return( rc );
 }	/* do_if */
+
+
+/*   check_protocol_conformance  --  After @implementation Class @end,
+ *   verify that Class implements every method required by each adopted protocol.
+ */
+void
+check_protocol_conformance(const char *class_name)
+{
+	struct mynode *clnp;
+	struct mynode *req;
+	struct Node *req_head;
+	const char *protocols;
+	char *p;
+	char *q;
+	char prot_buf[128];
+
+	if ( class_name == NULL || class_name[0] == '\0' )
+		return;
+	clnp = (struct mynode *)searchTree( class_tree, (char *)class_name );
+	if ( clnp == NULL || clnp->protocols == NULL || clnp->protocols[0] == '\0' )
+		return;
+	protocols = clnp->protocols;
+	p = (char *)protocols;
+	while ( *p != '\0' )
+	{
+		while ( *p == ' ' || *p == ',' )
+			p++;
+		if ( *p == '\0' )
+			break;
+		q = prot_buf;
+		while ( *p != '\0' && *p != ',' && q < prot_buf + sizeof(prot_buf) - 1 )
+			*q++ = *p++;
+		*q = '\0';
+		if ( prot_buf[0] == '\0' )
+			continue;
+		req_head = protocol_req_list.lh_Head;
+		while ( req_head != (struct Node *)&protocol_req_list )
+		{
+			req = (struct mynode *)req_head;
+			req_head = req_head->ln_Succ;
+			if ( strcmp( req->node.ln_Name, prot_buf ) != 0 )
+				continue;
+			/* Required selector is req->def; check if class implements it */
+			{
+				struct Node *impl_head;
+				struct mynode *impl;
+
+				impl_head = class_impl_list.lh_Head;
+				while ( impl_head != (struct Node *)&class_impl_list )
+				{
+					impl = (struct mynode *)impl_head;
+					impl_head = impl_head->ln_Succ;
+					if ( strcmp( impl->node.ln_Name, class_name ) == 0 &&
+					     strcmp( impl->def, req->def ) == 0 )
+						break;
+				}
+				if ( impl_head == (struct Node *)&class_impl_list )
+					printf( "Warning: class %s adopts protocol %s but does not implement %s\n",
+						class_name, prot_buf, req->def );
+			}
+		}
+	}
+}	/* check_protocol_conformance */
 

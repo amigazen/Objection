@@ -160,6 +160,9 @@ void	ooc_defs( );
 void	ooc_includes( );
 void	ooc_encode( );
 void    ooc_public( );
+void    ooc_protected( );
+void    ooc_private( );
+void    ooc_alias( );
 
 %}
 
@@ -209,6 +212,7 @@ void    ooc_public( );
 ^"@interface"           { ne_count(); return(OPEN_INTERFACE); }
 ^"@implementation"      { ne_count(); return(OPEN_IMPLEMENTATION); }
 ^"@protocol"            { ne_count(); return(OPEN_PROTOCOL); }
+^"@class"               { ne_count(); return(OPEN_CLASS); }
 ^"@end"                	{ ne_count(); return(CLOSE_END); }
 ^"+"                	{ return open_method();  }
 ^"-"                	{ return open_method();  }
@@ -218,7 +222,10 @@ void    ooc_public( );
 "@includes"                {  ooc_includes( );	}
 
 "@public"                {  ooc_public( );  }
+"@protected"             {  ooc_protected( );  }
+"@private"               {  ooc_private( );  }
 "@encode"                {  ooc_encode( );	}
+"@alias"                 {  ooc_alias( );	}
 
 
 {L}({L}|{D})*":"        {          return(msg_parm()); }
@@ -295,8 +302,8 @@ void    ooc_public( );
 #define  SIZ_BUFFER   120
 
 unsigned    lineat = 1, column = 0;
-short       save_text = 0;
-char        *texts = NULL;
+extern short save_text;   /* defined in main.c (oct.h when MAIN) */
+extern char *texts;
 
 int     	trip_hline;
 
@@ -749,6 +756,32 @@ ooc_public( )
 }	/* ooc_public */
 
 
+/*   ooc_protected  --  Note that we saw @protected.  Same as @public.
+ */
+    void
+ooc_protected( )
+{
+    extern void 	see_protected();
+
+    see_protected();
+    ne_count();
+
+}	/* ooc_protected */
+
+
+/*   ooc_private  --  Note that we saw @private.  Same as @public.
+ */
+    void
+ooc_private( )
+{
+    extern void 	see_private();
+
+    see_private();
+    ne_count();
+
+}	/* ooc_private */
+
+
 /*   ooc_selector  --  Handle "@selector( .. )".  Converts the following
 //                	   text into an internal selector code.  The text
 //                	   inside parens is converted and setup as the next
@@ -832,12 +865,68 @@ ooc_includes( )
     void
 ooc_encode( )
 {
+    extern const char *encode_type PARMS(( const char * ));
+    const char *enc;
+    const char *p;
 
-    take_parm();
-    fputs( "sorry, @encode() not implemented\n", stdout );
-    ++cnt_warnings;
+    if ( take_parm() == NULL )
+        return;
+    strremove( scan_keep, ' ' );
+    enc = encode_type( scan_keep );
+    /* Emit C string literal to yyout, escaping \ and " */
+    fputc( '"', yyout );
+    for ( p = enc ; *p != '\0' ; p++ )
+    {
+        if ( *p == '\\' || *p == '"' )
+            fputc( '\\', yyout );
+        fputc( (int)(unsigned char)*p, yyout );
+    }
+    fputc( '"', yyout );
+    ne_count();
 }   /* ooc_encode */
 
+
+/*   ooc_alias  --  Parse @alias(real_selector, alias_selector) and record
+ *                  the binding via mk_meth_alias() for method name resolution.
+ */
+    void
+ooc_alias( )
+{
+    extern void mk_meth_alias PARMS(( const char *, const char * ));
+    static char real_buf[ SIZ_BUFFER+2 ], alias_buf[ SIZ_BUFFER+2 ];
+    char *p, *s;
+    int len;
+
+    if ( take_parm() == NULL )
+        return;
+    p = strchr( scan_keep, ',' );
+    if ( p == NULL )
+        return;
+    s = scan_keep;
+    while ( *s == ' ' || *s == '\t' )
+        s++;
+    len = (int)(p - s);
+    while ( len > 0 && (s[len-1] == ' ' || s[len-1] == '\t' ) )
+        len--;
+    if ( len >= (int)(sizeof(real_buf)) )
+        len = (int)(sizeof(real_buf)) - 1;
+    real_buf[0] = '\0';
+    if ( len > 0 )
+    {
+        strncpy( real_buf, s, (unsigned)len );
+        real_buf[len] = '\0';
+    }
+    s = p + 1;
+    while ( *s == ' ' || *s == '\t' )
+        s++;
+    strncpy( alias_buf, s, sizeof(alias_buf) - 1 );
+    alias_buf[ sizeof(alias_buf) - 1 ] = '\0';
+    p = alias_buf + strlen( alias_buf );
+    while ( p > alias_buf && (p[-1] == ' ' || p[-1] == '\t') )
+        *--p = '\0';
+    mk_meth_alias( real_buf, alias_buf );
+    ne_count();
+}   /* ooc_alias */
 
 
 /* -----------------------  The Public Part  -------------------------- */

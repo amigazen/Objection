@@ -629,6 +629,7 @@ done_mynode( node )
                      MFREE( node->node.ln_Name );
     if( node->def)   MFREE( node->def );
     if( node->tag)   MFREE( node->tag );
+    if( node->protocols ) MFREE( node->protocols );
     MFREE( node );
 }   /* done_mynode */
 

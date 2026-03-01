@@ -213,6 +213,7 @@ struct mynode
     char           *tag;        /* misc info  */
     char           *names;      /* Yet another string... */
     char           *publicNames;  /* Names for all to see */
+    char           *protocols;  /* Adopted protocols: "P1,P2,..." or NULL */
 } ;
 
 #define  DF_CALLED   	0x01	    /* Method actually called */
@@ -317,6 +318,9 @@ extern void post_ops(void);
 extern void cleanup(int rc);
 extern void cpp_infile(char *prog_name, char *prog_args, char *infname, char *outfname);
 extern char *strlower(char *s);
+extern const char *encode_type(const char *type_str);
+extern void mk_meth_alias(const char *real_name, const char *alias_name);
+extern void check_protocol_conformance(const char *class_name);
 
 /*  These are generally known already to the grammar: */
 extern int      yydebug;
@@ -351,6 +355,10 @@ OC_EXTERN char     *ProgName ;              /* From argv[0] */
 /*  Various lookup trees (internal dataset): */
 OC_EXTERN void	    *class_tree;	    /*  class <--> superclass */
 OC_EXTERN void	    *method_tree;	    /*  methods <--> var types */
+/* Defined in gram0.c only (not main.c); always extern here to avoid duplicate definition. */
+extern char	    *current_protocol_name;
+extern struct List protocol_req_list;
+extern struct List class_impl_list;
 OC_EXTERN void	    *ivar_tree;  	    /*  class <--> instance structure */
 
 OC_EXTERN void   	*symtab;	    /* Variables and typedefs */
@@ -402,6 +410,8 @@ OC_EXTERN unsigned 	   in_state;
 #define  IS_PROTOCOL	    0x100	    /* Inside @protocol section */
 #define  IS_CATEGORY	    0x200	    /* Encountered category clause */
 #define  IS_SEEN_PUBLIC 	0x400   	/* See @public directive */
+#define  IS_SEEN_PROTECTED  0x800   	/* See @protected directive */
+#define  IS_SEEN_PRIVATE    0x1000  	/* See @private directive */
 
 #define  IS_ERROR          0x2000	    /* Used by gerr() */
 #define  IS_ABORT          0x4000

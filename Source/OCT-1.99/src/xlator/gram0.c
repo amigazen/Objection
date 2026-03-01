@@ -43,6 +43,9 @@
 
 struct List 	alias_list;			/* handles @alias() */
 struct List 	category_list;		/* handles class categories */
+struct List 	protocol_req_list;	/* (protocol, selector) for conformance */
+struct List 	class_impl_list;		/* (class, selector) for conformance */
+char		*current_protocol_name;	/* set in do_protocol */
 
 static LONG 	_just_in_case;		/* if token DONE == -1 */
 unsigned char 	tokenkey[ _LAST_TOKEN_SYMBOL ];
@@ -141,6 +144,7 @@ init_parser(void)
     tokenkey[ OPEN_INTERFACE ] = TKEY_OC_SPECIAL;
     tokenkey[ OPEN_IMPLEMENTATION ] = TKEY_OC_SPECIAL;
     tokenkey[ OPEN_PROTOCOL ] = TKEY_OC_SPECIAL;
+    tokenkey[ OPEN_CLASS ] = TKEY_OC_SPECIAL;
     tokenkey[ CLOSE_END  ] = TKEY_OC_SPECIAL;
 
     tokenkey[ OPEN_FACTORY_METHOD  ] = TKEY_OC_SPECIAL;
@@ -169,6 +173,9 @@ init_types(void)
 
 	NewList( & category_list );      /* "Node"  --> "doobie"; --> "test"   */
 	NewList( & alias_list );         /* "atChar:" --> "at:"               */
+	NewList( & protocol_req_list );
+	NewList( & class_impl_list );
+	current_protocol_name = NULL;
 	DBG(("init_types: done\n"));
 }	/* init_types */
 

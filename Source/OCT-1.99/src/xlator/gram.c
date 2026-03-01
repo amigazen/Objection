@@ -223,7 +223,23 @@ gram_typecast()
                    (void) get_tok();	    	/* Accept its name */
                     break ;
 
-            case  0 : /*  Something went wrong, didn't find closing paren: */
+            case  0 :
+                    /*  Optional protocol list after type: (id<Protocol>) or (id<P1,P2>) */
+                    if ( curr_tok == '<' )
+                    {
+                        get_tok();
+                        while ( curr_tok == IDENTIFIER )
+                        {
+                            get_tok();
+                            if ( curr_tok != ',' )
+                                break;
+                            get_tok();
+                        }
+                        if ( curr_tok == '>' )
+                            get_tok();
+                        break;
+                    }
+                    /*  Something went wrong, didn't find closing paren: */
                     in_state &= ~IS_TYPECAST;
                     return( RC_ERROR );
 
@@ -341,6 +357,31 @@ parse_structure( souoe )
 
             get_tok();
         }	/* while */
+
+        /*  Optional protocol qualifier: id<ProtocolName> or id<P1, P2> */
+        if ( curr_tok == '<' && again != 0 )
+        {
+            get_tok();
+            if ( curr_tok == IDENTIFIER )
+            {
+                typestr = newstrcat( typestr, " /* conforms to " );
+                typestr = newstrcat( typestr, curr_name );
+                get_tok();
+                while ( curr_tok == ',' )
+                {
+                    typestr = newstrcat( typestr, ", " );
+                    get_tok();
+                    if ( curr_tok == IDENTIFIER )
+                    {
+                        typestr = newstrcat( typestr, curr_name );
+                        get_tok();
+                    }
+                }
+                typestr = newstrcat( typestr, " */" );
+                if ( curr_tok == '>' )
+                    get_tok();
+            }
+        }
 
         /*  Check if we found any type tokens: */
         if( again == 0 )
@@ -725,6 +766,7 @@ yyparse( )
     extern int    function_body PARMS(( void ));
     extern int    do_if PARMS(( void ));
     extern int    do_imp PARMS(( void ));
+    extern int    do_class_forward PARMS(( void ));
     extern int    def_method PARMS(( void ));
 
     int   rc;	        	/* Any error value */
@@ -753,14 +795,14 @@ yyparse( )
                     	in_context |= IC_INTERFACE;
                     	rc = do_if();
                     	curr_method = (struct mynode *)NULL;
-                    	in_state   &= ~(IS_SEEN_IF | IS_SEEN_PUBLIC);
+                    	in_state   &= ~(IS_SEEN_IF | IS_SEEN_PUBLIC | IS_SEEN_PROTECTED | IS_SEEN_PRIVATE);
                     	in_context &= ~IC_INTERFACE;
                     	break ;
 
         	case OPEN_IMPLEMENTATION :
                     	in_state |= IS_SEEN_IMP;
                     	rc = do_imp();
-                    	in_state &= ~(IS_SEEN_IF | IS_SEEN_IMP | IS_SEEN_PUBLIC);
+                    	in_state &= ~(IS_SEEN_IF | IS_SEEN_IMP | IS_SEEN_PUBLIC | IS_SEEN_PROTECTED | IS_SEEN_PRIVATE);
 						in_state |= IS_GOT_IMP;
 
                     	if( !ocspecial( curr_tok ) )
@@ -774,10 +816,16 @@ yyparse( )
         	case OPEN_PROTOCOL :
                     	in_state |= IS_PROTOCOL;
                     	rc = do_protocol();
-                    	in_state &= ~(IS_PROTOCOL | IS_SEEN_PUBLIC);
+                    	in_state &= ~(IS_PROTOCOL | IS_SEEN_PUBLIC | IS_SEEN_PROTECTED | IS_SEEN_PRIVATE);
+                    	break ;
+
+        	case OPEN_CLASS :
+                    	rc = do_class_forward();
                     	break ;
 
         	case CLOSE_END :
+                    	if ( in_state & IS_GOT_IMP && className != NULL && className[0] != '\0' )
+                    	    check_protocol_conformance( className );
                     	goto  END_IMP;   	/* Make system stop */
 
         	case OPEN_FACTORY_METHOD :

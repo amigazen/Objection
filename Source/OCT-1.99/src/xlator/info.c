@@ -65,6 +65,69 @@ char        closecmt[ ] = { ' ', '*', '/', 0 } ;
 /* ----------------------  Public Code Works  ------------------------ */
 
 
+/*   encode_type  --  NeXT-style type encoding for @encode(type).
+ *  type_str is the text between the parens (may contain spaces).
+ *  Returns pointer to static encoding string; "?" for unknown types.
+ */
+const char *
+encode_type(const char *type_str)
+{
+	static char out[32];
+	char norm[64];
+	char *p;
+	const char *s;
+
+	if ( type_str == NULL || *type_str == '\0' )
+		return "?";
+	/* Normalize: remove spaces into norm */
+	p = norm;
+	s = type_str;
+	while ( p < norm + sizeof(norm) - 1 && *s != '\0' )
+	{
+		if ( *s != ' ' && *s != '\t' )
+			*p++ = (char)*s;
+		s++;
+	}
+	*p = '\0';
+
+	/* Object and pointer to object */
+	if ( strcmp( norm, "id" ) == 0 )
+		return "@";
+	if ( strcmp( norm, "id*" ) == 0 )
+		return "^@";
+	/* Integral */
+	if ( strcmp( norm, "int" ) == 0 )
+		return "i";
+	if ( strcmp( norm, "unsignedint" ) == 0 )
+		return "I";
+	if ( strcmp( norm, "long" ) == 0 )
+		return "l";
+	if ( strcmp( norm, "unsignedlong" ) == 0 )
+		return "L";
+	if ( strcmp( norm, "short" ) == 0 )
+		return "s";
+	if ( strcmp( norm, "unsignedshort" ) == 0 )
+		return "S";
+	if ( strcmp( norm, "char" ) == 0 )
+		return "c";
+	if ( strcmp( norm, "unsignedchar" ) == 0 )
+		return "C";
+	if ( strcmp( norm, "float" ) == 0 )
+		return "f";
+	if ( strcmp( norm, "double" ) == 0 )
+		return "d";
+	if ( strcmp( norm, "void" ) == 0 )
+		return "v";
+	/* char * */
+	if ( strcmp( norm, "char*" ) == 0 )
+		return "^c";
+	/* Unknown: return ? */
+	out[0] = '?';
+	out[1] = '\0';
+	return out;
+}
+
+
 /*   expose_bracket  --  Strip off one level of curly braces from the
  *                       string.  Callers owns returned string.
  *   Return:  string without outter "{..}" pair.
@@ -343,20 +406,15 @@ asCRef_selector( colon_name )
 
 
 
-#if SW_ALIAS
 /*   mk_meth_alias  --  Create an alias binding for method names.
-//        	    		Implements the @alias(,) compiler directive.  The
-//        	    		binding is used internally by asCRef_selector().
-*/
+ *   Implements the @alias(real, alias) compiler directive.  When SW_ALIAS
+ *   is set, asCRef_selector() resolves alias names to the real method.
+ */
     void
-mk_meth_alias( real_name, alias_name )
-    char	*real_name;          	/* an implemented method name */
-    char	*alias_name;        	/* A pseudo-name */
+mk_meth_alias(const char *real_name, const char *alias_name)
 {
-
     AddTail( & alias_list, & mk_mynode( real_name, alias_name )->node );
 }	/* mk_meth_alias */
-#endif
 
 
 
