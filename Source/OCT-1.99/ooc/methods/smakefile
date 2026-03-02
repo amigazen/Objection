@@ -1,0 +1,144 @@
+#
+# SAS/C smakefile: full build of the methods foundation and substrate.
+# Produces BASELIB.lib (foundation classes, replaces ocbase/ocCltn.lin) and
+# ocsubs.lib (runtime substrate). Amiga theme: "BASELIB" after Kickstart.
+# Run from this directory: smake
+# Set inc, oocbin, ooclib to your assigns (e.g. OOC: or path to OCT tree).
+# Apps: link with ww.o (from prelink) and -lBASELIB -locsubs (e.g. slink ... ww.o ... LIB ... -lBASELIB -locsubs).
+#
+
+inc    = OOC:include
+#usrinc = OOC:include/usr-inc
+usrinc = 
+sysinc = sc:include
+oocbin = OOC:C/
+ooclib = OOC:Lib/
+
+OCT    = $(oocbin)oct
+PLN    = $(oocbin)prelink
+LIB    = oml
+LN     = sc link
+ldlibs = sc:lib/sc.lib sc:lib/scm.lib lib:amiga.lib 
+
+OCFLAG = 
+# Foundation .c: NOLINK to produce .o; add INCLUDEDIR=$(usrinc) if you have usr-inc
+opts   = NOLINK INCLUDEDIR=$(inc) INCLUDEDIR=$(sysinc)
+# Substrate: SUBSTRATE=1 for objc.h; MCH_AMIGA=1 so tree.c uses exec.library
+opts_s = NOLINK INCLUDEDIR=$(inc) INCLUDEDIR=$(sysinc) DEFINE SUBSTRATE=1 DEFINE MCH_AMIGA=1
+
+# Foundation classes (order for linking: base first, then collections); ww.o is for app linking only, not in archive
+FOUND_M = Object.m IdArray.m System.m List.m LinkList.m String.m Array.m Collection.m OrderedCollection.m Sequence.m Set.m Queue.m
+FOUND_C = Object.c IdArray.c System.c List.c LinkList.c String.c Array.c Collection.c OrderedCollection.c Sequence.c Set.c Queue.c
+FOUND_O = Object.o IdArray.o System.o List.o LinkList.o String.o Array.o Collection.o OrderedCollection.o Sequence.o Set.o Queue.o
+
+# Substrate C sources and objects (stackovf.c = SAS/C _CXOVF replacement;
+# oc_exit.c = real exit, no objc.h, avoids exit->app_exit recursion)
+SUBS_C = subs.c subio.c submem.c subbind.c submsg.c tree.c stackovf.c oc_exit.c
+SUBS_O = subs.o subio.o submem.o subbind.o submsg.o tree.o stackovf.o oc_exit.o
+
+# Prelink input: ww.c is generated from the same .m list used in foundation
+WWC = ww.c
+
+BASELIB = $(ooclib)AEBase.lib
+OCSUBS  = $(ooclib)AESubs.lib
+
+# User test harness executable (depends on libs and ww.c)
+USER_BIN = user
+
+all: $(BASELIB) $(OCSUBS) $(WWC) $(USER_BIN)
+
+# --- Prelink: class table for app linking; include user.m so ww.c is built for the test harness ---
+$(WWC): $(FOUND_M) user.m
+	$(PLN) $(WWC) $(FOUND_M) user.m
+
+# --- Foundation: translate .m -> .c ---
+Object.c: Object.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o Object.c Object.m
+IdArray.c: IdArray.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o IdArray.c IdArray.m
+System.c: System.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o System.c System.m
+List.c: List.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o List.c List.m
+LinkList.c: LinkList.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o LinkList.c LinkList.m
+String.c: String.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o String.c String.m
+Array.c: Array.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o Array.c Array.m
+Collection.c: Collection.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o Collection.c Collection.m
+OrderedCollection.c: OrderedCollection.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o OrderedCollection.c OrderedCollection.m
+Sequence.c: Sequence.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o Sequence.c Sequence.m
+Set.c: Set.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o Set.c Set.m
+Queue.c: Queue.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o Queue.c Queue.m
+
+# --- User test harness: translate and compile ---
+user.c: user.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o user.c user.m
+user.o: user.c
+	sc $(opts) user.c
+
+# --- Foundation: compile .c -> .o ---
+Object.o: Object.c
+	sc $(opts) Object.c
+IdArray.o: IdArray.c
+	sc $(opts) IdArray.c
+System.o: System.c
+	sc $(opts) System.c
+List.o: List.c
+	sc $(opts) List.c
+LinkList.o: LinkList.c
+	sc $(opts) LinkList.c
+String.o: String.c
+	sc $(opts) String.c
+Array.o: Array.c
+	sc $(opts) Array.c
+Collection.o: Collection.c
+	sc $(opts) Collection.c
+OrderedCollection.o: OrderedCollection.c
+	sc $(opts) OrderedCollection.c
+Sequence.o: Sequence.c
+	sc $(opts) Sequence.c
+Set.o: Set.c
+	sc $(opts) Set.c
+Queue.o: Queue.c
+	sc $(opts) Queue.c
+ww.o: ww.c
+	sc $(opts) ww.c
+
+# --- Substrate: compile with SUBSTRATE and MCH_AMIGA ---
+subs.o: subs.c
+	sc $(opts_s) subs.c
+subio.o: subio.c
+	sc $(opts_s) subio.c
+submem.o: submem.c
+	sc $(opts_s) submem.c
+subbind.o: subbind.c
+	sc $(opts_s) subbind.c
+submsg.o: submsg.c
+	sc $(opts_s) submsg.c
+tree.o: tree.c
+	sc $(opts_s) tree.c
+stackovf.o: stackovf.c
+	sc $(opts_s) stackovf.c
+oc_exit.o: oc_exit.c
+	sc NOLINK INCLUDEDIR=$(inc) INCLUDEDIR=$(sysinc) oc_exit.c
+
+# --- Archives (ocBase.lib = foundation; ocSubs.lib = substrate) ---
+$(BASELIB): $(FOUND_O)
+	$(LIB) $(BASELIB) r $(FOUND_O)
+
+$(OCSUBS): $(SUBS_O)
+	$(LIB) $(OCSUBS) r $(SUBS_O)
+
+# --- User binary: link only user.o, ww.o and the .lib archives (no foundation .o) ---
+$(USER_BIN): user.o ww.o $(WWC) $(BASELIB) $(OCSUBS)
+	$(LN) TO $(USER_BIN) user.o ww.o LIB $(BASELIB) $(OCSUBS) $(ldlibs)
+
+clean:
+	-delete $(FOUND_C) $(FOUND_O) $(SUBS_O) oc_exit.o $(WWC) user.c user.o $(USER_BIN) \#?.sym \#?.lst quiet
