@@ -138,7 +138,7 @@ $(OCSUBS): $(SUBS_O)
 
 # --- User binary: link only user.o, ww.o and the .lib archives (no foundation .o) ---
 $(USER_BIN): user.o ww.o $(WWC) $(BASELIB) $(OCSUBS)
-	$(LN) TO $(USER_BIN) user.o ww.o LIB $(BASELIB) $(OCSUBS) $(ldlibs)
+	$(LN) TO $(USER_BIN) MAP user.o ww.o LIB $(BASELIB) $(OCSUBS) $(ldlibs)
 
 clean:
-	-delete $(FOUND_C) $(FOUND_O) $(SUBS_O) oc_exit.o $(WWC) user.c user.o $(USER_BIN) \#?.sym \#?.lst quiet
+	-delete $(FOUND_C) $(FOUND_O) $(SUBS_O) oc_exit.o $(WWC) user.c user.o $(USER_BIN) \#?.sym \#?.lst \#?.map quiet

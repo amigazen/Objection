@@ -388,7 +388,13 @@ extern void poseAs();
 
 - next
 {
-  return nil;
+  return next;
+}
+
+- setNext: anObject
+{
+  next = anObject;
+  return self;
 }
 
 - asGraph: (BOOL) unique

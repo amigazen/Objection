@@ -118,12 +118,22 @@
 }
 
 /* -----------------------------------------------------------------------
- * remove: first matching id; delegate to contents (pack handled there)
+ * remove: first matching id; delegate to contents then pack and sync count
  * ----------------------------------------------------------------------- */
 
 - remove: anObject
 {
-  return contents != nil ? [contents remove: anObject] : nil;
+  id r;
+
+  if (contents == nil)
+    return nil;
+  r = [contents remove: anObject];
+  if (r != nil)
+    {
+      [contents packContents];
+      firstEmptySlot = (short)[contents count];
+    }
+  return r;
 }
 
 /* -----------------------------------------------------------------------
