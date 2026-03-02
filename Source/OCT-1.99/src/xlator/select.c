@@ -306,23 +306,21 @@ m_call( starts )
                    	  (UCHAR)target[5] == CH_PARM_SEP) )
                    {
                    	/*  When requesting a superclass msg, the anchor
-                   	//	point must be given to the dispatcher.
-                   	//
-                   	//	Dr. Cox does away with this by having the
-                   	//	dispatcher search back through the stack
-                   	//	frame for the caller's `self' variable (which
-                   	//	is at a fixed location).  Thus, with a short
-                   	//	dispatcher prolouge, the same arguments can
-                   	//	be used when calling either entry point.
+                   	//	point must be the superclass so the dispatcher
+                   	//	searches there first. Use the existing class
+                   	//	pointer (e.g. Object) so we need no extra extern
+                   	//	for instXXX/factoryXXX; (id)Object is instance,
+                   	//	((id)Object)->isa is factory.
                    	*/
                    	in_context |= IC_SUPERCLASS;
-                   	if( m_order == 'F' )
+                   	if( superclassName[0] != EOS )
                    	{
-                       	sprintf( buff, "&factory%s,self", className );
+                   		if( m_order == 'F' )
+                   		    sprintf( buff, "((id)%s)->isa,self", superclassName );
+                   		else
+                   		    sprintf( buff, "(id)%s,self", superclassName );
                    	} else
-                   	{
-                       	sprintf( buff, "&inst%s,self", className );
-                   	}
+                   		sprintf( buff, "(struct objc_class *)0,self" );
                    	target = newstrjoin( "_msgSuper))(" , buff );
                    } else
                    {
