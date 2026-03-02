@@ -18,6 +18,7 @@
 {
 @public
 	Class 	isa;		// Famous "is-a" link...
+	id	next;		// For linked structures (e.g. LinkList nodes)
 }
 
 
@@ -69,6 +70,7 @@
 - show ;
 - (STR) str ;
 - next ;
+- setNext: anObject ;
 - (BOOL) isEqualSTR: (STR)aCStr ;
 - (int) compare: anObject ;
 - (BOOL) isSame: anObject ;

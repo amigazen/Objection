@@ -40,8 +40,11 @@
 - eachElementPerform: (SEL) aSelector with: arg1 ;
 - eachElementPerform: (SEL) aSelector with: arg1 with: arg2 ;
 - find: anObject ;
+- findMatching: anObject ;
 - findSTR: (STR) aStr ;
+- (STR) describe ;
 - (int) offsetOf: anObject ;
+- (int) offsetMatching: anObject ;
 - (int) offsetSTR: (STR) aStr ;
 
 @end

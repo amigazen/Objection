@@ -1,5 +1,8 @@
 //    class interface: Sequence
 
+#ifndef _INC_COLLECT_SEQUENCE_H
+#define _INC_COLLECT_SEQUENCE_H  1
+
 #include <collect/Collection.h>
 
 @interface  Sequence : Collection
@@ -12,9 +15,12 @@
 - previous ;
 - toFirst ;
 - toLast ;
+- rewind ;
 - first ;
 - last ;
 - (int) count ;
 
 @end
+
+#endif
 

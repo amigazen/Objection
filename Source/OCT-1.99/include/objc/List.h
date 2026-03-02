@@ -23,12 +23,13 @@
 - freeObjects ;
 - copy ;
 - (BOOL) isEqual: otherList ;
-- (unsigned) capacity ;
+- (int) capacity ;
 - setAvailableCapacity: (unsigned)numSlots ;
-- (unsigned) count ;
+- (int) count ;
 - objectAt: (unsigned)index ;
 - (unsigned) indexOf: matchObject ;
 - lastObject ;
+- first ;
 - addObject: newElement ;
 - addObjectIfAbsent: testObject ;
 - insertObject: newElement at: (unsigned) index ;

@@ -31,26 +31,28 @@
 
 
 #ifndef _OOC_PASS2
-extern  void    _oc_errfmt PARMS(( CONST char *fmt, ... ));
-extern  void    _oc_atExit PARMS(( IMP callback )); /* Call at app_exit() */
+extern  void    _oc_errfmt(const char *fmt, ...);
+extern  void    _oc_atExit(IMP callback);
 
-extern  IMP     _msgCheck PARMS(( Class  class, SEL sel ));
+extern  IMP     _msgCheck(Class class, SEL sel);
 
 
 /*  Substrate operations:  */
 
-extern  Class     objc_getClass PARMS(( STR className ));   /* instance */
-extern  Class     objc_getMetaClass PARMS(( STR className ));   /* factory */
+extern  Class     objc_getClass(const char *className);
+extern  Class     objc_getMetaClass(const char *className);
 
 
 /*  Specific extensions...  */
-extern char       *_progName;   	/* From argv[0] */
+extern char       *_progName;
 
 
 /*  Amiga specific runtime.  For non-amigas, this is part of substrate. */
-extern struct Node 	*FindName PARMS(( struct List *, CONST char * ));
-extern void  	NewList PARMS(( struct List * ));
-extern void 	AddHead PARMS(( struct List *, struct Node * ));
+#ifndef _OCT_HEAD_LIST_FUNCS
+extern struct Node 	*FindName(struct List *list, const char *name);
+extern void  	NewList(struct List *list);
+extern void 	AddHead(struct List *list, struct Node *node);
+#endif
 
 # ifdef MCH_AMIGA
 extern struct Process   *_oc_thread0;	/* Holds central Process ID */

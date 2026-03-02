@@ -302,13 +302,13 @@ struct class_cb
 } ;
 
 
-/*  user level calls:  */
+/*  user level calls:  (ANSI prototypes for substrate compatibility) */
 
-extern  SEL      sel_getUid PARMS(( CONST STR colon_name ));
-extern 	STR	  	 sel_getName PARMS(( SEL sel_id ));  /* selNumb --> string */
-extern  BOOL     sel_isMapped PARMS(( SEL sel_id ));
+extern  SEL      sel_getUid(const char *colon_name);
+extern  STR      sel_getName(SEL sel_id);
+extern  BOOL     sel_isMapped(SEL sel_id);
 
-extern  STR      object_getClassName PARMS(( id  someObj ));
+extern  STR      object_getClassName(id someObj);
 
 # else
 
@@ -331,8 +331,8 @@ extern struct objc_class	factoryObject;		/* Anchor pad */
 extern struct objc_class	factoryObject;		/* Anchor pad */
 # endif
 
-extern void 	*_msg ( /* void *, SEL, ... */ );
-extern void 	*_msgSuper ( /* Class, void *, SEL, ... */ );
+extern void 	*_msg(void *self, SEL sel, ...);
+extern void 	*_msgSuper(void *superClass, void *self, SEL sel, ...);
 
 # define  ISSELECTOR(u)     sel_isMapped(u)
 # define  SELNAME(u)        sel_getName(u)
