@@ -1,0 +1,361 @@
+
+
+   
+
+
+
+
+
+   Section 1    Section 1
+   Section 1    Section 1
+   _______ __________________________________    _______ __________________________________   Section 1. Method Selector Definitions   Section 1. Method Selector Definitions
+
+   Below are listed the methods in the OCT system.  There abstract
+   functionallity and return types are detailed.  Each class is
+   free to interpret them within some leway; after all this is an
+   object oriented system with data-hiding! 
+
+
+        The name in square brackets ([,]) after the method protype
+   is the category where the method is first defined.  Generally
+   speaking, any method in this category of classes or inheriting
+   from a class in this category can respond sucessfully to this
+   message.  
+
+
+
+   1.1. Factory Methods         1.1. Factory Methods
+   These methods are known by factory objects.  
+
+
+   initialize [Foundation]      Perform any presetting for this   initialize [Foundation]
+        class.  Returing nil will cause the application to abort.
+        Called before user's application begins to run.  Classes
+        with complex instance variable declarations that can't be
+        encoded during translation may change their text encoding.  
+
+        A handler for cleanup may be installed by calling
+        _oc_atExit().  The single parameter is a function that will
+        be called in LIFO (stack) order when the application exits.  
+
+
+   new [Foundation]      Allocate and initialize a new instance of   new [Foundation]
+        the receiver class.  In contrast to [Cox86], in a factory
+        method, it's illegal to assign the result to the variable
+        `self', as that refers to the class object, and not the
+        instance object! 
+
+
+       + new
+       {
+          id newObj;
+
+          /*  Never assign to "self" in a factory!  */
+          newObj = [super new];
+          newObj->capacity = 0;
+          return( newObj );
+       }
+
+
+   Barney - OCT                  pg. 1                   29-Jul-1993
+
+
+   
+
+
+   (int)ndxVarSize [Foundation]      Reply the count of bytes each   (int)ndxVarSize [Foundation]
+        indexed variable occupies. For non-indexing class, the
+        default from Object will return 0.  Effectively returns:
+        sizeof( [self ndxVarType] ).  
+
+
+   (STR)ndxVarType [Foundation]      Reply a string encoding that   (STR)ndxVarType [Foundation]
+        describes the instance variables that are index-able.  For
+        instance, ByteArray returns "c", char type.                    ByteArray
+
+
+   poseAs:(classId) [Foundation]      Perform surgery and change the   poseAs:(classId) [Foundation]
+        class of the receiver to a new class.  (Still under
+        construction.) 
+
+
+   with:(int)nArgs vaDcl:(id)argList [Foundation]     Create a   with:(int)nArgs vaDcl:(id)argList [Foundation]
+        "sized" object, capable of holding 'nArgs' things.  Of
+        course, the class is free is adjust to account for memory
+        management, and additional memory could be used by a class's
+        superclass.  The "vaDcl:" selector is inserted automatically
+        by the translator when it sees a comma inside a message
+        expression.  
+
+
+
+   1.2. Instance Methods         1.2. Instance Methods
+   These methods are known by instance objects.  
+
+
+   add:item [Array and Collection]    Store 'item' at the next   add:item [Array and Collection]
+        available slot.  If there is a notion of a cursor in self,
+        then 'item' will be after the cursored slot.  Array's
+        generally store in the first unused (nil) slot.  
+
+
+   at:(int)index put:(id)anObject [Foundation]     Store an object   at:(int)index put:(id)anObject [Foundation]
+        into the indexing storage receiver object.  
+
+
+   (int) count [Array and Collection]   Return the count of usable   (int) count [Array and Collection]
+        objects contained within the object.  For Array types, 'nil'
+        pointers are not counted.  (Was named 'size'.) 
+
+
+   error:(STR)fmtSTR vaDcl:stuff [Foundation]     Display an error   error:(STR)fmtSTR vaDcl:stuff [Foundation]
+        message about self.  Feeds 'stuff' to an sprintf() call.
+        Aborts the program and never returns.  
+
+
+
+
+
+
+   Barney - OCT                  pg. 2                   29-Jul-1993
+
+
+   
+
+
+   find:otherObj [Array and Collection]    Returns a member that is   find:otherObj [Array and Collection]
+        "==" to 'otherObj'.  Returns nil if there is no match.  
+
+
+   findMatching:otherObj [Array and Collection]    Returns a member   findMatching:otherObj [Array and Collection]
+        that is isEqual: to 'otherObj'.  Returns nil if there is no
+        match.  
+
+
+   findSTR:(STR)aString [Array and Collection]    Returns a member   findSTR:(STR)aString [Array and Collection]
+        that is isEqual: to 'aString'.  Returns nil if there is no
+        match.  
+
+
+   first [Sequence]      Sets the objects cursor to be the first   first [Sequence]
+        element.  Returns the first element within the list.  This
+        is how sequencing starts.  Performing [list next] returns
+        the second element.  
+
+
+   free [Foundation]      Releases memory used by object and returns   free [Foundation]
+        nil.  The object is no longer usable, and any references the
+        appliation holds must be forgotten.  Because there is no
+        reference counting, free'ing an object that has an
+        infrastructure (like Set) will create unreachable objects.                               Set)
+
+
+   freeContents [Foundation]      Walks through internal contents   freeContents [Foundation]
+        and frees any major sub-objects.  The internal
+        infrastructure is invisible to the application.  Added an
+        object after freeContents will cause the object to rebuild
+        its infrastructure.  
+
+
+   hash [Foundation]      Return an integer representing a the   hash [Foundation]
+        receiver in hashed form.  The same hash value is returned
+        for all objects that are YES for "isEqual:".  Ie, [obj1
+        hash] == [obj2 hash], iff [obj1 isSame:obj2] == YES.
+        Implemented in Object so everything hash a hash value.                       Object
+        Re-implemented in classes like ByteArray.                                         ByteArray.
+
+
+   last [Collection]      Moves a cursor to the last element stored   last [Collection]
+        and returns that element.  
+
+
+   toFirst [Collection]      Set a cursor inside the object to point   toFirst [Collection]
+        at the first element.  Returns 'self', not the first object
+        in the list.  Performing [list next] returns the first
+        element.  
+
+
+
+
+   Barney - OCT                  pg. 3                   29-Jul-1993
+
+
+   
+
+
+   toLast [Collection]      Set a cursor inside the object to point   toLast [Collection]
+        just past the last object.  Returns 'self', not the last
+        object in the list.  Performing [list prev] returns the last
+        element.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   Barney - OCT                  pg. 4                   29-Jul-1993
+
+
+   Object C Translator                                     Release 2
+
+
+
+
+
+   Section 2    Section 2
+   Section 2    Section 2
+   _______ _______________________    _______ _______________________   Section 2. Class Heirarchy   Section 2. Class Heirarchy
+
+
+        Listed here are the categories and which classes they
+   contain.  Each category has a superclass listed after it, except
+   "Foundation" which is the base for all other classes.  Class
+   structuring is a tradeoff between time and space.  For instance,
+   time has been gained by not subclassing the ByteArray off of                                               ByteArray
+   Array but rather copying the superclass's implementation code   Array
+   into ByteArray and making it a subclass of Object.  This saves        ByteArray                             Object.
+   one level of dictionary searching in _msg(), and for a these
+   central classes, the redundancy may be worth it.  
+
+
+       Foundation:       Foundation:
+          Object
+             Array
+             ByteArray
+             IdArray
+
+       Collection (Object):       Collection (Object):
+          Collection
+             Set
+             Sequence
+             Queue
+             OrderedCollection
+
+       Windowing (Object):       Windowing (Object):
+          View
+             Fixture
+                ArrowFixture
+                ElevatorFixture
+                StretchFixture
+             NullView
+             MenuBar
+                PullDownMenu
+                   TextMenu
+             StdSystemView
+
+
+
+
+
+
+
+
+
+
+
+   Barney - OCT                  pg. 5                   29-Jul-1993
+
+
+                                                         29-Jul-1993
+
+
+                             Table of Contents                             Table of Contents
+
+
+                       Barney  (Release 2)  OCT
+                            As of 25-May-90
+
+                          Includes 0 figures
+
+
+
+   1. Method Selector Definitions    .........................    1
+      1.1. Factory Methods     ...............................    1
+      1.2. Instance Methods     ..............................    2
+
+   2. Class Heirarchy     ....................................    5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                -- I --
+

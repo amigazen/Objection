@@ -1,0 +1,121 @@
+
+
+     prelink(OOPS)                                      Release 2
+
+
+
+
+ Name     Name
+
+     prelink - Invokes prelinker for O.O.C. Translator 
+
+
+ Syntax     Syntax
+
+     prelink C_outfile M_infile.. otherfiles..       prelink
+
+
+ Description     Description
+
+     Invokes  the  prelinker  for  the  Object Oriented C system.
+     The  output file listfile is created with a list of pointers                      listfile
+     to  classes  required  to  build the final application.  The
+     list  is  used  to  ensure  the needed classes are extracted
+     from the Object Oriented C libraries.  
+
+     The  inputs  to  _______  are  the class filenames and other                      prelink
+     files  using  message-expressions  created  by  the user for
+     their  application.   A list is built of all the classes and
+     all their superclasses.  
+
+     The  output  listfile  must be passed to the C compiler, and                  listfile
+     then  included  during  the link phase.  This will cause the
+     linker  to extract the proper classes from the library.  And
+     then  when the application starts running, the substrate has
+     a  list  of all the classes so they can be initialized.  For
+     an example, see oct(OOPS) 
+
+     The are no options.  
+
+
+ Diagnostics     Diagnostics
+
+     If  the  "must init" file can't be located, awarning message
+     is displayed.  
+
+
+ Files     Files
+
+     AMIGA: ooc:include/mustinit.ooc 
+     UNIX:  /usr/local/include/mustinit.ooc 
+
+
+
+
+
+
+
+
+
+     29-Jul-1993                                           Page 1
+
+
+     prelink(OOPS)                                      Release 2
+
+
+ See Also    See Also
+
+     cc(CP), oct(OOPS) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     29-Jul-1993                                           Page 2
+

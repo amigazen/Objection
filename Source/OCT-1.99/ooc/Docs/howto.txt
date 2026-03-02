@@ -1,0 +1,901 @@
+
+
+   
+
+
+
+
+
+                    Object Oriented "C" Translator                    Object Oriented "C" Translator
+
+
+                Program Development -- Hints and Advice
+
+
+
+
+                           Installation and
+
+
+             Daily Usage of Translator and Class Libraries
+
+
+
+
+
+
+
+
+
+         ________                 ________         Abstract         Abstract
+
+         This  document  describes  how  to  use  the  Object  C
+         Translator   on   a   daily   basis.    It  charts  the
+         development   of   a   user   class   and   a  matching
+         application.   Installation  is outlined.  The Object C
+         Translator  is based on a system similar to Objective-C
+         as  outlined  by  Brad  Cox [Cox86].  A bibliography of
+         related materials is also included.  
+
+
+
+
+
+
+
+
+                              Legal Notices    
+
+            This document copyright (c) 1990 by Brian Witt.
+
+            C++ and UNIX are trademarks of AT&T Bell Labs.
+       Macintosh is trademark licensed to Apple Computers, Inc.
+    Objective-C and Software-IC are phrases coined by Dr. Brad Cox
+     and trademarked by Productivity Products International, Inc.
+           Smalltalk-80 is a trademark of ParcPlace Systems.
+
+
+
+
+   Barney - OCT                  pg. 1                   29-Jul-1993
+
+
+   Object C Translator                                     Release 2
+
+
+
+
+
+   Section 1    Section 1
+   Section 1    Section 1
+   _______ _____________________    _______ _____________________   Section 1. Introduction   Section 1. Introduction
+
+   This document covers installation of the OCT system.  Most of
+   the document is a tutorial based around building a sample
+   class.  This tutorial should help outline the daily care and
+   feeding of OCT.  If your site has ____ then tracking changes in                                     make
+   the file can be automated.  
+
+        The  uses several resources from the host.  Normal utilties
+   to produce executables from "C" source code are required.  The
+   UNIX user of the OCT asks the system to supply ___ (the C                                                  cpp
+   pre-processor).  Included with the OCT is DECUS's version of ___                                                                cpp
+   in case there is none locally (like most AmigaDOS and MS-DOS
+   systems).  
+
+        The OCT must somehow find the include files.  Environment
+   variables hold the list of directories to search.  Normally one
+   more directory must be appended to a list somewhere.
+   Alternatively, a script or makefile make explicitly specify a                              makefile
+   directory (see man page for ___ ).  Include files from Object C                               ooc
+   Translator don't need to mingle with your systems own files, if
+   you don't want.  
+
+        Linking does require searching through libraries.  By
+   installing the libraries in /usr/lib the class libraries can be                               /usr/lib
+   seperate from the systems libraries.  
+
+
+   1.1. System Components         1.1. System Components
+
+        A running OCT application is the product of source files,
+   interface definitions, and translation programs.  The Object C
+   Translator programs include an OCT to "C" source code
+   translator, a class interface helper, and a pre-linker utility.
+   Your site must provide a K&R version 1 [Kern78] "C" compiler.  
+
+        The interface definition file includes information about
+   the class, its superclass, and method return types.  The
+   prelinker program arranges for the needed classes to be included
+   from the OCT object library.  The output "C" file is then linked
+   along with application files and the OCT libraries.  
+         The author can be reached at these USENET addresses:
+
+                     DOMAIN:  aleks@well.sf.ca.us
+               USENET: {backbone}!uunet!seer!rael!aleks
+
+
+
+
+   Barney - OCT                  pg. 2                   29-Jul-1993
+
+
+   Object C Translator                                     Release 2
+
+
+
+
+
+   Section 2    Section 2
+   Section 2    Section 2
+   _______ _____________________    _______ _____________________   Section 2. Installation   Section 2. Installation
+
+   From the overview document, you know that OCT reads a class
+   file, imports public interface files for classes you reference,
+   and then outputs a "C" file ready for your "C" compiler.  Where
+   these things come from and where the go are determined by
+   environment variables.  For the Amiga system, Manx's ___ is                                                        set
+   used, not the ENV: directory (sorry).  For UNIX users, use the
+   normal shell environment variables.  
+
+        To get the system up and ready for class development
+   requires a sub-directory with a few directories.  You may elect
+   to not mix OCT header and library files with the rest of your
+   system.  Here is a basic roadmap for the directories: 
+
+
+          ---> OOC -----+----- methods
+                        |
+                        +----- include ---+--- objc
+                        |                 |
+                        |                 +--- apps
+                        |                 |
+                        |                 +--- exec (for UNIX only)
+                        |
+                        |
+        (from here on, these directories may mingle..)
+                        |
+                        +----- lib
+                        |
+                        +----- bin
+
+
+
+        Fig. 2-1, OCT Directory Tree     .          Fig. 2-1,
+
+
+   Into the 'methods' directory you should copy all the *.m files
+   from this directory on the distribution disk.  These serve as
+   good examples of how to call various services.  
+
+        The 'include' directory contains the public interface
+   header files for classes in your OCT library.  Copy this
+   directory and its subdirectories verbatim from the distribution
+   disk.  For UNIX people, the exec directory contains files                               exec
+   defining the list and node primitive structures used internally
+   to the OCT translator and the application substrate.  Assign the
+   variable INCLUDE to also specify this directory.  
+
+
+   Barney - OCT                  pg. 3                   29-Jul-1993
+
+
+   Object C Translator                                     Release 2
+
+
+
+        The remaining directories can be seperate from your system
+   directories if you don't want "mixing" of programs.  A temporary
+   directory may be specified with the variable CCTEMP.  If not
+   specified, a default directory is used, depending on the host
+   system (AmigaDOS, UNIX or MS-DOS).  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   Barney - OCT                  pg. 4                   29-Jul-1993
+
+
+   Object C Translator                                     Release 2
+
+
+
+
+
+   Section 3    Section 3
+   Section 3    Section 3
+   _______ ___________________    _______ ___________________   Section 3. Daily Usage   Section 3. Daily Usage
+
+   **** THIS DOCUMENT IS UNFINISHED **** 
+
+   Now that you got the thing, it's time to use the thing.  The
+   thing, here, refers to the Object C Translator system:
+   translator, utilities, and class libraries.  At present (April
+   1990), the system is remarkably independent of the actual
+   machine it's running on.  Applications can be generated with
+   16-bit or 32-bit int's.  The translator relies strictly on the
+   "C" runtime library, not any Amiga or U*NX specific routines.
+   So developing an application should be just like developing any
+   other "C" language application.  Well, it's almost the same...  
+
+        A few rules for generating an application will be detailed
+   below.  These refer to source and ____ rules.  In most                                     make
+   circumstances, plain "C" files may be added coagulated into your
+   application.  These files, however, won't be taking advantage of
+   any special object oriented features.  By adding one translator
+   directive (@includes), a source file may onw open up the power
+   of this exciting programming system.  The system also requires
+   additional libraries at link time.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   Barney - OCT                  pg. 5                   29-Jul-1993
+
+
+   Object C Translator                                     Release 2
+
+
+
+
+
+   Section 4    Section 4
+   Section 4    Section 4
+   _______ __________________________________    _______ __________________________________   Section 4. Application Program Concept   Section 4. Application Program Concept
+
+   **** THIS DOCUMENT IS UNFINISHED **** 
+
+   In the object oriented world, the programmer dreams of objects
+   that actions affect.  Objects are usually modeled after real
+   life entities.  "Look for structure, other systems, devices,
+   things remembered, roles played, locations, organization units,
+   and descriptive catalogs." [Coad89] "As a system evolves, its
+   tasks may change drastically.  Much more persistency may be
+   found in the classes of data it manipulates.." [Meyer88] These
+   objects may maintain state internally, or relie on other objects
+   to remember.  
+
+        Objects are instances of a class, and all objects of a
+   given class react similarily (although, based on state,
+   reactions may be different).  Each class will be a problem
+   solving module.  "Modular concepts apply to programming as well
+   as specification and design." [Meyer88].  
+
+
+   4.1. Sample System: Queue        4.1. Sample System: Queue
+
+        This paper will outline the development of the Queue                                                       Queue
+   class.  This queue is single ended, circular, and will expand to
+   meet its own size requirements.  This class basically joins
+   OrderedCollection's input and adding abilities to Sequence's   OrderedCollection's                               Sequence's
+   output and enumeration methods.  It will inherit from the
+   abstract class Collection directly; this should keep minimal any                  Collection
+   awkwardness trying to shoehorn the Queue class on top of another                                      Queue
+   class.  You should have a copy of the Collection class method                                         Collection
+   file (.m) on handy during your reading here.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   Barney - OCT                  pg. 6                   29-Jul-1993
+
+
+   Object C Translator                                     Release 2
+
+
+
+
+
+   Section 5    Section 5
+   Section 5    Section 5
+   _______ __________________    _______ __________________   Section 5. Class File   Section 5. Class File
+
+   **** THIS DOCUMENT IS UNFINISHED **** 
+
+   To create a class requires the creation of two files: the
+   interface and the implementation.  The interface file is a
+   public header that all clients of the class will read.  The
+   implementation is where the code to support the class is
+   located.  This file will be described first.  
+
+
+   5.1. Methods          5.1. Methods
+
+        Time to invoke your favorite program editor and start
+   writing.  Normally you would invoke your favorite pencil and
+   start writing on paper.  Planning ahead on which methods a class
+   will implemenet is very important, as they will dictate what
+   type of services the class will be providing, and hence, what
+   data structures will be used.  For the Queue we'll be adding to                                          Queue
+   the front and removing from the tail.  Any absolute references
+   will have to be adjusted to fit around the circular-ness of the
+   Queue.  Only some of the conversion methods (ie, asBag) will be
+   implemented here, but you may flesh out the class completely.  
+
+        Examining the Collection method file, you'll notice the add                      Collection
+   and remove methods are very generic.  These will be interpreted
+   as "addHead:" and "remTail:" 
+
+   The _________ builds a list of modules provided by the user.       prelinker
+   When the runtime system initializes itself, it walks down this
+   list finding all the dependent classes.  From this list, all the
+   methods are given codes, and every class initialized.  
+
+
+   5.2. After Translation         5.2. After Translation
+
+        A prelinker is used to build a list of classes that will be
+   brought together to form the final application.  A small .c file                                                            .c
+   is built, which must be compiled and added into the list of
+   object modules for the appliction.  This list tells the linker
+   which classes to extract from the library, including any
+   dependencies the included classes need, like other classes.
+   It's also used by the substrate at startup-time to build a
+   central list of method selector codes and class names.
+   Normally, this small file need only be rebuilt when the list of
+   modules the user provides changes in some way, or a new class is
+   added to the application.  
+
+
+   Barney - OCT                  pg. 7                   29-Jul-1993
+
+
+   Object C Translator                                     Release 2
+
+
+
+
+
+   Section 6    Section 6
+   Section 6    Section 6
+   _______ ____________________    _______ ____________________   Section 6. Translation   Section 6. Translation
+
+   The first two passes are driven by OCT, which calls ___ first.                                                       cpp
+   The translator then converts class definitions and methods into
+   legal "C" code.  The translator uses information in the
+   @interface clauses to relate the external classes.  The system's
+   "C" compiler runs next.  The prelinker creates a list of classes
+   for use by the substrate.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   Barney - OCT                  pg. 8                   29-Jul-1993
+
+
+   Object C Translator                                     Release 2
+
+
+
+
+
+   Section 7    Section 7
+   Section 7    Section 7
+   _______ ____________________________________    _______ ____________________________________   Section 7. Theory of Methods and Factories   Section 7. Theory of Methods and Factories
+
+   This section describes the run-time environment the objects
+   exist within.  It describes the theory behind the "reality" the
+   application runs inside of.  
+
+
+    Objects             Instance Base             Factory Base    Objects             Instance Base             Factory Base
+                                            ,____________,
+                                            |                         |
+                  ,-----------------------------------------------,   |
+                  |                         |                     |   |
+   +--------+     V    +--------------+     V   +--------------+  |   |
+   | isa   ----------> | isa         ---------> | isa         ------->|
+   +========+     ^    +--------------+     ^   +--------------+  |   |
+                  |    | super    --> Nil   |   | super       ----+   |
+                  |    | "Object"     |     |   | "Object"    |      |
+                  |    | size       4 |     |   | size      24 |      |
+                  |    +--------------+     |   +--------------+      |
+                  |                         |                         |
+                  \----------------------,  \---------------------,   |
+                                         |                        |   |
+   +--------+          +--------------+  |      +--------------+  |   |
+   | isa   ----------> | isa         ---------> | isa         ------->|
+   +--------+     ^    +--------------+  |   ^  +--------------+  |   |
+   |        |     |    | super       ----'   |  | super       ----'   |
+   +--------+     |    | "View"       |      |  | "View"      |      |
+                  |    | size      20 |      |  | size      24 |      |
+                  |    +--------------+      |  +--------------+      |
+                  |                          |                        |
+                  \----------------------,   \--------------------,   |
+                                         |                        |   |
+   +--------+          +--------------+  |      +--------------+  |   |
+   | isa   ----------> | isa         ---------> | isa         ------->|
+   |        |          +--------------+  |      +--------------+  |
+   +--------+          | super       ----'      | super       ----'
+   |        |          | "Fixture"    |         | "Fixture"   |
+   +--------+          | size      26 |         | size      24 | 
+                       +--------------+         +--------------+
+
+
+
+        Fig. 7-1, Classes in Memory     .          Fig. 7-1,
+
+
+
+
+
+
+   Barney - OCT                  pg. 9                   29-Jul-1993
+
+
+   Object C Translator                                     Release 2
+
+
+   7.1. Factories          7.1. Factories
+
+        Software factories create software objects.  These objects
+   carry inbedded information about how much space they occupy and
+   what kind of method selectors they respond to.  In a factory
+   method, "self" refers to the factory object.  It is a real
+   variable (along with "_cmd" which is the method selector)
+   declared as part of the method definition clause.  "self" can be
+   reassigned to a new instance of itself and returned from a
+   factory method, just as in [Cox86].  However, this practice is
+   discouraged by the author.  Factory objects can never be
+   free'd.  
+
+
+   7.2. Instances          7.2. Instances
+
+        Once created ([new] method), objects can be manipulated and
+   assigned at will.  The caller must track memory usage since
+   there is no automatic garbage collection nor referencing
+   counting.  This does place an extra burden on the programmer,
+   but all of us learned Pascal in order to better discipline
+   ourselves...  
+
+
+   7.3. Methods          7.3. Methods
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   Barney - OCT                 pg. 10                   29-Jul-1993
+
+
+   Object C Translator                                     Release 2
+
+
+
+
+
+   Section 8    Section 8
+   Section 8    Section 8
+   _______ __________________________________    _______ __________________________________   Section 8. Interpreting Runtime Errors   Section 8. Interpreting Runtime Errors
+
+   Because of the dynamic nature of messages and objects, only a
+   limitied amount of checking can be done at compile time.  If
+   this system, all checking of whether a message is appropriate
+   for the object is done at runtime.  If something is amiss, the
+   application can abort.  
+
+        When the first thing your program does is give the "message
+   selector 0" error, suspect your makefile.  If the prelinker                                   makefile.
+   isn't told about your main.m then its method won't be resolved                         main.m
+   (they'll remian 0).  The program will start up, but abort with
+   the first message performed from your main file.  
+
+        If you send a message to a nil ptr, the message dispatcher
+   will just ignore your attempt.  If the object has been free'd,
+   but you have a dangling pointer, you'll also be ignore.  There
+   are compile time switches that can provide some diagnostic
+   messages in these instances, but usually they are a nuicence to
+   have around.  
+
+        If you send a message that an object can handle, you'll get
+   an error message like: 
+
+
+       (oc_error) Slider does not recognize [moreGadgets:]!
+
+       This means an object of the class Slider could not handle                                         Slider
+   the method "moreGadgets:", and neither could any of its parent
+   classes.  If the class name had been Slider then a factory                                        Slider
+   method was being invoked.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   Barney - OCT                 pg. 11                   29-Jul-1993
+
+
+   Object C Translator                                     Release 2
+
+
+
+
+
+   Section 9    Section 9
+   Section 9    Section 9
+   _______ ____________________________    _______ ____________________________   Section 9. The Reality of Runtime   Section 9. The Reality of Runtime
+
+   Before the user application can begin running, the system must
+   initialize itself.  Each class will see the "initialize" message
+   first, which will most likely be fielded by class Object as the                                                     Object
+   default implementation.  The user's main() function name has
+   been changed via a #define in  <objc/objc.h>.  This allows                                  <objc/objc.h>.
+   (almost) seamless operation with pre-existing source files, and
+   requires nothing special from the run-time environment.  Since
+   many microcomputer "C" runtime libraries don't have _atexit(),
+   the include file also redirects exit().  This allows the
+   substrate to cleanup.  Setting the global (BOOL) msgTrace will
+   print out some statistics when the application exits.  
+
+
+   9.1. Method Selector Codes        9.1. Method Selector Codes
+
+        jkjk 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   Barney - OCT                 pg. 12                   29-Jul-1993
+
+
+   Object C Translator                                     Release 2
+
+
+
+
+
+   Section 10    Section 10
+   Section 10    Section 10
+   _______ ___________________    _______ ___________________   Section 10. Cheating!   Section 10. Cheating!
+
+   I'd only be able to get your attention faster if I offered free
+   Calastoga Mineral Water :-).  Wanna delve deep into the guts of
+   an application and pull out something that is hidden in a dark
+   corner? Come a little closer and I shall depart a few tibits of
+   knowledge before tomorrow when I must travel again.  But tonight
+   my stories can be had for an pint of ale.  
+
+
+   10.1. Extracting Instance Variables        10.1. Extracting Instance Variables
+
+        Although objects are supposed to be complete and
+   inaccessible from outside the methods code, you can access the
+   variables if you really need to.  From inside a class you can
+   reference any superclasses' instance variables using "self->" in
+   front of the reference.  
+
+
+
+       - (int) capacity
+       {
+           /* reach into another class and read its mind! */
+           struct { @defs(IdArray) }   *id_ptr;
+
+           id_ptr = (void *) self->contents;    /* Grab pointer to array obj */
+           printf( "its capacity=%d\n", id_ptr->capacity );
+
+           return( [id_ptr capacity] );
+       }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   Barney - OCT                 pg. 13                   29-Jul-1993
+
+
+   Object C Translator                                     Release 2
+
+
+   Bibliography           Bibliography
+
+
+    [Budd87]       Timothy Budd, ___________________  Reading,    [Budd87]                     A Little Smalltalk.
+         Massachusetts: Addison-Wesley, 1987.  
+
+
+    [Coad89]       Peter Coad,    [Coad89]
+         ___________________________________________ Englewood         OORA - Object-Oriented Requirement Analysis
+         Cliffs, New Jersy: Prentice-Hall, 1989.  
+
+
+    [Cox86]       Brad Cox,    [Cox86]
+         _______________________________________________________         Object Oriented Programming - An Evolutionary Approach.
+         Reading, Massachusetts: Addison-Wesley, 1986.  Copyright
+         (c) 1986 by Productivity Products International, Sandy
+         Hook, CT.  
+
+
+    [Gold89]       Adele Goldberg and Dave Robson,    [Gold89]
+         ___________________________  Reading, Massachusetts:         Smalltalk-80: The Language.
+         Addison-Wesley, 1989.  Copyright (c) 1986 by ParcPlace
+         Systems.  
+
+
+    [Kern76]       Brian Kerningham and P. J. Plauger,    [Kern76]
+         _______________  Reading, Massachusetts: Addison-Wesley,         Software Tools.
+         1986.  
+
+
+    [Kern78]       Brian Kerningham and Dennis Ritchie,    [Kern78]
+         ___________________________  Englewood Cliffs, New Jersy:         The C Programming Language.
+         Prentice-Hall, 1978.  Copyright (c) 1978 by Bell Telephone
+         Laboratories, Inc.  
+
+
+    [Meyer88]       Bertrand Meyer,    [Meyer88]
+         ______________________________________  Hertfordshire, UK:         Object-oriented Software Construction.
+         Prentice Hall International, 1988.  
+
+
+    [Stro86]       Bjarne Stroustrup, _____________________________    [Stro86]                          The C++ Programming Language,
+         Reading, Massachusetts: Addison-Wesley, 1986.  
+
+
+
+
+
+
+
+
+
+
+
+   Barney - OCT                 pg. 14                   29-Jul-1993
+
+
+                                                         29-Jul-1993
+
+
+                              Table of Contents                              Table of Contents
+
+
+              Barney - (Release 2) - Object C Translator
+                            As of 25-May-90
+
+                          Includes 2 figures
+
+
+   Abstract       ............................................    1
+
+   1. Introduction      ......................................    2
+      1.1. System Components     .............................    2
+
+   2. Installation      ......................................    3
+      Fig 2-1, OCT Directory Tree    .........................    3
+
+   3. Daily Usage     ........................................    5
+
+   4. Application Program Concept    .........................    6
+      4.1. Sample System: Queue    ...........................    6
+
+   5. Class File     .........................................    7
+      5.1. Methods      ......................................    7
+      5.2. After Translation     .............................    7
+
+   6. Translation      .......................................    8
+
+   7. Theory of Methods and Factories  .......................    9
+      Fig 7-1, Classes in Memory    ..........................    9
+      7.1. Factories      ....................................    9
+      7.2. Instances      ....................................   10
+      7.3. Methods      ......................................   10
+
+   8. Interpreting Runtime Errors    .........................   11
+
+   9. The Reality of Runtime   ...............................   12
+      9.1. Method Selector Codes    ..........................   12
+
+   10. Cheating!      ........................................   13
+      10.1. Extracting Instance Variables    .................   13
+
+
+   Bibliography       ........................................   14
+
+
+
+
+
+
+
+
+
+
+                                -- I --
+
