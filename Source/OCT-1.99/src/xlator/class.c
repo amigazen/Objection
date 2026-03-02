@@ -104,7 +104,12 @@ publicClassVarSTR( class_name )
         if( vars == NULL )
             vars = newstring( np->names );       /* Access all in own class */
         else
-            vars = newstrcat( vars, np->publicNames ); /* publics in supers */
+            /* ObjC ivars are effectively 'protected' by default: subclasses
+             * may reference inherited ivars by bare name (e.g. "contents").
+             * Include superclass ivar names so lu_instvar() can rewrite
+             * them to self->ivar in translated C.
+             */
+            vars = newstrcat( vars, np->names );
         if( yydebug )
             printf( "<%s>\n" , vars );
 	}

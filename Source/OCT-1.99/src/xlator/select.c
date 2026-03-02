@@ -237,6 +237,7 @@ m_call( starts )
     extern void 	add_generic  PARMS(( char *colon_name ));
 
     register char	*p;
+    size_t      len;            /* used when checking selector suffix */
     int 	recurse_flag;
 
     switch( starts )
@@ -371,7 +372,12 @@ m_call( starts )
 
                 if( in_context & IC_VADCL )
                 {
-                   selector = newstrcat( selector, "vaDcl:" );
+                   /* Only append "vaDcl:" if not already present (e.g. user
+                    * wrote [self error: fmt vaDcl: a, b]; selector is already
+                    * "error:vaDcl:" so do not append again. */
+                   len = selector != NULL ? strlen( selector ) : 0;
+                   if( len < 6 || strcmp( selector + len - 6, "vaDcl:" ) != 0 )
+                    selector = newstrcat( selector, "vaDcl:" );
                    strremove( selector, ' ' );
                 }
                 if( selector == NULL )

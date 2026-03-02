@@ -157,6 +157,12 @@ known_type( tok, text )
         case IDENTIFIER :
                     if( lu_type( text ) )
                     	return 1;
+                    /* Treat Objective-C class names as known types too.
+                     * This allows casts like (List *)obj without confusing
+                     * the expression parser.
+                     */
+                    if( searchTree( class_tree, text ) != NULL )
+                    	return 1;
 
     }	/* switch on easy cases */
 
@@ -845,8 +851,8 @@ yyparse( )
                     	break ;
 
         	case ')' :
-                    	/* Found a function with no parameters.. */
-                    	if( prev_tok == '(' && get_tok() == CH_LCURLY )
+                    	/* Found function: ) followed by { (ANSI or K&R with no params). */
+                    	if( get_tok() == CH_LCURLY )
                         {
                             haveFunctYet() ;
                     	    rc = function_body( );

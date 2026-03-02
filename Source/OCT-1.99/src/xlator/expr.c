@@ -251,19 +251,24 @@ primary( tok )
                 break ;
 
         case SIZEOF :
-                (void) get_tok( );  	/* Move upto paren.. */
-                must_match( "primary/sizeof", CH_OPEN_PAREN );
-
-                /* Check tokens after paren (read by must_match()): */
-                if( curr_tok != '*' && known_type(curr_tok, curr_name) )
+                (void) get_tok( );  	/* Consume sizeof, curr_tok is operand */
+                if( curr_tok == CH_OPEN_PAREN )
                 {
-                    gram_typecast();
+                    must_match( "primary/sizeof", CH_OPEN_PAREN );
+                    /* Check tokens after paren (read by must_match()): */
+                    if( curr_tok != '*' && known_type(curr_tok, curr_name) )
+                    {
+                        gram_typecast();
+                    } else
+                    {
+                        expr( curr_tok );   	/* Size of( variable ) */
+                    }
+                    must_match( "primary/sizeof", CH_CLOSE_PAREN );
                 } else
                 {
-                    expr( curr_tok );   	/* Size of( variable ) */
+                    /* sizeof expr -- no parens (e.g. sizeof buf) */
+                    primary( curr_tok );
                 }
-
-                must_match( "primary/sizeof", CH_CLOSE_PAREN );
                 break ;
 
         case CH_OPEN_PAREN :    	/* Nested Expression */
@@ -570,6 +575,8 @@ function_body()
     register int   tok;            		/* Current token */
     int   pp_tok;            	/* Previous previous token.. */
     int   prev_token;        	/* Previous token (hides global var) */
+    int   decl_prev;          /* local prev token while digesting decl */
+    int   decl_pp;            /* local pp token while digesting decl */
     short	save_nest;      	/* nesting at this level */
 
     save_nest  = td_nest;
@@ -580,6 +587,50 @@ function_body()
         if( tok == CH_LCURLY && warn_level > WARN_NORMAL )
         {
         	trip_hline = 1;
+        }
+
+        /* If we are inside a method body (m_order != 0) and we encounter
+         * a C declaration at the start of a block (right after '{'), do not
+         * try to parse it as an expression. Just digest until ';'.  This
+         * allows valid C89 local declarations like:
+         *    extern void foo(int);
+         *    id (*fn)(id,SEL) = _msg;
+         *
+         * IMPORTANT: do NOT trigger on type tokens inside expressions (e.g.
+         * casts like "(short)[obj count]"), otherwise message expressions
+         * won't be translated.
+         */
+        if( m_order != 0 && prev_token == CH_LCURLY &&
+            ( storage(tok) || typetoken(tok) || tok == TYPE_NAME ||
+              (tok == IDENTIFIER &&
+               (lu_type(curr_name) || searchTree(class_tree, curr_name) != NULL)) ) )
+        {
+            /* Digest the declaration statement, but still translate any
+             * Objective-C message expressions that appear in initializers
+             * (e.g. "id all = [[self class] new:1];").
+             */
+            decl_prev = prev_token;
+            decl_pp   = pp_tok;
+            while( tok != DONE && tok != ';' )
+            {
+                if( tok == '[' && decl_prev != IDENTIFIER &&
+                    ( (!trailing(decl_prev) || separator(decl_prev)) ||
+                      (decl_pp != IDENTIFIER && decl_pp != CONSTANT &&
+                        decl_prev == CH_CLOSE_PAREN) ) )
+                {
+                    whole_msg_body();
+                    tok = curr_tok;
+                }
+                else
+                {
+                    tok = get_tok();
+                }
+                decl_pp   = decl_prev;
+                decl_prev = tok;
+            }
+            pp_tok = decl_pp;
+            prev_token = tok;
+            continue;
         }
 
         if( prev_token == CH_OPEN_PAREN && tok != '*' &&
@@ -655,7 +706,12 @@ function_body()
         	tok = ';' ;
         }
         else
+        /* Only treat '[' as an Objective-C message opener when it appears
+         * at an expression boundary. If it follows a function call like
+         * "foo(...)[i]" then it is a C array subscript, not a message.
+         */
         if( tok == '[' && prev_token != IDENTIFIER &&
+            !(prev_token == CH_CLOSE_PAREN && pp_tok == IDENTIFIER) &&
             ( (!trailing(prev_token) || separator(prev_token)) ||
               (pp_tok != IDENTIFIER && pp_tok != CONSTANT &&
         	    prev_token == CH_CLOSE_PAREN) ) )
