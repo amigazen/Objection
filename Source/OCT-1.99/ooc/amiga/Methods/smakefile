@@ -1,0 +1,92 @@
+#
+# SAS/C smakefile: Amiga-specific methods (MsgPort, EList, ENode, IdList) and test harness.
+# Produces AEExec.lib (amiga classes) and main (test binary).
+# Requires BASELIB and OCSUBS from ooc/methods (build that first).  BASELIB must
+# contain ww_base.o (class table); if you get undefined __oc_allCCB_base, rebuild
+# the foundation in ooc/methods with the smakefile that uses "prelink -suffix base".
+# Run from this directory: smake
+#
+
+inc    = OOC:include
+sysinc = sc:include
+oocbin = OOC:C/
+ooclib = OOC:Lib/
+
+OCT    = $(oocbin)oct
+PLN    = $(oocbin)prelink
+LIB    = oml
+LN     = sc link
+ldlibs = sc:lib/sc.lib sc:lib/scm.lib lib:amiga.lib
+
+OCFLAG =
+opts   = NOLINK INCLUDEDIR=$(inc) INCLUDEDIR=$(sysinc)
+
+# Amiga class .m/.c/.o (IdList subclasses List; List comes from BASELIB)
+AMIGA_M = MsgPort.m EList.m ENode.m IdList.m
+AMIGA_C = MsgPort.c EList.c ENode.c IdList.c
+AMIGA_O = MsgPort.o EList.o ENode.o IdList.o
+
+# Library class table (shipped in AMIGALIB; app uses --with base,amiga)
+WW_AMIGA = ww_amiga.c
+
+# App class table (references _oc_allCCB_base and _oc_allCCB_amiga via --with)
+WWC = ww.c
+
+# Archives: amiga classes; foundation and substrate from ooc/methods
+AMIGALIB = $(ooclib)AEExec.lib
+BASELIB  = $(ooclib)AEBase.lib
+OCSUBS   = $(ooclib)AESubs.lib
+
+# Test harness executable
+MAIN_BIN = main
+
+all: $(AMIGALIB) $(WWC) $(MAIN_BIN)
+
+# --- Library class table: prelink -suffix amiga; object goes into AMIGALIB ---
+$(WW_AMIGA): $(AMIGA_M)
+	$(PLN) -suffix amiga $(WW_AMIGA) $(AMIGA_M)
+ww_amiga.o: $(WW_AMIGA)
+	sc $(opts) $(WW_AMIGA)
+
+# --- App class table: prelink --with base,amiga so _oc_registry finds lib tables ---
+$(WWC): main.m
+	$(PLN) --with base,amiga $(WWC) main.m
+
+# --- Amiga classes: translate .m -> .c ---
+MsgPort.c: MsgPort.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o MsgPort.c MsgPort.m
+EList.c: EList.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o EList.c EList.m
+ENode.c: ENode.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o ENode.c ENode.m
+IdList.c: IdList.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o IdList.c IdList.m
+
+# --- Test harness: translate and compile ---
+main.c: main.m
+	$(OCT) $(OCFLAG) -i $(inc) -i $(sysinc) -o main.c main.m
+main.o: main.c
+	sc $(opts) main.c
+
+# --- Amiga classes: compile .c -> .o ---
+MsgPort.o: MsgPort.c
+	sc $(opts) MsgPort.c
+EList.o: EList.c
+	sc $(opts) EList.c
+ENode.o: ENode.c
+	sc $(opts) ENode.c
+IdList.o: IdList.c
+	sc $(opts) IdList.c
+ww.o: ww.c
+	sc $(opts) ww.c
+
+# --- Archive (amiga classes + library class table) ---
+$(AMIGALIB): $(AMIGA_O) ww_amiga.o
+	$(LIB) $(AMIGALIB) r $(AMIGA_O) ww_amiga.o
+
+# --- Test binary: link main.o, ww.o; foundation before amiga so base classes init first ---
+$(MAIN_BIN): main.o ww.o $(WWC) $(AMIGALIB) $(BASELIB) $(OCSUBS)
+	$(LN) TO $(MAIN_BIN) MAP main.o ww.o LIB $(BASELIB) $(AMIGALIB) $(OCSUBS) $(ldlibs)
+
+clean:
+	-delete $(AMIGA_C) $(AMIGA_O) $(WW_AMIGA) ww_amiga.o $(WWC) main.c main.o $(MAIN_BIN) \#?.sym \#?.lst \#?.map quiet

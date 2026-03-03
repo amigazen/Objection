@@ -66,12 +66,13 @@ static char copyright[]={" (c) copyright Brian Witt, 1989,1990,1991. ALL RIGHTS 
 
 
 
-/*  This name must jive with extern array in subbind.c/_oc_bind(): */
-#define  CB_ARRAY	"_oc_allCCB"
-
+/*  Base name for class table; suffix added for library build (subbind walks _oc_registry). */
+#define  CB_ARRAY_BASE	"_oc_allCCB"
+#define  OC_REGISTRY	"_oc_registry"
 
 #define  SIZ_BUFFER  120
-
+#define  SIZ_SUFFIX  32
+#define  SIZ_WITH    120
 
 /* ----------------------  Externally, Yours  ------------------------ */
 
@@ -81,6 +82,11 @@ static char copyright[]={" (c) copyright Brian Witt, 1989,1990,1991. ALL RIGHTS 
 FILE	*data_file; 					/* Prelinker output file */
 
 struct List 	module_list;
+
+/*  -suffix <name>: library build; output array _oc_allCCB_<name> (no _oc_registry).  */
+static char 	array_suffix[ SIZ_SUFFIX ];
+/*  --with <list>: app build; emit externs for lib tables and _oc_registry[] pointing at them.  */
+static char 	with_libs[ SIZ_WITH ];
 
 
 /* --------------------  Our Private Variables  ---------------------- */
@@ -207,39 +213,85 @@ must_list(void)
 /* ----------------------  Public Code Works  ------------------------ */
 
 
-/*   mk_table  --  Create the two extern class tables in the output file.
- *                 First list is extern definitions, second is the array
- *                 that the runtime binding will use.
+/*   mk_table  --  Create extern class table(s).  Library build (-suffix): single array
+ *                 _oc_allCCB_<suffix>.  App build: _oc_allCCB plus optional _oc_registry
+ *                 that points at library arrays (--with base,amiga) so runtime can find them.
  */
 void
 mk_table(void)
 {
 	struct Node 	*np;
 	short 	isFirst;
+	char 	*cb_array;
+	char 	*p;
+	char 	*q;
 
 	fprintf( data_file, "%sCreated by %s for class initialization%s\n\n",
 				cmt_open, VERSION, cmt_close );
 
-    /*  1.  External References:  */
+	{
+		static char  array_name_buf[64];
+		if ( array_suffix[0] != EOS )
+			{
+				sprintf( array_name_buf, "%s_%s", CB_ARRAY_BASE, array_suffix );
+				cb_array = array_name_buf;
+			}
+		else
+			cb_array = (char *)CB_ARRAY_BASE;
+	}
+
+	/*  Extern refs for library tables when app uses --with  */
+	if ( with_libs[0] != EOS )
+		{
+			p = with_libs;
+			while ( *p != EOS )
+				{
+					q = p;
+					while ( *q != EOS && *q != ',' )
+						q++;
+					if ( q > p )
+						fprintf( data_file, "extern char *_oc_allCCB_%.*s[];\n", (int)(q - p), p );
+					p = ( *q == ',' ) ? q + 1 : q;
+				}
+			fputs( "\n", data_file );
+		}
+
+	/*  1.  External References for this table  */
 	isFirst = TRUE;
 	fprintf( data_file, "extern char " );
 	for( np=module_list.lh_Head ; np->ln_Succ != NULL ; np=np->ln_Succ )
-	{
-		if( ! isFirst )
-			fputs( ",\n        ", data_file );
-		fprintf( data_file, "_ocCB%s", np->ln_Name );
-		isFirst = FALSE;
-	}
+		{
+			if( ! isFirst )
+				fputs( ",\n        ", data_file );
+			fprintf( data_file, "_ocCB%s", np->ln_Name );
+			isFirst = FALSE;
+		}
 
-    /*  2.  Array of pointers to classes:  */
-	fprintf( data_file, ";\n\nchar  *%s [] = {\n", CB_ARRAY );
+	/*  2.  Array of pointers to classes  */
+	fprintf( data_file, ";\n\nchar  *%s [] = {\n", cb_array );
 	for( np=module_list.lh_Head ; np->ln_Succ != NULL ; np=np->ln_Succ )
-	{
 		fprintf( data_file, "    & _ocCB%s,\n", np->ln_Name );
-	}
-
 	fprintf( data_file, "   (char *)0\n} ;\n\n" );
 
+	/*  3.  App only: registry so runtime walks lib tables then app table  */
+	if ( array_suffix[0] == EOS )
+		{
+			fprintf( data_file, "char  **%s [] = {\n", OC_REGISTRY );
+			if ( with_libs[0] != EOS )
+				{
+					p = with_libs;
+					while ( *p != EOS )
+						{
+							q = p;
+							while ( *q != EOS && *q != ',' )
+								q++;
+							if ( q > p )
+								fprintf( data_file, "    _oc_allCCB_%.*s,\n", (int)(q - p), p );
+							p = ( *q == ',' ) ? q + 1 : q;
+						}
+				}
+			fprintf( data_file, "    %s,\n   (char **)0\n} ;\n\n", CB_ARRAY_BASE );
+		}
 }	/* mk_table */
 
 
@@ -250,7 +302,9 @@ usage(int rc)
 	FILE	*uf = stdout;
 
 	fprintf( uf, "%s", RELEASE );
-	fprintf( uf, "usage: prelink <outCfile> <inMfile>..\n" );
+	fprintf( uf, "usage: prelink [ -suffix <name> ] [ --with <lib,list> ] <outCfile> <inMfile>..\n" );
+	fprintf( uf, "  -suffix <name>   library build: output _oc_allCCB_<name> (no _oc_registry)\n" );
+	fprintf( uf, "  --with <list>    app build: emit _oc_registry[] referencing lib tables (e.g. base,amiga)\n" );
 #ifdef MUST_FNAME
 	fprintf( uf, "uses file: %s\n", MUST_FNAME );
 #else
@@ -267,25 +321,56 @@ parse_cmd(int argc, char *argv[])
 	char	*name;
 	int 	j;
 
+	array_suffix[0] = EOS;
+	with_libs[0] = EOS;
+
 	if( argc <= 2 )
 		usage( 1 );
 
-    /*  1.  Argv[1] == Output filename:  */
-	name = argv[ 1 ];
+	j = 1;
+	while ( j < argc && argv[j][0] == '-' )
+		{
+			if ( strcmp( argv[j], "-suffix" ) == 0 )
+				{
+					j++;
+					if ( j >= argc )
+						usage( 1 );
+					strncpy( array_suffix, argv[j], SIZ_SUFFIX - 1 );
+					array_suffix[SIZ_SUFFIX - 1] = EOS;
+					j++;
+				}
+			else if ( strcmp( argv[j], "--with" ) == 0 )
+				{
+					j++;
+					if ( j >= argc )
+						usage( 1 );
+					strncpy( with_libs, argv[j], SIZ_WITH - 1 );
+					with_libs[SIZ_WITH - 1] = EOS;
+					j++;
+				}
+			else
+				usage( 1 );
+		}
+
+	if ( j >= argc )
+		usage( 1 );
+
+	/*  Output filename  */
+	name = argv[j];
+	j++;
 	if( (data_file=fopen(name, "w")) == NULL )
-	{
-		printf( "Can't write <%s>!\n", name );
-		exit( 10 );
-	}
+		{
+			printf( "Can't write <%s>!\n", name );
+			exit( 10 );
+		}
 
-    /*  2.  Argv[2+] == Class names..  */
-	for( j=2 ; j < argc ; ++j )
-	{
-		name = mk_base_name( argv[ j ] );
-		strlower( name );
-		AddTail( & module_list, mk_node( name ) );
-	}
-
+	/*  Remaining args: .m files (or module names)  */
+	for( ; j < argc ; ++j )
+		{
+			name = mk_base_name( argv[j] );
+			strlower( name );
+			AddTail( & module_list, mk_node( name ) );
+		}
 }	/* parse_cmd */
 
 

@@ -26,17 +26,20 @@ opts   = NOLINK INCLUDEDIR=$(inc) INCLUDEDIR=$(sysinc)
 # Substrate: SUBSTRATE=1 for objc.h; MCH_AMIGA=1 so tree.c uses exec.library
 opts_s = NOLINK INCLUDEDIR=$(inc) INCLUDEDIR=$(sysinc) DEFINE SUBSTRATE=1 DEFINE MCH_AMIGA=1
 
-# Foundation classes (order for linking: base first, then collections); ww.o is for app linking only, not in archive
+# Foundation classes (order for linking: base first, then collections)
 FOUND_M = Object.m IdArray.m System.m List.m LinkList.m String.m Array.m Collection.m OrderedCollection.m Sequence.m Set.m Queue.m
 FOUND_C = Object.c IdArray.c System.c List.c LinkList.c String.c Array.c Collection.c OrderedCollection.c Sequence.c Set.c Queue.c
 FOUND_O = Object.o IdArray.o System.o List.o LinkList.o String.o Array.o Collection.o OrderedCollection.o Sequence.o Set.o Queue.o
+
+# Library class table (shipped in BASELIB; apps use --with base to reference it)
+WW_BASE = ww_base.c
 
 # Substrate C sources and objects (stackovf.c = SAS/C _CXOVF replacement;
 # oc_exit.c = real exit, no objc.h, avoids exit->app_exit recursion)
 SUBS_C = subs.c subio.c submem.c subbind.c submsg.c tree.c stackovf.c oc_exit.c
 SUBS_O = subs.o subio.o submem.o subbind.o submsg.o tree.o stackovf.o oc_exit.o
 
-# Prelink input: ww.c is generated from the same .m list used in foundation
+# App class table (references _oc_allCCB_base via --with base)
 WWC = ww.c
 
 BASELIB = $(ooclib)AEBase.lib
@@ -47,9 +50,15 @@ USER_BIN = user
 
 all: $(BASELIB) $(OCSUBS) $(WWC) $(USER_BIN)
 
-# --- Prelink: class table for app linking; include user.m so ww.c is built for the test harness ---
-$(WWC): $(FOUND_M) user.m
-	$(PLN) $(WWC) $(FOUND_M) user.m
+# --- Library class table: prelink -suffix base; object goes into BASELIB (no source needed at app link) ---
+$(WW_BASE): $(FOUND_M)
+	$(PLN) -suffix base $(WW_BASE) $(FOUND_M)
+ww_base.o: $(WW_BASE)
+	sc $(opts) $(WW_BASE)
+
+# --- App class table: prelink --with base so _oc_registry points at _oc_allCCB_base ---
+$(WWC): user.m
+	$(PLN) --with base $(WWC) user.m
 
 # --- Foundation: translate .m -> .c ---
 Object.c: Object.m
@@ -129,9 +138,9 @@ stackovf.o: stackovf.c
 oc_exit.o: oc_exit.c
 	sc NOLINK INCLUDEDIR=$(inc) INCLUDEDIR=$(sysinc) oc_exit.c
 
-# --- Archives (ocBase.lib = foundation; ocSubs.lib = substrate) ---
-$(BASELIB): $(FOUND_O)
-	$(LIB) $(BASELIB) r $(FOUND_O)
+# --- Archives (foundation + library class table) ---
+$(BASELIB): $(FOUND_O) ww_base.o
+	$(LIB) $(BASELIB) r $(FOUND_O) ww_base.o
 
 $(OCSUBS): $(SUBS_O)
 	$(LIB) $(OCSUBS) r $(SUBS_O)
@@ -141,4 +150,4 @@ $(USER_BIN): user.o ww.o $(WWC) $(BASELIB) $(OCSUBS)
 	$(LN) TO $(USER_BIN) MAP user.o ww.o LIB $(BASELIB) $(OCSUBS) $(ldlibs)
 
 clean:
-	-delete $(FOUND_C) $(FOUND_O) $(SUBS_O) oc_exit.o $(WWC) user.c user.o $(USER_BIN) \#?.sym \#?.lst \#?.map quiet
+	-delete $(FOUND_C) $(FOUND_O) $(SUBS_O) oc_exit.o $(WW_BASE) ww_base.o $(WWC) user.c user.o $(USER_BIN) \#?.sym \#?.lst \#?.map quiet

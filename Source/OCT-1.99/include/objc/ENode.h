@@ -13,8 +13,8 @@
  */
 @interface ENode : Object
 {
-	char	*next;
-	char	*prev;
+	char	*nodeNext;	/* list link; avoid name clash with Object's ivar "next" */
+	char	*nodePrev;
 }
 
 

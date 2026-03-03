@@ -42,6 +42,17 @@
 #  endif
 # endif
 
+/* Some vendor headers (or cross-toolchain headers) may use GCC-style
+ * __attribute__((...)) even when compiling with a non-GCC compiler such
+ * as SAS/C.  If the compiler doesn't recognize __attribute__, treat it
+ * as an empty macro so those headers still parse.
+ */
+# ifndef __GNUC__
+#  ifndef __attribute__
+#   define __attribute__(x)
+#  endif
+# endif
+
 # define EXEC_NODES_H  1
 # define EXEC_LISTS_H  1
 # define EXEC_TYPES_H  1
@@ -150,8 +161,7 @@ extern void AddTail(struct MinList *list, struct Node *node);
 extern struct Node *RemTail(struct MinList *list);
 extern struct Node *FindName(struct MinList *list, char *name);
 #endif
-
-
+#define _OCT_HEAD_LIST_FUNCS 1
 #endif
 
 /* end octhead.h */

@@ -5,7 +5,7 @@
 
 
 @implementation ENode 
-/**  : Object { char  *next; char  *prev; }  **/
+/**  : Object { char  *nodeNext; char  *nodePrev; }  **/
 
 
 struct SuperClass {
@@ -18,7 +18,7 @@ struct SuperClass {
 #define  prv  mln_Pred
 
 
-#define PNOD(le)	(&(le)->next)
+#define PNOD(le)	(&(le)->nodeNext)
 #define BACK(p)		((id)(((char*)p)-sizeof(struct SuperClass)))
 
 
@@ -26,7 +26,7 @@ struct SuperClass {
 {
 	struct MinNode	*n;
 
-	n = (struct MinNode *) next;
+	n = (struct MinNode *) nodeNext;
 	if (!n->nxt)
 		return nil;
 	return BACK(n);
@@ -36,7 +36,7 @@ struct SuperClass {
 {
 	struct MinNode	*n;
 
-	n = (struct MinNode *) prev;
+	n = (struct MinNode *) nodePrev;
 	if (!n->prv)
 		return nil;
 	return BACK(n);

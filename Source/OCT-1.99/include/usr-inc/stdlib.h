@@ -1,39 +1,35 @@
-/*   STDLIB.H		Standard Library stuff (K&R,2Ed, pg 251-252)   */
+/*   STDLIB.H   Standard Library (ANSI prototypes for SAS/C).   */
 
-/*     This header declares functions for number conversion, storeage
- *     allocation, and similar tasks.
- */
+#ifndef _STDLIB_H
+#define _STDLIB_H 1
 
-extern double 		atof();
-extern int  		atoi();
-extern long 		atol();
+double atof(const char *nptr);
+int atoi(const char *nptr);
+long atol(const char *nptr);
 
-extern double       strtod();
-extern long   		strtol();
-extern long   		strtoul();
+double strtod(const char *nptr, char **endptr);
+long strtol(const char *nptr, char **endptr, int base);
+unsigned long strtoul(const char *nptr, char **endptr, int base);
 
-extern int 			rand();				/* 0..32767 random numbers */
-extern void			srand();			/* Seed it */
+int rand(void);
+void srand(unsigned int seed);
 
-extern char			*calloc();
-extern char			*malloc();
-#ifdef __STDC__
-extern void			free();				/* ANSI always succeeds */
+void *calloc(unsigned long nmemb, unsigned long size);
+void *malloc(unsigned long size);
+void free(void *ptr);
+
+void abort(void);
+void exit(int status);
+int atexit(void (*function)(void));
+
+int system(const char *command);
+char *getenv(const char *name);
+void *bsearch(const void *key, const void *base, unsigned long nmemb,
+    unsigned long size, int (*compar)(const void *, const void *));
+void qsort(void *base, unsigned long nmemb, unsigned long size,
+    int (*compar)(const void *, const void *));
+
+int abs(int j);
+long labs(long j);
+
 #endif
-#ifdef AZTEC_C
-extern int 			free();				/* Aztec returns 0 if OK */
-#endif
-
-extern void			abort();			/* Causes a signal :-) */
-extern void			exit();
-extern int          atexit();
-
-extern int 			system();
-extern char			*getenv();
-extern void 		*bsearch();
-extern void 		qsort();
-
-extern int  		abs();
-extern long 		labs();
-
-/*	end of stdlib.h */
