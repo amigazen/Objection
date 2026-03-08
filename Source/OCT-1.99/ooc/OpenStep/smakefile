@@ -1,0 +1,155 @@
+#
+# SAS/C smakefile: OpenStep Foundation library for OCT.
+# Produces OpenStep.lib (or libOpenStep.a). Modeled on ooc/methods/smakefile.
+# Depends on base library (BASELIB / libocbase) and substrate (ocsubs).
+# Run from this directory: smake
+# Set inc, oocbin, ooclib to your assigns (e.g. OOC: or path to OCT tree).
+# Apps: link with ww.o (from prelink), -lOpenStep -lBASELIB -locsubs.
+#
+
+inc    = OOC:include
+usrinc =
+sysinc = sc:include
+oocbin = OOC:C/
+ooclib = OOC:Lib/
+
+OCT    = $(oocbin)oct
+PLN    = $(oocbin)prelink
+LIB    = oml
+LN     = sc link
+ldlibs = sc:lib/sc.lib sc:lib/scm.lib lib:amiga.lib
+
+OCTFLAG =
+opts   = NOLINK INCLUDEDIR=$(inc) INCLUDEDIR=$(sysinc)
+
+# OpenStep Foundation classes (order: base first, then collections/value)
+OPENSTEP_M = NSObject.m NSString.m NSMutableString.m NSArray.m NSMutableArray.m NSData.m NSMutableData.m \
+              NSValue.m NSNumber.m NSEnumerator.m NSDictionary.m NSMutableDictionary.m \
+              NSSet.m NSMutableSet.m NSDate.m NSException.m NSIndexSet.m NSMutableIndexSet.m
+OPENSTEP_C = NSObject.c NSString.c NSMutableString.c NSArray.c NSMutableArray.c NSData.c NSMutableData.c \
+              NSValue.c NSNumber.c NSEnumerator.c NSDictionary.c NSMutableDictionary.c \
+              NSSet.c NSMutableSet.c NSDate.c NSException.c NSIndexSet.c NSMutableIndexSet.c
+# NSAllocator.c, NSRuntime.c: Amiga exec/dos/utility (no libc). ww_openstep.o: class table for runtime.
+OPENSTEP_O = NSObject.o NSString.o NSMutableString.o NSArray.o NSMutableArray.o NSData.o NSMutableData.o \
+              NSValue.o NSNumber.o NSEnumerator.o NSDictionary.o NSMutableDictionary.o \
+              NSSet.o NSMutableSet.o NSDate.o NSException.o NSIndexSet.o NSMutableIndexSet.o NSAllocator.o NSRuntime.o ww_openstep.o
+
+OPENSTEP_LIB = $(ooclib)OpenStep.lib
+
+# OpenStep class table (so runtime can find NSString, NSArray, etc.)
+WW_OPENSTEP = ww_openstep.c
+
+# User test harness (links with OpenStep + base + substrate)
+WWC = ww.c
+USER_BIN = user
+
+all: $(OPENSTEP_LIB) $(WWC) $(USER_BIN)
+
+# --- OpenStep class table: prelink -suffix openstep; object goes into OpenStep.lib ---
+$(WW_OPENSTEP): $(OPENSTEP_M)
+	$(PLN) -suffix openstep $(WW_OPENSTEP) $(OPENSTEP_M)
+ww_openstep.o: $(WW_OPENSTEP)
+	sc $(opts) $(WW_OPENSTEP)
+
+# --- App class table: prelink --with base,openstep so _oc_registry finds OpenStep classes ---
+$(WWC): user.m $(WW_OPENSTEP)
+	$(PLN) --with base,openstep $(WWC) user.m
+
+# --- Translate .m -> .c ---
+NSObject.c: NSObject.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSObject.c NSObject.m
+NSString.c: NSString.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSString.c NSString.m
+NSArray.c: NSArray.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSArray.c NSArray.m
+NSMutableArray.c: NSMutableArray.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSMutableArray.c NSMutableArray.m
+NSData.c: NSData.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSData.c NSData.m
+NSMutableData.c: NSMutableData.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSMutableData.c NSMutableData.m
+NSValue.c: NSValue.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSValue.c NSValue.m
+NSNumber.c: NSNumber.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSNumber.c NSNumber.m
+NSEnumerator.c: NSEnumerator.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSEnumerator.c NSEnumerator.m
+NSDictionary.c: NSDictionary.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSDictionary.c NSDictionary.m
+NSMutableDictionary.c: NSMutableDictionary.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSMutableDictionary.c NSMutableDictionary.m
+NSSet.c: NSSet.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSSet.c NSSet.m
+NSMutableSet.c: NSMutableSet.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSMutableSet.c NSMutableSet.m
+NSDate.c: NSDate.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSDate.c NSDate.m
+NSMutableString.c: NSMutableString.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSMutableString.c NSMutableString.m
+NSException.c: NSException.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSException.c NSException.m
+NSIndexSet.c: NSIndexSet.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSIndexSet.c NSIndexSet.m
+NSMutableIndexSet.c: NSMutableIndexSet.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o NSMutableIndexSet.c NSMutableIndexSet.m
+
+# --- User test harness ---
+user.c: user.m
+	$(OCT) $(OCTFLAG) -i $(inc) -i $(sysinc) -o user.c user.m
+user.o: user.c
+	sc $(opts) user.c
+
+# --- Compile .c -> .o ---
+NSObject.o: NSObject.c
+	sc $(opts) NSObject.c
+NSString.o: NSString.c
+	sc $(opts) NSString.c
+NSArray.o: NSArray.c
+	sc $(opts) NSArray.c
+NSMutableArray.o: NSMutableArray.c
+	sc $(opts) NSMutableArray.c
+NSData.o: NSData.c
+	sc $(opts) NSData.c
+NSMutableData.o: NSMutableData.c
+	sc $(opts) NSMutableData.c
+NSValue.o: NSValue.c
+	sc $(opts) NSValue.c
+NSNumber.o: NSNumber.c
+	sc $(opts) NSNumber.c
+NSEnumerator.o: NSEnumerator.c
+	sc $(opts) NSEnumerator.c
+NSDictionary.o: NSDictionary.c
+	sc $(opts) NSDictionary.c
+NSMutableDictionary.o: NSMutableDictionary.c
+	sc $(opts) NSMutableDictionary.c
+NSSet.o: NSSet.c
+	sc $(opts) NSSet.c
+NSMutableSet.o: NSMutableSet.c
+	sc $(opts) NSMutableSet.c
+NSDate.o: NSDate.c
+	sc $(opts) NSDate.c
+NSMutableString.o: NSMutableString.c
+	sc $(opts) NSMutableString.c
+NSException.o: NSException.c
+	sc $(opts) NSException.c
+NSIndexSet.o: NSIndexSet.c
+	sc $(opts) NSIndexSet.c
+NSMutableIndexSet.o: NSMutableIndexSet.c
+	sc $(opts) NSMutableIndexSet.c
+NSAllocator.o: NSAllocator.c
+	sc $(opts) NSAllocator.c
+NSRuntime.o: NSRuntime.c
+	sc $(opts) NSRuntime.c
+ww.o: ww.c
+	sc $(opts) ww.c
+
+# --- Archive ---
+$(OPENSTEP_LIB): $(OPENSTEP_O)
+	$(LIB) $(OPENSTEP_LIB) r $(OPENSTEP_O)
+
+# --- User binary: link user.o, ww.o, OpenStep, base, substrate ---
+$(USER_BIN): user.o ww.o $(OPENSTEP_LIB)
+	$(LN) TO $(USER_BIN) MAP user.o ww.o LIB $(OPENSTEP_LIB) $(ooclib)AEBase.lib $(ooclib)AESubs.lib $(ldlibs)
+
+clean:
+	-delete $(OPENSTEP_C) $(OPENSTEP_O) $(WW_OPENSTEP) ww_openstep.o $(WWC) user.c user.o $(USER_BIN) \#?.sym \#?.lst \#?.map quiet
