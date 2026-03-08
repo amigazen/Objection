@@ -516,7 +516,27 @@ whole_msg_body( )
 
         case IDENTIFIER :
                     m_call( MSM_METHOD );
-                    if( get_tok() != ']' )    	/* Eat ']' */
+                    if( get_tok() == ':' )
+                        {
+                            /* IDENTIFIER ':' not merged as PARM_LABEL; parse args, maybe more keywords */
+                            top_expr( get_tok() );
+                            while( curr_tok == PARM_LABEL )
+                                {
+                                    m_call( MSM_METHOD );
+                                    top_expr( get_tok() );
+                                }
+                            if( curr_tok == ',' )
+                                {
+                                    m_call( MSM_VADCL );
+                                    while( curr_tok == ',' && depth == td_nest )
+                                        top_expr( get_tok() );
+                                }
+                            else if( curr_tok == IDENTIFIER )
+                                gerr( ERROR_RESYNC, GERR_EXPRESSION, er_msg, 0L );
+                            if( curr_tok != ']' && get_tok() != ']' )
+                                gerr( ERROR_RESYNC, GERR_LONG_MESSAGE, er_msg, 0L );
+                        }
+                    else if( curr_tok != ']' )
                     	gerr( ERROR_RESYNC, GERR_LONG_MESSAGE, er_msg, 0L );
 
                     break ;

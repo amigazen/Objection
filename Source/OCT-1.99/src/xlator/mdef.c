@@ -201,14 +201,21 @@ dcl_method2( ret_type, method1 )
 						type = newstrcat( type, lex_text(LT_STOP, ' ') );
 						break ;
 
-			case OPEN_FACTORY_METHOD :
-			case OPEN_INSTANCE_METHOD :
+		case OPEN_FACTORY_METHOD :
+		case OPEN_INSTANCE_METHOD :
 						gwarn( GW_MISSING_SEMI );
 						unget_tok();
 						/*-- fall through --*/
 
-			case CH_LCURLY :
-			case ';' :
+		case ',' :
+						/* Variadic method: last parameter followed by , ... */
+						get_tok();
+						if ( curr_tok != ELIPSIS )
+							goto DM_ERR;
+						get_tok();   /* consume ... ; curr_tok is now ';' or CH_LCURLY */
+						/* fall through */
+		case CH_LCURLY :
+		case ';' :
 						strremove( name, ' ' );
 						np = mk_mynode( name, type );
 						np->tag = var;

@@ -149,7 +149,7 @@ init_parser(void)
 
     tokenkey[ OPEN_FACTORY_METHOD  ] = TKEY_OC_SPECIAL;
     tokenkey[ OPEN_INSTANCE_METHOD ] = TKEY_OC_SPECIAL;
-    tokenkey[ PARM_LABEL ] = TKEY_OC_SPECIAL;
+    tokenkey[ PARM_LABEL ] = TKEY_OC_SPECIAL | TKEY_TRAILING;
     tokenkey[ OOC_DEFS  ] = TKEY_OC_SPECIAL;
     tokenkey[ OOC_SELECTOR ] = TKEY_OC_SPECIAL;
     tokenkey[ OOC_PUBLIC ] = TKEY_OC_SPECIAL;

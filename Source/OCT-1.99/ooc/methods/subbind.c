@@ -1,7 +1,8 @@
 /*
  * subbind.c -- OCT substrate: selector binding, class registry, poseAs.
- * _oc_bind() runs at startup: walks _oc_allCCB (from prelinker), binds
- * selector strings to SELs and registers classes. poseAs stubbed.
+ * _oc_bind() runs at startup: walks _oc_registry (from prelinker), each
+ * element of which is an array of class_cb ptrs (app table + lib tables
+ * from --with base,amiga).  Libraries ship their own _oc_allCCB_<name>.o.
  *
  * Compile with -DSUBSTRATE so objc.h uses struct objc_class for id
  * (avoids undefined struct _PRIVATE when building substrate alone).
@@ -16,8 +17,8 @@
 #define MAX_SELS   2048
 #define MAX_CLASSES 256
 
-/* Prelinker-generated table: array of (char*) pointing to class_cb structs. */
-extern char *_oc_allCCB[];
+/* Prelinker-generated: registry of class tables (libs then app). */
+extern char **_oc_registry[];
 
 static STR sel_strings[MAX_SELS];
 static SEL sel_values[MAX_SELS];
@@ -149,12 +150,15 @@ register_class(Class cls)
 }
 
 /*
- * Walk _oc_allCCB, bind selectors in each class_cb, register instance class.
+ * Walk _oc_registry (each entry an array of class_cb ptrs), bind selectors
+ * and register classes.  Order: base lib, amiga lib, ..., app table.
  */
 void
 _oc_bind(void)
 {
+  int r;
   int i;
+  char **arr;
   struct class_cb *cb;
 
   if (bound)
@@ -162,22 +166,28 @@ _oc_bind(void)
   bound = 1;
   sel_count = 0;
   class_count = 0;
-  for (i = 0; _oc_allCCB[i] != (char *)0; i++)
+  for (r = 0; _oc_registry[r] != (char **)0; r++)
     {
-      cb = (struct class_cb *)_oc_allCCB[i];
-      if (cb == (struct class_cb *)0)
+      arr = _oc_registry[r];
+      if (arr == (char **)0)
         continue;
-      bind_selectors_in_list(cb->fact_sels);
-      bind_selectors_in_list(cb->inst_sels);
-      bind_selectors_in_list((struct objc_method_list *)cb->ref_methods);
-      fill_selector_arrays_in_list(cb->fact_sels, (unsigned int)cb->total_selectors);
-      fill_selector_arrays_in_list(cb->inst_sels, (unsigned int)cb->total_selectors);
-      fill_selector_arrays_in_list((struct objc_method_list *)cb->ref_methods, (unsigned int)cb->total_selectors);
-      if (cb->instance != (Class)0)
+      for (i = 0; arr[i] != (char *)0; i++)
         {
-          register_class(cb->instance);
-          if (cb->instance->isa != (Class)0)
-            register_class(cb->instance->isa);
+          cb = (struct class_cb *)arr[i];
+          if (cb == (struct class_cb *)0)
+            continue;
+          bind_selectors_in_list(cb->fact_sels);
+          bind_selectors_in_list(cb->inst_sels);
+          bind_selectors_in_list((struct objc_method_list *)cb->ref_methods);
+          fill_selector_arrays_in_list(cb->fact_sels, (unsigned int)cb->total_selectors);
+          fill_selector_arrays_in_list(cb->inst_sels, (unsigned int)cb->total_selectors);
+          fill_selector_arrays_in_list((struct objc_method_list *)cb->ref_methods, (unsigned int)cb->total_selectors);
+          if (cb->instance != (Class)0)
+            {
+              register_class(cb->instance);
+              if (cb->instance->isa != (Class)0)
+                register_class(cb->instance->isa);
+            }
         }
     }
 }
